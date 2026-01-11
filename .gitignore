@@ -1,0 +1,52 @@
+# Project Planning (Internal)
+ROADMAP.md
+
+# Composer
+/vendor/
+composer.lock
+
+# PHPUnit
+.phpunit.result.cache
+.phpunit.cache/
+phpunit.xml
+
+# Coverage
+/coverage/
+.coverage
+clover.xml
+
+# IDE
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# Build artifacts
+/build/
+/dist/
+
+# Logs
+*.log
+logs/
+
+# Testing
+.phpunit.result.cache
+testbench.yaml
+
+# PHPStan / Psalm
+phpstan.neon
+psalm.xml
+.php-cs-fixer.cache
+
+# Docker
+docker-compose.override.yml
+
