@@ -1,0 +1,40 @@
+# ============================================================================
+# Docker Compose for Local Development
+# ============================================================================
+#
+# This file sets up a local NATS server for development and testing.
+#
+# Usage:
+#   docker-compose up -d      # Start NATS server
+#   docker-compose down       # Stop NATS server
+#   docker-compose logs -f    # View logs
+#
+# NATS Endpoints:
+#   - nats://localhost:4222   # Client connections
+#   - http://localhost:8222   # HTTP monitoring
+#
+# ============================================================================
+
+services:
+  nats:
+    image: nats:2.10
+    container_name: laravel-nats-server
+    ports:
+      # Client port - this is where your application connects
+      - "4222:4222"
+      # HTTP monitoring port - provides server stats and health checks
+      - "8222:8222"
+    command:
+      # Enable JetStream for persistence and streaming features
+      - "--jetstream"
+      # Enable HTTP monitoring
+      - "--http_port=8222"
+      # Enable debug logging (useful for development)
+      - "-DV"
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "http://localhost:8222/healthz"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+

@@ -1,0 +1,70 @@
+{
+    "name": "laravel-nats/laravel-nats",
+    "description": "A production-ready, native Laravel NATS integration with Queue driver, JetStream support, and Artisan commands",
+    "keywords": [
+        "laravel",
+        "nats",
+        "queue",
+        "messaging",
+        "jetstream",
+        "pub-sub",
+        "microservices"
+    ],
+    "license": "MIT",
+    "type": "library",
+    "authors": [
+        {
+            "name": "Laravel NATS Contributors"
+        }
+    ],
+    "require": {
+        "php": "^8.1",
+        "ext-json": "*",
+        "ext-sockets": "*"
+    },
+    "require-dev": {
+        "friendsofphp/php-cs-fixer": "^3.0",
+        "laravel/framework": "^10.0|^11.0|^12.0",
+        "mockery/mockery": "^1.6",
+        "orchestra/testbench": "^8.0|^9.0|^10.0",
+        "pestphp/pest": "^2.0|^3.0",
+        "pestphp/pest-plugin-laravel": "^2.0|^3.0",
+        "phpstan/phpstan": "^1.10"
+    },
+    "autoload": {
+        "psr-4": {
+            "LaravelNats\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "LaravelNats\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "LaravelNats\\Laravel\\Providers\\NatsServiceProvider"
+            ],
+            "aliases": {
+                "Nats": "LaravelNats\\Laravel\\Facades\\Nats"
+            }
+        }
+    },
+    "scripts": {
+        "test": "vendor/bin/pest",
+        "test:coverage": "vendor/bin/pest --coverage",
+        "analyse": "vendor/bin/phpstan analyse",
+        "format": "vendor/bin/php-cs-fixer fix 2>/dev/null",
+        "format:check": "vendor/bin/php-cs-fixer fix --dry-run --diff 2>/dev/null"
+    },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
+
