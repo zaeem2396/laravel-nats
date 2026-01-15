@@ -115,6 +115,13 @@ jobs:
           exit 1
 
       - name: Run tests
+        run: vendor/bin/pest
+        env:
+          NATS_HOST: localhost
+          NATS_PORT: 4222
+
+      - name: Run tests with coverage
+        if: matrix.php == '8.3' && matrix.laravel == '11.*'
         run: vendor/bin/pest --coverage --coverage-clover coverage.xml
         env:
           NATS_HOST: localhost
