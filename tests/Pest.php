@@ -115,3 +115,59 @@ function testClient(): \LaravelNats\Core\Client
 
     return $client;
 }
+
+/**
+ * Get configuration for the secured NATS server (username/password).
+ *
+ * @param array<string, mixed> $overrides Configuration overrides
+ *
+ * @return \LaravelNats\Core\Connection\ConnectionConfig
+ */
+function securedConfig(array $overrides = []): \LaravelNats\Core\Connection\ConnectionConfig
+{
+    return \LaravelNats\Core\Connection\ConnectionConfig::fromArray(array_merge([
+        'host' => env('NATS_HOST', 'localhost'),
+        'port' => (int) env('NATS_SECURED_PORT', 4223),
+        'user' => 'testuser',
+        'password' => 'testpass',
+        'timeout' => 5.0,
+    ], $overrides));
+}
+
+/**
+ * Get configuration for the token-auth NATS server.
+ *
+ * @param array<string, mixed> $overrides Configuration overrides
+ *
+ * @return \LaravelNats\Core\Connection\ConnectionConfig
+ */
+function tokenConfig(array $overrides = []): \LaravelNats\Core\Connection\ConnectionConfig
+{
+    return \LaravelNats\Core\Connection\ConnectionConfig::fromArray(array_merge([
+        'host' => env('NATS_HOST', 'localhost'),
+        'port' => (int) env('NATS_TOKEN_PORT', 4224),
+        'token' => 'secret-token-12345',
+        'timeout' => 5.0,
+    ], $overrides));
+}
+
+/**
+ * Check if a specific port is available.
+ *
+ * @param int $port Port to check
+ * @param string $host Host to check (default: localhost)
+ *
+ * @return bool True if server is reachable
+ */
+function isPortAvailable(int $port, string $host = 'localhost'): bool
+{
+    $socket = @fsockopen($host, $port, $errno, $errstr, 1);
+
+    if ($socket !== false) {
+        fclose($socket);
+
+        return true;
+    }
+
+    return false;
+}

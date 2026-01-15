@@ -106,4 +106,39 @@ interface ConnectionInterface
      * PONG is sent in response to a server PING.
      */
     public function pong(): void;
+
+    /**
+     * Perform a proactive health check on the connection.
+     *
+     * This method sends a PING and waits for PONG to verify the connection
+     * is still alive. Use this for long-running processes.
+     *
+     * @param float $timeout Maximum time to wait for PONG in seconds
+     *
+     * @return bool True if connection is healthy
+     */
+    public function healthCheck(float $timeout = 2.0): bool;
+
+    /**
+     * Check if a health check is due based on activity time.
+     *
+     * @return bool True if health check should be performed
+     */
+    public function isHealthCheckDue(): bool;
+
+    /**
+     * Get the time since last successful I/O activity.
+     *
+     * @return float Seconds since last activity, or 0 if never connected
+     */
+    public function getIdleTime(): float;
+
+    /**
+     * Attempt to detect if the connection is still alive.
+     *
+     * This performs a quick, non-blocking check using stream metadata.
+     *
+     * @return bool True if connection appears alive
+     */
+    public function probeConnection(): bool;
 }

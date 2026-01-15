@@ -39,6 +39,11 @@ final class Connection implements ConnectionInterface
     private const BUFFER_SIZE = 65536; // 64KB
 
     /**
+     * Interval between proactive health checks in seconds.
+     */
+    private const HEALTH_CHECK_INTERVAL = 5.0;
+
+    /**
      * The socket resource.
      *
      * @var resource|null
@@ -59,6 +64,21 @@ final class Connection implements ConnectionInterface
      * Whether currently connected.
      */
     private bool $connected = false;
+
+    /**
+     * Timestamp of last successful I/O operation.
+     */
+    private float $lastActivityTime = 0.0;
+
+    /**
+     * Timestamp of last health check.
+     */
+    private float $lastHealthCheck = 0.0;
+
+    /**
+     * Number of consecutive failed pings (for health tracking).
+     */
+    private int $failedPings = 0;
 
     /**
      * Protocol parser.
@@ -96,6 +116,8 @@ final class Connection implements ConnectionInterface
         $this->createSocket();
         $this->performHandshake();
         $this->connected = true;
+        $this->lastActivityTime = microtime(true);
+        $this->lastHealthCheck = microtime(true);
     }
 
     /**
@@ -112,6 +134,9 @@ final class Connection implements ConnectionInterface
         $this->connected = false;
         $this->serverInfo = null;
         $this->readBuffer = '';
+        $this->lastActivityTime = 0.0;
+        $this->lastHealthCheck = 0.0;
+        $this->failedPings = 0;
     }
 
     /**
@@ -123,8 +148,130 @@ final class Connection implements ConnectionInterface
             return false;
         }
 
-        // Check if socket is still valid
-        return ! feof($this->socket);
+        // Check if socket is still valid using feof
+        if (feof($this->socket)) {
+            $this->markDisconnected();
+
+            return false;
+        }
+
+        // Proactive check: use stream_get_meta_data to detect issues
+        $meta = stream_get_meta_data($this->socket);
+        if ($meta['eof'] || $meta['timed_out']) {
+            $this->markDisconnected();
+
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Perform a proactive health check on the connection.
+     *
+     * This method sends a PING and waits for PONG to verify the connection
+     * is still alive. Use this for long-running processes.
+     *
+     * @param float $timeout Maximum time to wait for PONG in seconds
+     *
+     * @throws ConnectionException If health check fails
+     *
+     * @return bool True if connection is healthy
+     */
+    public function healthCheck(float $timeout = 2.0): bool
+    {
+        if (! $this->isConnected()) {
+            return false;
+        }
+
+        try {
+            // Send PING
+            $this->ping();
+
+            // Wait for PONG
+            $deadline = microtime(true) + $timeout;
+
+            while (microtime(true) < $deadline) {
+                $line = $this->readLine();
+
+                if ($line !== null) {
+                    $type = $this->parser->detectType($line);
+
+                    if ($type === 'PONG') {
+                        $this->failedPings = 0;
+                        $this->lastHealthCheck = microtime(true);
+
+                        return true;
+                    }
+
+                    // Handle PING from server during health check
+                    if ($type === 'PING') {
+                        $this->pong();
+                    }
+                }
+
+                usleep(1000);
+            }
+
+            // Timeout waiting for PONG
+            $this->failedPings++;
+
+            if ($this->failedPings >= $this->config->getMaxPingsOut()) {
+                $this->markDisconnected();
+
+                return false;
+            }
+
+            return true; // Allow some failed pings before declaring dead
+        } catch (ConnectionException) {
+            $this->markDisconnected();
+
+            return false;
+        }
+    }
+
+    /**
+     * Check if a health check is due based on activity time.
+     *
+     * @return bool True if health check should be performed
+     */
+    public function isHealthCheckDue(): bool
+    {
+        if (! $this->connected) {
+            return false;
+        }
+
+        $now = microtime(true);
+        $sinceLastActivity = $now - $this->lastActivityTime;
+        $sinceLastCheck = $now - $this->lastHealthCheck;
+
+        // Health check is due if we haven't had activity or checks recently
+        return $sinceLastActivity > self::HEALTH_CHECK_INTERVAL
+            && $sinceLastCheck > self::HEALTH_CHECK_INTERVAL;
+    }
+
+    /**
+     * Get the time since last successful I/O activity.
+     *
+     * @return float Seconds since last activity, or 0 if never connected
+     */
+    public function getIdleTime(): float
+    {
+        if ($this->lastActivityTime === 0.0) {
+            return 0.0;
+        }
+
+        return microtime(true) - $this->lastActivityTime;
+    }
+
+    /**
+     * Get the number of consecutive failed ping attempts.
+     *
+     * @return int Failed ping count
+     */
+    public function getFailedPingCount(): int
+    {
+        return $this->failedPings;
     }
 
     /**
@@ -258,6 +405,94 @@ final class Connection implements ConnectionInterface
     }
 
     /**
+     * Check socket readability without blocking.
+     *
+     * This method uses stream_select to check if there's data available
+     * or if the socket has been closed by the remote end.
+     *
+     * @param float $timeout Maximum time to wait in seconds (default 0 = non-blocking)
+     *
+     * @return bool|null True if readable, false if not, null if error/closed
+     */
+    public function isReadable(float $timeout = 0.0): ?bool
+    {
+        if ($this->socket === null) {
+            return null;
+        }
+
+        $seconds = (int) floor($timeout);
+        $microseconds = (int) (($timeout - $seconds) * 1000000);
+
+        // Perform stream_select to check socket state
+        $selectResult = $this->performStreamSelect(
+            readSockets: [$this->socket],
+            exceptSockets: [$this->socket],
+            seconds: $seconds,
+            microseconds: $microseconds,
+        );
+
+        if ($selectResult === null) {
+            // stream_select failed
+            $this->markDisconnected();
+
+            return null;
+        }
+
+        if ($selectResult['hasExceptions']) {
+            $this->markDisconnected();
+
+            return null;
+        }
+
+        return $selectResult['readable'];
+    }
+
+    /**
+     * Attempt to detect if the connection is still alive.
+     *
+     * This performs a quick, non-blocking check using stream metadata
+     * and optional socket-level checks.
+     *
+     * @return bool True if connection appears alive
+     */
+    public function probeConnection(): bool
+    {
+        if (! $this->connected || $this->socket === null) {
+            return false;
+        }
+
+        // Check stream metadata
+        $meta = stream_get_meta_data($this->socket);
+
+        if ($meta['eof']) {
+            $this->markDisconnected();
+
+            return false;
+        }
+
+        if ($meta['timed_out']) {
+            // Timeout occurred - connection might be stale
+            return false;
+        }
+
+        // Check for socket exceptions (non-blocking)
+        $selectResult = $this->performStreamSelect(
+            readSockets: [],
+            exceptSockets: [$this->socket],
+            seconds: 0,
+            microseconds: 0,
+        );
+
+        if ($selectResult === null || $selectResult['hasExceptions']) {
+            $this->markDisconnected();
+
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
      * Internal write implementation.
      *
      * This method is used during handshake when $this->connected is not yet true.
@@ -293,6 +528,9 @@ final class Connection implements ConnectionInterface
 
         // Flush the stream
         fflush($this->socket);
+
+        // Update activity timestamp
+        $this->lastActivityTime = microtime(true);
     }
 
     /**
@@ -332,6 +570,9 @@ final class Connection implements ConnectionInterface
         }
 
         $this->readBuffer .= $data;
+
+        // Update activity timestamp on successful read
+        $this->lastActivityTime = microtime(true);
 
         // Try again for complete line
         $crlfPos = strpos($this->readBuffer, "\r\n");
@@ -509,7 +750,61 @@ final class Connection implements ConnectionInterface
 
         // Check if connection is still valid
         if ($this->socket !== null && feof($this->socket)) {
-            $this->connected = false;
+            $this->markDisconnected();
         }
+    }
+
+    /**
+     * Mark the connection as disconnected.
+     *
+     * This is called when we detect the connection has been lost.
+     * It updates internal state but does NOT close the socket
+     * (that's done in disconnect()).
+     */
+    private function markDisconnected(): void
+    {
+        $this->connected = false;
+    }
+
+    /**
+     * Perform stream_select and return structured results.
+     *
+     * This helper method wraps stream_select to work around PHPStan's
+     * limitations with understanding in-place array modification.
+     *
+     * @param array<resource> $readSockets Sockets to check for readability
+     * @param array<resource> $exceptSockets Sockets to check for exceptions
+     * @param int $seconds Timeout seconds
+     * @param int $microseconds Timeout microseconds
+     *
+     * @return array{readable: bool, hasExceptions: bool}|null Null on failure
+     */
+    private function performStreamSelect(
+        array $readSockets,
+        array $exceptSockets,
+        int $seconds,
+        int $microseconds,
+    ): ?array {
+        $read = $readSockets;
+        $write = [];
+        $except = $exceptSockets;
+
+        $result = @stream_select($read, $write, $except, $seconds, $microseconds);
+
+        if ($result === false) {
+            return null;
+        }
+
+        // After stream_select:
+        // - $read contains only sockets that are readable
+        // - $except contains only sockets with exceptions
+        // We need to check if these arrays still have elements
+        $readCount = count($read);
+        $exceptCount = count($except);
+
+        return [
+            'readable' => $readCount > 0,
+            'hasExceptions' => $exceptCount > 0,
+        ];
     }
 }
