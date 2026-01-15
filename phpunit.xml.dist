@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+============================================================================
+PHPUnit / Pest Configuration
+============================================================================
+This configuration file sets up the testing environment for the package.
+
+Test Organization:
+- tests/Unit/       : Unit tests (no external dependencies)
+- tests/Feature/    : Feature tests (may use Laravel)
+- tests/Integration/: Integration tests (require NATS server)
+
+Environment Variables:
+- NATS_HOST: NATS server hostname (default: localhost)
+- NATS_PORT: NATS server port (default: 4222)
+
+Run tests with: vendor/bin/pest
+============================================================================
+-->
+<phpunit
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
+    bootstrap="vendor/autoload.php"
+    colors="true"
+    cacheDirectory=".phpunit.cache"
+    executionOrder="depends,defects"
+    failOnRisky="true"
+    failOnWarning="true"
+    beStrictAboutOutputDuringTests="true"
+>
+    <!-- Test Suites -->
+    <testsuites>
+        <!-- Unit tests: Fast, isolated, no external dependencies -->
+        <testsuite name="Unit">
+            <directory>tests/Unit</directory>
+        </testsuite>
+        
+        <!-- Feature tests: May use Laravel application context -->
+        <testsuite name="Feature">
+            <directory>tests/Feature</directory>
+        </testsuite>
+        
+        <!-- Integration tests: Require running NATS server -->
+        <testsuite name="Integration">
+            <directory>tests/Integration</directory>
+        </testsuite>
+    </testsuites>
+
+    <!-- Code Coverage Configuration -->
+    <coverage>
+        <report>
+            <html outputDirectory="coverage/html"/>
+            <clover outputFile="coverage/clover.xml"/>
+        </report>
+        <include>
+            <directory suffix=".php">src</directory>
+        </include>
+        <exclude>
+            <directory>src/Laravel/Config</directory>
+        </exclude>
+    </coverage>
+
+    <!-- Environment Variables for Testing -->
+    <php>
+        <env name="NATS_HOST" value="localhost"/>
+        <env name="NATS_PORT" value="4222"/>
+        <env name="APP_ENV" value="testing"/>
+    </php>
+</phpunit>
+

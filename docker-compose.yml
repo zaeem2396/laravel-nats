@@ -1,0 +1,106 @@
+# ============================================================================
+# Docker Compose for Local Development
+# ============================================================================
+#
+# This file sets up NATS servers for development and testing.
+#
+# Usage:
+#   docker-compose up -d      # Start NATS servers
+#   docker-compose down       # Stop NATS servers
+#   docker-compose logs -f    # View logs
+#
+# NATS Endpoints:
+#   - nats://localhost:4222   # Open client connections (no auth)
+#   - nats://localhost:4223   # Secured client connections (auth required)
+#   - http://localhost:8222   # HTTP monitoring (open server)
+#   - http://localhost:8223   # HTTP monitoring (secured server)
+#
+# Authentication (secured server):
+#   - Username: testuser / Password: testpass
+#   - Token: secret-token-12345
+#
+# ============================================================================
+
+services:
+  # --------------------------------------------------------------------------
+  # Open NATS Server (No Authentication)
+  # --------------------------------------------------------------------------
+  # Use this for basic pub/sub testing without authentication
+  nats:
+    image: nats:2.10
+    container_name: laravel-nats-server
+    ports:
+      # Client port - this is where your application connects
+      - "4222:4222"
+      # HTTP monitoring port - provides server stats and health checks
+      - "8222:8222"
+    command:
+      # Enable JetStream for persistence and streaming features
+      - "--jetstream"
+      # Enable HTTP monitoring
+      - "--http_port=8222"
+      # Enable debug logging (useful for development)
+      - "-DV"
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "http://localhost:8222/healthz"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  # --------------------------------------------------------------------------
+  # Secured NATS Server (Authentication Required)
+  # --------------------------------------------------------------------------
+  # Use this for testing authentication flows
+  nats-secured:
+    image: nats:2.10
+    container_name: laravel-nats-secured
+    ports:
+      # Client port (secured)
+      - "4223:4222"
+      # HTTP monitoring port (secured server)
+      - "8223:8222"
+    command:
+      # Enable JetStream
+      - "--jetstream"
+      # Enable HTTP monitoring
+      - "--http_port=8222"
+      # Enable debug logging
+      - "-DV"
+      # User authentication
+      - "--user=testuser"
+      - "--pass=testpass"
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "http://localhost:8222/healthz"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  # --------------------------------------------------------------------------
+  # Token-Auth NATS Server
+  # --------------------------------------------------------------------------
+  # Use this for testing token-based authentication
+  nats-token:
+    image: nats:2.10
+    container_name: laravel-nats-token
+    ports:
+      # Client port (token auth)
+      - "4224:4222"
+      # HTTP monitoring port
+      - "8224:8222"
+    command:
+      # Enable JetStream
+      - "--jetstream"
+      # Enable HTTP monitoring
+      - "--http_port=8222"
+      # Enable debug logging
+      - "-DV"
+      # Token authentication
+      - "--auth=secret-token-12345"
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "http://localhost:8222/healthz"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped

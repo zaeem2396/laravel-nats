@@ -1,5 +1,7 @@
 # Project Planning (Internal)
 ROADMAP.md
+PROGRESS.md
+CODE_EXPLANATIONS.md
 
 # Composer
 /vendor/
@@ -43,7 +45,6 @@ logs/
 testbench.yaml
 
 # PHPStan / Psalm
-phpstan.neon
 psalm.xml
 .php-cs-fixer.cache
 
