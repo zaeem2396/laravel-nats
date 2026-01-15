@@ -1,0 +1,52 @@
+# ============================================================================
+# PHPStan Configuration
+# ============================================================================
+# PHPStan is a static analysis tool that finds bugs in code without running it.
+# It analyzes types, catches potential null pointer exceptions, and ensures
+# type safety throughout the codebase.
+#
+# Levels (0-9):
+# - Level 0: Basic checks (typos, unknown classes)
+# - Level 5: Checks return types, method existence
+# - Level 8: Strict mode (mixed type, property types)
+# - Level 9: Maximum strictness (everything)
+#
+# We use level 8 for a good balance of strictness and practicality.
+# ============================================================================
+
+parameters:
+    # Analysis strictness level (0-9, where 9 is the strictest)
+    level: 8
+
+    # Paths to analyze
+    paths:
+        - src
+
+    # Paths to exclude from analysis
+    excludePaths:
+        - src/Laravel/Config  # Config files aren't type-strict
+
+    # Report unmatched ignored errors
+    reportUnmatchedIgnoredErrors: false
+
+    # Treat phpdoc types as certain (not just for IDE)
+    treatPhpDocTypesAsCertain: true
+
+    # Check missing typehints
+    checkMissingIterableValueType: true
+    checkGenericClassInNonGenericObjectType: true
+
+    # Ignore specific errors that are false positives or intentional
+    ignoreErrors:
+        # Resource types cannot be typed in PHP
+        - '#Property .+::\$socket has unknown class resource as its type#'
+        - '#Parameter \#1 \$stream of function .+ expects resource, resource\|null given#'
+
+    # Bootstrap files for Laravel facades and helpers
+    bootstrapFiles:
+        - vendor/autoload.php
+
+    # Parallel processing for faster analysis
+    parallel:
+        maximumNumberOfProcesses: 4
+
