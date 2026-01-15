@@ -80,7 +80,7 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
           extensions: json, sockets, pcntl
-          coverage: pcov
+          coverage: none
           ini-values: memory_limit=512M
 
       - name: Get Composer cache directory
@@ -119,18 +119,3 @@ jobs:
         env:
           NATS_HOST: localhost
           NATS_PORT: 4222
-
-      - name: Run tests with coverage
-        if: matrix.php == '8.3' && matrix.laravel == '11.*'
-        run: vendor/bin/pest --coverage --coverage-clover coverage.xml
-        env:
-          NATS_HOST: localhost
-          NATS_PORT: 4222
-
-      - name: Upload coverage to Codecov
-        if: matrix.php == '8.3' && matrix.laravel == '11.*'
-        uses: codecov/codecov-action@v4
-        with:
-          files: coverage.xml
-          fail_ci_if_error: false
-          verbose: true
