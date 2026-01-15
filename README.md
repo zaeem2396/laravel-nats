@@ -1,8 +1,8 @@
 # Laravel NATS
 
-[![Tests](https://github.com/YOUR_USERNAME/laravel-nats/actions/workflows/tests.yml/badge.svg)](https://github.com/YOUR_USERNAME/laravel-nats/actions/workflows/tests.yml)
-[![Static Analysis](https://github.com/YOUR_USERNAME/laravel-nats/actions/workflows/static-analysis.yml/badge.svg)](https://github.com/YOUR_USERNAME/laravel-nats/actions/workflows/static-analysis.yml)
-[![Code Style](https://github.com/YOUR_USERNAME/laravel-nats/actions/workflows/code-style.yml/badge.svg)](https://github.com/YOUR_USERNAME/laravel-nats/actions/workflows/code-style.yml)
+[![Tests](https://github.com/zaeem2396/laravel-nats/actions/workflows/tests.yml/badge.svg)](https://github.com/zaeem2396/laravel-nats/actions/workflows/tests.yml)
+[![Static Analysis](https://github.com/zaeem2396/laravel-nats/actions/workflows/static-analysis.yml/badge.svg)](https://github.com/zaeem2396/laravel-nats/actions/workflows/static-analysis.yml)
+[![Code Style](https://github.com/zaeem2396/laravel-nats/actions/workflows/code-style.yml/badge.svg)](https://github.com/zaeem2396/laravel-nats/actions/workflows/code-style.yml)
 
 A native NATS integration for Laravel that feels like home. Publish, subscribe, and request/reply with a familiar, expressive API.
 
@@ -15,7 +15,7 @@ A native NATS integration for Laravel that feels like home. Publish, subscribe, 
 ## Installation
 
 ```bash
-composer require your-vendor/laravel-nats
+composer require zaeem2396/laravel-nats
 ```
 
 The service provider will be auto-discovered. To publish the configuration file:

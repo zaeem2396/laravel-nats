@@ -1,5 +1,5 @@
 {
-    "name": "laravel-nats/laravel-nats",
+    "name": "zaeem2396/laravel-nats",
     "description": "A production-ready, native Laravel NATS integration with Queue driver, JetStream support, and Artisan commands",
     "keywords": [
         "laravel",
@@ -14,7 +14,8 @@
     "type": "library",
     "authors": [
         {
-            "name": "Laravel NATS Contributors"
+            "name": "Zaeem",
+            "homepage": "https://github.com/zaeem2396"
         }
     ],
     "require": {
