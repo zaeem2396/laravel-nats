@@ -37,11 +37,14 @@ declare(strict_types=1);
 | may use Laravel's full application context.
 */
 
-// Unit tests: Pure PHP, no framework dependencies
-uses(LaravelNats\Tests\TestCase::class)->in('Unit');
+// Unit tests: Pure PHP, no framework dependencies (excluding Laravel folder)
+uses(LaravelNats\Tests\TestCase::class)->in('Unit/Connection', 'Unit/Messaging', 'Unit/Protocol', 'Unit/Serialization');
 
-// Feature tests: Laravel application context
-uses(LaravelNats\Tests\TestCase::class)->in('Feature');
+// Unit/Laravel tests: Laravel application context with Orchestra Testbench
+uses(LaravelNats\Tests\LaravelTestCase::class)->in('Unit/Laravel');
+
+// Feature tests: Laravel application context with Orchestra Testbench
+uses(LaravelNats\Tests\LaravelTestCase::class)->in('Feature');
 
 // Integration tests: Require NATS server
 uses(LaravelNats\Tests\TestCase::class)
