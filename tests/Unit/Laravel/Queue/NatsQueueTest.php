@@ -28,6 +28,7 @@ describe('NatsQueue', function (): void {
     describe('getQueue', function (): void {
         it('returns the default queue name', function (): void {
             $setup = createQueueTestSetup();
+
             try {
                 expect($setup['queue']->getQueue())->toBe('test-queue');
             } finally {
@@ -37,6 +38,7 @@ describe('NatsQueue', function (): void {
 
         it('returns custom queue name when provided', function (): void {
             $setup = createQueueTestSetup();
+
             try {
                 expect($setup['queue']->getQueue('custom'))->toBe('custom');
             } finally {
@@ -46,6 +48,7 @@ describe('NatsQueue', function (): void {
 
         it('returns default when null is passed', function (): void {
             $setup = createQueueTestSetup();
+
             try {
                 expect($setup['queue']->getQueue(null))->toBe('test-queue');
             } finally {
@@ -55,6 +58,7 @@ describe('NatsQueue', function (): void {
 
         it('returns default when empty string is passed', function (): void {
             $setup = createQueueTestSetup();
+
             try {
                 expect($setup['queue']->getQueue(''))->toBe('test-queue');
             } finally {
@@ -66,6 +70,7 @@ describe('NatsQueue', function (): void {
     describe('getRetryAfter', function (): void {
         it('returns the retry after value', function (): void {
             $setup = createQueueTestSetup('test-queue', 90);
+
             try {
                 expect($setup['queue']->getRetryAfter())->toBe(90);
             } finally {
@@ -75,6 +80,7 @@ describe('NatsQueue', function (): void {
 
         it('uses default retry after value', function (): void {
             $setup = createQueueTestSetup('test-queue', 60);
+
             try {
                 $queue = new NatsQueue($setup['client']);
                 expect($queue->getRetryAfter())->toBe(60);
@@ -87,6 +93,7 @@ describe('NatsQueue', function (): void {
     describe('size', function (): void {
         it('returns zero for size (NATS Core limitation)', function (): void {
             $setup = createQueueTestSetup();
+
             try {
                 expect($setup['queue']->size())->toBe(0);
             } finally {
@@ -96,6 +103,7 @@ describe('NatsQueue', function (): void {
 
         it('returns zero regardless of queue name', function (): void {
             $setup = createQueueTestSetup();
+
             try {
                 expect($setup['queue']->size('any-queue'))->toBe(0);
             } finally {
@@ -107,6 +115,7 @@ describe('NatsQueue', function (): void {
     describe('pushRaw', function (): void {
         it('can push a raw payload', function (): void {
             $setup = createQueueTestSetup();
+
             try {
                 $payload = json_encode([
                     'uuid' => 'test-123',
@@ -125,6 +134,7 @@ describe('NatsQueue', function (): void {
 
         it('extracts uuid from payload as job id', function (): void {
             $setup = createQueueTestSetup();
+
             try {
                 $payload = json_encode([
                     'uuid' => 'unique-uuid-456',
@@ -141,6 +151,7 @@ describe('NatsQueue', function (): void {
 
         it('falls back to id field if uuid not present', function (): void {
             $setup = createQueueTestSetup();
+
             try {
                 $payload = json_encode([
                     'id' => 'fallback-id-789',
@@ -157,6 +168,7 @@ describe('NatsQueue', function (): void {
 
         it('generates uuid if not present in payload', function (): void {
             $setup = createQueueTestSetup();
+
             try {
                 $payload = json_encode([
                     'displayName' => 'TestJob',
@@ -176,6 +188,7 @@ describe('NatsQueue', function (): void {
 
         it('pushes to custom queue', function (): void {
             $setup = createQueueTestSetup();
+
             try {
                 $payload = json_encode(['uuid' => 'custom-queue-job']);
 
@@ -191,6 +204,7 @@ describe('NatsQueue', function (): void {
     describe('getClient', function (): void {
         it('returns the NATS client', function (): void {
             $setup = createQueueTestSetup();
+
             try {
                 expect($setup['queue']->getClient())->toBe($setup['client']);
             } finally {
@@ -200,6 +214,7 @@ describe('NatsQueue', function (): void {
 
         it('returns a connected client', function (): void {
             $setup = createQueueTestSetup();
+
             try {
                 expect($setup['queue']->getClient()->isConnected())->toBeTrue();
             } finally {
@@ -211,6 +226,7 @@ describe('NatsQueue', function (): void {
     describe('pop', function (): void {
         it('returns null when no messages available', function (): void {
             $setup = createQueueTestSetup();
+
             try {
                 // Use a unique queue name to avoid interference
                 $uniqueQueue = 'empty-queue-' . uniqid();
@@ -235,6 +251,7 @@ describe('NatsQueue', function (): void {
     describe('constructor defaults', function (): void {
         it('uses default queue name', function (): void {
             $setup = createQueueTestSetup();
+
             try {
                 $queue = new NatsQueue($setup['client']);
                 expect($queue->getQueue())->toBe('default');
@@ -245,6 +262,7 @@ describe('NatsQueue', function (): void {
 
         it('uses default retry after value', function (): void {
             $setup = createQueueTestSetup();
+
             try {
                 $queue = new NatsQueue($setup['client']);
                 expect($queue->getRetryAfter())->toBe(60);
