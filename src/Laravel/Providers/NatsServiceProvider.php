@@ -8,15 +8,10 @@ use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Support\ServiceProvider;
 use LaravelNats\Core\Client;
 use LaravelNats\Laravel\NatsManager;
+use LaravelNats\Laravel\Queue\NatsConnector;
 
 /**
  * NatsServiceProvider registers NATS services with the Laravel container.
- *
- * This provider:
- * - Publishes the config file
- * - Registers the NatsManager as a singleton
- * - Provides facade access
- * - Implements deferred loading for performance
  */
 class NatsServiceProvider extends ServiceProvider implements DeferrableProvider
 {
@@ -40,6 +35,7 @@ class NatsServiceProvider extends ServiceProvider implements DeferrableProvider
     public function boot(): void
     {
         $this->publishConfig();
+        $this->registerQueueDriver();
     }
 
     /**
@@ -73,7 +69,6 @@ class NatsServiceProvider extends ServiceProvider implements DeferrableProvider
      */
     protected function registerBindings(): void
     {
-        // Bind the Client class to resolve from the default connection
         $this->app->bind(Client::class, function ($app) {
             return $app['nats']->connection();
         });
@@ -89,5 +84,17 @@ class NatsServiceProvider extends ServiceProvider implements DeferrableProvider
                 __DIR__ . '/../Config/nats.php' => config_path('nats.php'),
             ], 'nats-config');
         }
+    }
+
+    /**
+     * Register the NATS queue driver.
+     */
+    protected function registerQueueDriver(): void
+    {
+        $this->app->afterResolving('queue', function (\Illuminate\Queue\QueueManager $manager): void {
+            $manager->addConnector('nats', function () {
+                return new NatsConnector();
+            });
+        });
     }
 }

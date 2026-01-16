@@ -113,4 +113,36 @@ return [
         'channel' => env('NATS_LOG_CHANNEL', config('logging.default')),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Queue Configuration
+    |--------------------------------------------------------------------------
+    |
+    | Configuration for using NATS as a Laravel queue driver.
+    | Add this to your config/queue.php 'connections' array:
+    |
+    | 'nats' => [
+    |     'driver' => 'nats',
+    |     'host' => env('NATS_HOST', 'localhost'),
+    |     'port' => env('NATS_PORT', 4222),
+    |     'queue' => env('NATS_QUEUE', 'default'),
+    |     'retry_after' => 60,
+    | ],
+    |
+    */
+
+    'queue' => [
+        // Default queue name
+        'queue' => env('NATS_QUEUE', 'default'),
+
+        // Subject prefix for queue messages
+        'prefix' => env('NATS_QUEUE_PREFIX', 'laravel.queue.'),
+
+        // Seconds to wait before retrying a failed job
+        'retry_after' => (int) env('NATS_QUEUE_RETRY_AFTER', 60),
+
+        // Block timeout when waiting for jobs (seconds)
+        'block_for' => (int) env('NATS_QUEUE_BLOCK_FOR', 0),
+    ],
+
 ];
