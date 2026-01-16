@@ -116,6 +116,47 @@ Nats::subscribe('logs.>', function ($message) {
 });
 ```
 
+## Queue Driver
+
+Use NATS as a Laravel queue backend:
+
+### Configuration
+
+Add the NATS connection to your `config/queue.php`:
+
+```php
+'connections' => [
+    // ... other connections ...
+
+    'nats' => [
+        'driver' => 'nats',
+        'host' => env('NATS_HOST', 'localhost'),
+        'port' => env('NATS_PORT', 4222),
+        'user' => env('NATS_USER'),
+        'password' => env('NATS_PASSWORD'),
+        'token' => env('NATS_TOKEN'),
+        'queue' => env('NATS_QUEUE', 'default'),
+        'retry_after' => 60,
+    ],
+],
+```
+
+### Usage
+
+```php
+// Dispatch a job to the NATS queue
+dispatch(new ProcessOrder($order))->onConnection('nats');
+
+// Or set NATS as default in .env
+// QUEUE_CONNECTION=nats
+```
+
+### Current Limitations
+
+- **Delayed jobs:** Not yet supported (requires JetStream, coming in v1.0)
+- **Queue size:** Returns 0 (NATS Core doesn't track queue size)
+- **Job retries:** Basic support, advanced backoff coming soon
+
 ## Authentication
 
 ### Username/Password
@@ -170,7 +211,7 @@ This package is under active development. Current status:
 
 - ✅ **Phase 1:** Core Messaging (Publish, Subscribe, Request/Reply)
 - ✅ **Phase 1:** Laravel Integration (ServiceProvider, Facade, Config)
-- 🔲 **Phase 2:** Laravel Queue Driver
+- 🔵 **Phase 2:** Laravel Queue Driver (Milestone 2.1 ✅ Complete)
 - 🔲 **Phase 3:** JetStream Support
 - 🔲 **Phase 4:** Worker & Runtime
 - 🔲 **Phase 5:** Observability & Debugging
