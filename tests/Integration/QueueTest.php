@@ -9,67 +9,73 @@ use LaravelNats\Laravel\Queue\NatsConnector;
 use LaravelNats\Laravel\Queue\NatsJob;
 use LaravelNats\Laravel\Queue\NatsQueue;
 
+/**
+ * Helper to create a connected client for queue tests.
+ */
+function createQueueTestClient(): Client
+{
+    $config = ConnectionConfig::local();
+    $client = new Client($config);
+    $client->connect();
+
+    return $client;
+}
+
 describe('Queue Integration', function (): void {
-    beforeEach(function (): void {
-        // Ensure NATS is available before trying to connect
-        if (! isPortAvailable(4222)) {
-            $this->markTestSkipped('NATS server not available on port 4222');
-        }
-
-        $config = ConnectionConfig::local();
-        $this->client = new Client($config);
-        $this->client->connect();
-
-        $this->queue = new NatsQueue($this->client, 'integration-test', 60);
-        $this->queue->setContainer(new Container());
-        $this->queue->setConnectionName('nats');
-    });
-
-    afterEach(function (): void {
-        if (isset($this->client) && $this->client !== null && $this->client->isConnected()) {
-            $this->client->disconnect();
-        }
-    });
-
     describe('publish and consume', function (): void {
         it('can publish a job and receive it', function (): void {
-            $uniqueSubject = 'integration-' . uniqid();
-            $queue = new NatsQueue($this->client, $uniqueSubject, 60);
-            $queue->setContainer(new Container());
-            $queue->setConnectionName('nats');
+            $client = createQueueTestClient();
 
-            $payload = json_encode([
-                'uuid' => 'integration-test-job',
-                'displayName' => 'TestJob',
-                'job' => 'Illuminate\\Queue\\CallQueuedHandler@call',
-                'data' => ['message' => 'Hello, NATS Queue!'],
-            ]);
+            try {
+                $uniqueSubject = 'integration-' . uniqid();
+                $queue = new NatsQueue($client, $uniqueSubject, 60);
+                $queue->setContainer(new Container());
+                $queue->setConnectionName('nats');
 
-            // Subscribe first, then publish
-            $received = null;
-            $this->client->subscribe('laravel.queue.' . $uniqueSubject, function ($msg) use (&$received): void {
-                $received = $msg;
-            });
+                $payload = json_encode([
+                    'uuid' => 'integration-test-job',
+                    'displayName' => 'TestJob',
+                    'job' => 'Illuminate\\Queue\\CallQueuedHandler@call',
+                    'data' => ['message' => 'Hello, NATS Queue!'],
+                ]);
 
-            // Push the job
-            $jobId = $queue->pushRaw($payload);
-            expect($jobId)->toBe('integration-test-job');
+                // Subscribe first, then publish
+                $received = null;
+                $client->subscribe('laravel.queue.' . $uniqueSubject, function ($msg) use (&$received): void {
+                    $received = $msg;
+                });
 
-            // Process to receive
-            $this->client->process(0.5);
+                // Push the job
+                $jobId = $queue->pushRaw($payload);
+                expect($jobId)->toBe('integration-test-job');
 
-            expect($received)->not->toBeNull();
-            expect($received->getPayload())->toBe($payload);
+                // Process to receive
+                $client->process(0.5);
+
+                expect($received)->not->toBeNull();
+                expect($received->getPayload())->toBe($payload);
+            } finally {
+                $client->disconnect();
+            }
         });
 
         it('generates unique job ids for each push', function (): void {
-            $payload1 = json_encode(['job' => 'Job1']);
-            $payload2 = json_encode(['job' => 'Job2']);
+            $client = createQueueTestClient();
 
-            $jobId1 = $this->queue->pushRaw($payload1);
-            $jobId2 = $this->queue->pushRaw($payload2);
+            try {
+                $queue = new NatsQueue($client, 'integration-test', 60);
+                $queue->setContainer(new Container());
 
-            expect($jobId1)->not->toBe($jobId2);
+                $payload1 = json_encode(['job' => 'Job1']);
+                $payload2 = json_encode(['job' => 'Job2']);
+
+                $jobId1 = $queue->pushRaw($payload1);
+                $jobId2 = $queue->pushRaw($payload2);
+
+                expect($jobId1)->not->toBe($jobId2);
+            } finally {
+                $client->disconnect();
+            }
         });
     });
 
@@ -85,18 +91,19 @@ describe('Queue Integration', function (): void {
 
             $queue = $connector->connect($config);
 
-            expect($queue)->toBeInstanceOf(NatsQueue::class);
-            expect($queue->getClient()->isConnected())->toBeTrue();
-            expect($queue->getQueue())->toBe('connector-test');
-            expect($queue->getRetryAfter())->toBe(90);
+            try {
+                expect($queue)->toBeInstanceOf(NatsQueue::class);
+                expect($queue->getClient()->isConnected())->toBeTrue();
+                expect($queue->getQueue())->toBe('connector-test');
+                expect($queue->getRetryAfter())->toBe(90);
 
-            // Test that we can push
-            $payload = json_encode(['uuid' => 'connector-job', 'test' => true]);
-            $jobId = $queue->pushRaw($payload);
-            expect($jobId)->toBe('connector-job');
-
-            // Clean up
-            $queue->getClient()->disconnect();
+                // Test that we can push
+                $payload = json_encode(['uuid' => 'connector-job', 'test' => true]);
+                $jobId = $queue->pushRaw($payload);
+                expect($jobId)->toBe('connector-job');
+            } finally {
+                $queue->getClient()->disconnect();
+            }
         });
 
         it('works with authenticated NATS server', function (): void {
@@ -115,152 +122,186 @@ describe('Queue Integration', function (): void {
 
             $queue = $connector->connect($config);
 
-            expect($queue)->toBeInstanceOf(NatsQueue::class);
-            expect($queue->getClient()->isConnected())->toBeTrue();
+            try {
+                expect($queue)->toBeInstanceOf(NatsQueue::class);
+                expect($queue->getClient()->isConnected())->toBeTrue();
 
-            // Push a job to verify it works
-            $payload = json_encode(['uuid' => 'secured-job']);
-            $jobId = $queue->pushRaw($payload);
-            expect($jobId)->toBe('secured-job');
-
-            // Clean up
-            $queue->getClient()->disconnect();
+                // Push a job to verify it works
+                $payload = json_encode(['uuid' => 'secured-job']);
+                $jobId = $queue->pushRaw($payload);
+                expect($jobId)->toBe('secured-job');
+            } finally {
+                $queue->getClient()->disconnect();
+            }
         });
     });
 
     describe('NatsJob integration', function (): void {
         it('creates a job from queue pop simulation', function (): void {
-            $uniqueQueue = 'job-test-' . uniqid();
-            $queue = new NatsQueue($this->client, $uniqueQueue, 60);
-            $queue->setContainer(new Container());
-            $queue->setConnectionName('nats');
+            $client = createQueueTestClient();
 
-            $payload = json_encode([
-                'uuid' => 'popped-job-123',
-                'displayName' => 'App\\Jobs\\ProcessOrder',
-                'attempts' => 1,
-                'data' => ['order_id' => 456],
-            ]);
+            try {
+                $uniqueQueue = 'job-test-' . uniqid();
+                $queue = new NatsQueue($client, $uniqueQueue, 60);
+                $queue->setContainer(new Container());
+                $queue->setConnectionName('nats');
 
-            // Create a NatsJob directly (simulating what pop() would do)
-            $job = new NatsJob(
-                container: new Container(),
-                nats: $queue,
-                job: $payload,
-                connectionName: 'nats',
-                queue: $uniqueQueue,
-            );
+                $payload = json_encode([
+                    'uuid' => 'popped-job-123',
+                    'displayName' => 'App\\Jobs\\ProcessOrder',
+                    'attempts' => 1,
+                    'data' => ['order_id' => 456],
+                ]);
 
-            expect($job->getJobId())->toBe('popped-job-123');
-            expect($job->attempts())->toBe(1);
-            expect($job->getQueue())->toBe($uniqueQueue);
-            expect($job->payload()['data']['order_id'])->toBe(456);
+                // Create a NatsJob directly (simulating what pop() would do)
+                $job = new NatsJob(
+                    container: new Container(),
+                    nats: $queue,
+                    job: $payload,
+                    connectionName: 'nats',
+                    queue: $uniqueQueue,
+                );
+
+                expect($job->getJobId())->toBe('popped-job-123');
+                expect($job->attempts())->toBe(1);
+                expect($job->getQueue())->toBe($uniqueQueue);
+                expect($job->payload()['data']['order_id'])->toBe(456);
+            } finally {
+                $client->disconnect();
+            }
         });
 
         it('can release and re-queue a job', function (): void {
-            $uniqueQueue = 'release-test-' . uniqid();
-            $queue = new NatsQueue($this->client, $uniqueQueue, 60);
-            $queue->setContainer(new Container());
-            $queue->setConnectionName('nats');
+            $client = createQueueTestClient();
 
-            $payload = json_encode([
-                'uuid' => 'release-job',
-                'attempts' => 1,
-            ]);
+            try {
+                $uniqueQueue = 'release-test-' . uniqid();
+                $queue = new NatsQueue($client, $uniqueQueue, 60);
+                $queue->setContainer(new Container());
+                $queue->setConnectionName('nats');
 
-            // Track released jobs
-            $releasedPayload = null;
-            $this->client->subscribe('laravel.queue.' . $uniqueQueue, function ($msg) use (&$releasedPayload): void {
-                $releasedPayload = $msg->getPayload();
-            });
+                $payload = json_encode([
+                    'uuid' => 'release-job',
+                    'attempts' => 1,
+                ]);
 
-            // Create and release the job
-            $job = new NatsJob(
-                container: new Container(),
-                nats: $queue,
-                job: $payload,
-                connectionName: 'nats',
-                queue: $uniqueQueue,
-            );
+                // Track released jobs
+                $releasedPayload = null;
+                $client->subscribe('laravel.queue.' . $uniqueQueue, function ($msg) use (&$releasedPayload): void {
+                    $releasedPayload = $msg->getPayload();
+                });
 
-            $job->release();
+                // Create and release the job
+                $job = new NatsJob(
+                    container: new Container(),
+                    nats: $queue,
+                    job: $payload,
+                    connectionName: 'nats',
+                    queue: $uniqueQueue,
+                );
 
-            // Process to receive the released job
-            $this->client->process(0.5);
+                $job->release();
 
-            expect($job->isReleased())->toBeTrue();
-            expect($releasedPayload)->toBe($payload);
+                // Process to receive the released job
+                $client->process(0.5);
+
+                expect($job->isReleased())->toBeTrue();
+                expect($releasedPayload)->toBe($payload);
+            } finally {
+                $client->disconnect();
+            }
         });
     });
 
     describe('multiple queues', function (): void {
         it('can push to different queues', function (): void {
-            $queue1Messages = [];
-            $queue2Messages = [];
+            $client = createQueueTestClient();
 
-            $this->client->subscribe('laravel.queue.queue-one', function ($msg) use (&$queue1Messages): void {
-                $queue1Messages[] = $msg->getPayload();
-            });
+            try {
+                $queue = new NatsQueue($client, 'multi-queue-test', 60);
+                $queue->setContainer(new Container());
 
-            $this->client->subscribe('laravel.queue.queue-two', function ($msg) use (&$queue2Messages): void {
-                $queue2Messages[] = $msg->getPayload();
-            });
+                $queue1Messages = [];
+                $queue2Messages = [];
 
-            // Push to different queues
-            $this->queue->pushRaw(json_encode(['uuid' => 'job-1', 'queue' => 'one']), 'queue-one');
-            $this->queue->pushRaw(json_encode(['uuid' => 'job-2', 'queue' => 'two']), 'queue-two');
-            $this->queue->pushRaw(json_encode(['uuid' => 'job-3', 'queue' => 'one']), 'queue-one');
+                $client->subscribe('laravel.queue.queue-one', function ($msg) use (&$queue1Messages): void {
+                    $queue1Messages[] = $msg->getPayload();
+                });
 
-            // Process
-            $this->client->process(0.5);
+                $client->subscribe('laravel.queue.queue-two', function ($msg) use (&$queue2Messages): void {
+                    $queue2Messages[] = $msg->getPayload();
+                });
 
-            expect($queue1Messages)->toHaveCount(2);
-            expect($queue2Messages)->toHaveCount(1);
+                // Push to different queues
+                $queue->pushRaw(json_encode(['uuid' => 'job-1', 'queue' => 'one']), 'queue-one');
+                $queue->pushRaw(json_encode(['uuid' => 'job-2', 'queue' => 'two']), 'queue-two');
+                $queue->pushRaw(json_encode(['uuid' => 'job-3', 'queue' => 'one']), 'queue-one');
+
+                // Process
+                $client->process(0.5);
+
+                expect($queue1Messages)->toHaveCount(2);
+                expect($queue2Messages)->toHaveCount(1);
+            } finally {
+                $client->disconnect();
+            }
         });
     });
 
     describe('queue subject naming', function (): void {
         it('uses correct subject prefix', function (): void {
-            $uniqueQueue = 'subject-test-' . uniqid();
-            $queue = new NatsQueue($this->client, $uniqueQueue, 60);
-            $queue->setContainer(new Container());
+            $client = createQueueTestClient();
 
-            $receivedSubject = null;
-            $this->client->subscribe('laravel.queue.' . $uniqueQueue, function ($msg) use (&$receivedSubject): void {
-                $receivedSubject = $msg->getSubject();
-            });
+            try {
+                $uniqueQueue = 'subject-test-' . uniqid();
+                $queue = new NatsQueue($client, $uniqueQueue, 60);
+                $queue->setContainer(new Container());
 
-            $queue->pushRaw(json_encode(['uuid' => 'subject-job']));
-            $this->client->process(0.3);
+                $receivedSubject = null;
+                $client->subscribe('laravel.queue.' . $uniqueQueue, function ($msg) use (&$receivedSubject): void {
+                    $receivedSubject = $msg->getSubject();
+                });
 
-            expect($receivedSubject)->toBe('laravel.queue.' . $uniqueQueue);
+                $queue->pushRaw(json_encode(['uuid' => 'subject-job']));
+                $client->process(0.3);
+
+                expect($receivedSubject)->toBe('laravel.queue.' . $uniqueQueue);
+            } finally {
+                $client->disconnect();
+            }
         });
     });
 
     describe('high volume', function (): void {
         it('can handle multiple rapid pushes', function (): void {
-            $uniqueQueue = 'volume-test-' . uniqid();
-            $queue = new NatsQueue($this->client, $uniqueQueue, 60);
-            $queue->setContainer(new Container());
+            $client = createQueueTestClient();
 
-            $received = [];
-            $this->client->subscribe('laravel.queue.' . $uniqueQueue, function ($msg) use (&$received): void {
-                $received[] = json_decode($msg->getPayload(), true);
-            });
+            try {
+                $uniqueQueue = 'volume-test-' . uniqid();
+                $queue = new NatsQueue($client, $uniqueQueue, 60);
+                $queue->setContainer(new Container());
 
-            // Push 50 jobs rapidly
-            $jobCount = 50;
-            for ($i = 0; $i < $jobCount; $i++) {
-                $queue->pushRaw(json_encode([
-                    'uuid' => "job-{$i}",
-                    'index' => $i,
-                ]));
+                $received = [];
+                $client->subscribe('laravel.queue.' . $uniqueQueue, function ($msg) use (&$received): void {
+                    $received[] = json_decode($msg->getPayload(), true);
+                });
+
+                // Push 50 jobs rapidly
+                $jobCount = 50;
+                for ($i = 0; $i < $jobCount; $i++) {
+                    $queue->pushRaw(json_encode([
+                        'uuid' => "job-{$i}",
+                        'index' => $i,
+                    ]));
+                }
+
+                // Process to receive all
+                $client->process(2.0);
+
+                expect(count($received))->toBe($jobCount);
+            } finally {
+                $client->disconnect();
             }
-
-            // Process to receive all
-            $this->client->process(2.0);
-
-            expect(count($received))->toBe($jobCount);
         });
     });
 });
