@@ -6,66 +6,70 @@ use Illuminate\Container\Container;
 use LaravelNats\Laravel\Queue\NatsJob;
 use LaravelNats\Laravel\Queue\NatsQueue;
 
+/**
+ * Create a mock NatsQueue for testing.
+ */
+function createMockQueue(): \Mockery\MockInterface
+{
+    $queue = Mockery::mock(NatsQueue::class);
+    $queue->shouldReceive('getQueue')->andReturn('test-queue');
+
+    return $queue;
+}
+
+/**
+ * Create a standard test payload.
+ */
+function createTestPayload(): string
+{
+    return json_encode([
+        'uuid' => 'job-uuid-123',
+        'displayName' => 'App\\Jobs\\TestJob',
+        'job' => 'Illuminate\\Queue\\CallQueuedHandler@call',
+        'maxTries' => 3,
+        'attempts' => 2,
+        'data' => [
+            'commandName' => 'App\\Jobs\\TestJob',
+            'command' => 'serialized-command-data',
+        ],
+    ]);
+}
+
+/**
+ * Create a NatsJob instance for testing.
+ */
+function createTestJob(?string $payload = null, ?\Mockery\MockInterface $queue = null): NatsJob
+{
+    return new NatsJob(
+        container: new Container(),
+        nats: $queue ?? createMockQueue(),
+        job: $payload ?? createTestPayload(),
+        connectionName: 'nats',
+        queue: 'test-queue',
+    );
+}
+
+afterEach(function (): void {
+    Mockery::close();
+});
+
 describe('NatsJob', function (): void {
-    beforeEach(function (): void {
-        $this->container = new Container();
-
-        // Create a mock queue (we don't need actual NATS for unit tests)
-        $this->queue = Mockery::mock(NatsQueue::class);
-        $this->queue->shouldReceive('getQueue')->andReturn('test-queue');
-
-        $this->payload = json_encode([
-            'uuid' => 'job-uuid-123',
-            'displayName' => 'App\\Jobs\\TestJob',
-            'job' => 'Illuminate\\Queue\\CallQueuedHandler@call',
-            'maxTries' => 3,
-            'attempts' => 2,
-            'data' => [
-                'commandName' => 'App\\Jobs\\TestJob',
-                'command' => 'serialized-command-data',
-            ],
-        ]);
-
-        $this->job = new NatsJob(
-            container: $this->container,
-            nats: $this->queue,
-            job: $this->payload,
-            connectionName: 'nats',
-            queue: 'test-queue',
-        );
-    });
-
-    afterEach(function (): void {
-        Mockery::close();
-    });
-
     describe('getJobId', function (): void {
         it('returns the job id from uuid field', function (): void {
-            expect($this->job->getJobId())->toBe('job-uuid-123');
+            $job = createTestJob();
+            expect($job->getJobId())->toBe('job-uuid-123');
         });
 
         it('falls back to id field if uuid not present', function (): void {
             $payload = json_encode(['id' => 'fallback-id']);
-            $job = new NatsJob(
-                container: $this->container,
-                nats: $this->queue,
-                job: $payload,
-                connectionName: 'nats',
-                queue: 'test-queue',
-            );
+            $job = createTestJob($payload);
 
             expect($job->getJobId())->toBe('fallback-id');
         });
 
         it('returns empty string if no id present', function (): void {
             $payload = json_encode(['displayName' => 'Test']);
-            $job = new NatsJob(
-                container: $this->container,
-                nats: $this->queue,
-                job: $payload,
-                connectionName: 'nats',
-                queue: 'test-queue',
-            );
+            $job = createTestJob($payload);
 
             expect($job->getJobId())->toBe('');
         });
@@ -73,18 +77,13 @@ describe('NatsJob', function (): void {
 
     describe('attempts', function (): void {
         it('returns the number of attempts', function (): void {
-            expect($this->job->attempts())->toBe(2);
+            $job = createTestJob();
+            expect($job->attempts())->toBe(2);
         });
 
         it('defaults to 1 attempt if not specified', function (): void {
             $payload = json_encode(['uuid' => 'test']);
-            $job = new NatsJob(
-                container: $this->container,
-                nats: $this->queue,
-                job: $payload,
-                connectionName: 'nats',
-                queue: 'test-queue',
-            );
+            $job = createTestJob($payload);
 
             expect($job->attempts())->toBe(1);
         });
@@ -92,18 +91,14 @@ describe('NatsJob', function (): void {
 
     describe('getRawBody', function (): void {
         it('returns the raw body', function (): void {
-            expect($this->job->getRawBody())->toBe($this->payload);
+            $payload = createTestPayload();
+            $job = createTestJob($payload);
+            expect($job->getRawBody())->toBe($payload);
         });
 
         it('returns exactly what was passed to constructor', function (): void {
             $rawPayload = '{"custom":"payload"}';
-            $job = new NatsJob(
-                container: $this->container,
-                nats: $this->queue,
-                job: $rawPayload,
-                connectionName: 'nats',
-                queue: 'test-queue',
-            );
+            $job = createTestJob($rawPayload);
 
             expect($job->getRawBody())->toBe($rawPayload);
         });
@@ -111,13 +106,15 @@ describe('NatsJob', function (): void {
 
     describe('getQueue', function (): void {
         it('returns the queue name', function (): void {
-            expect($this->job->getQueue())->toBe('test-queue');
+            $job = createTestJob();
+            expect($job->getQueue())->toBe('test-queue');
         });
     });
 
     describe('payload', function (): void {
         it('returns the decoded payload', function (): void {
-            $payload = $this->job->payload();
+            $job = createTestJob();
+            $payload = $job->payload();
 
             expect($payload)->toBeArray();
             expect($payload['uuid'])->toBe('job-uuid-123');
@@ -125,20 +122,15 @@ describe('NatsJob', function (): void {
         });
 
         it('caches the decoded payload', function (): void {
-            $first = $this->job->payload();
-            $second = $this->job->payload();
+            $job = createTestJob();
+            $first = $job->payload();
+            $second = $job->payload();
 
             expect($first)->toBe($second);
         });
 
         it('returns empty array for invalid json', function (): void {
-            $job = new NatsJob(
-                container: $this->container,
-                nats: $this->queue,
-                job: 'not-valid-json',
-                connectionName: 'nats',
-                queue: 'test-queue',
-            );
+            $job = createTestJob('not-valid-json');
 
             expect($job->payload())->toBe([]);
         });
@@ -146,65 +138,76 @@ describe('NatsJob', function (): void {
 
     describe('getNatsQueue', function (): void {
         it('returns the nats queue instance', function (): void {
-            expect($this->job->getNatsQueue())->toBe($this->queue);
+            $queue = createMockQueue();
+            $job = createTestJob(null, $queue);
+            expect($job->getNatsQueue())->toBe($queue);
         });
     });
 
     describe('release', function (): void {
         it('releases the job back to queue without delay', function (): void {
-            $this->queue->shouldReceive('pushRaw')
+            $payload = createTestPayload();
+            $queue = createMockQueue();
+            $queue->shouldReceive('pushRaw')
                 ->once()
-                ->with($this->payload, 'test-queue')
+                ->with($payload, 'test-queue')
                 ->andReturn('job-uuid-123');
 
-            $this->job->release();
+            $job = createTestJob($payload, $queue);
+            $job->release();
 
-            expect($this->job->isReleased())->toBeTrue();
+            expect($job->isReleased())->toBeTrue();
         });
 
         it('releases the job with delay', function (): void {
-            $this->queue->shouldReceive('later')
+            $payload = createTestPayload();
+            $queue = createMockQueue();
+            $queue->shouldReceive('later')
                 ->once()
-                ->with(30, $this->payload, '', 'test-queue')
+                ->with(30, $payload, '', 'test-queue')
                 ->andReturn('job-uuid-123');
 
-            $this->job->release(30);
+            $job = createTestJob($payload, $queue);
+            $job->release(30);
 
-            expect($this->job->isReleased())->toBeTrue();
+            expect($job->isReleased())->toBeTrue();
         });
 
         it('calls parent release method', function (): void {
-            $this->queue->shouldReceive('pushRaw')->andReturn('job-uuid-123');
+            $queue = createMockQueue();
+            $queue->shouldReceive('pushRaw')->andReturn('job-uuid-123');
 
-            $this->job->release();
+            $job = createTestJob(null, $queue);
+            $job->release();
 
-            expect($this->job->isReleased())->toBeTrue();
+            expect($job->isReleased())->toBeTrue();
         });
     });
 
     describe('delete', function (): void {
         it('deletes the job', function (): void {
-            $this->job->delete();
+            $job = createTestJob();
+            $job->delete();
 
-            expect($this->job->isDeleted())->toBeTrue();
+            expect($job->isDeleted())->toBeTrue();
         });
 
         it('marks job as deleted', function (): void {
-            expect($this->job->isDeleted())->toBeFalse();
+            $job = createTestJob();
+            expect($job->isDeleted())->toBeFalse();
 
-            $this->job->delete();
+            $job->delete();
 
-            expect($this->job->isDeleted())->toBeTrue();
+            expect($job->isDeleted())->toBeTrue();
         });
     });
 
     describe('connection name', function (): void {
         it('stores the connection name', function (): void {
-            // The connection name is stored but accessed via parent class
             $payload = json_encode(['uuid' => 'test']);
             $job = new NatsJob(
-                container: $this->container,
-                nats: $this->queue,
+                container: new Container(),
+                nats: createMockQueue(),
                 job: $payload,
                 connectionName: 'my-nats-connection',
                 queue: 'test-queue',
@@ -230,14 +233,7 @@ describe('NatsJob', function (): void {
                 ],
             ]);
 
-            $job = new NatsJob(
-                container: $this->container,
-                nats: $this->queue,
-                job: $payload,
-                connectionName: 'nats',
-                queue: 'test-queue',
-            );
-
+            $job = createTestJob($payload);
             $decoded = $job->payload();
 
             expect($decoded['data']['users'])->toHaveCount(2);
@@ -251,13 +247,7 @@ describe('NatsJob', function (): void {
                 'message' => 'Hello, World! 🎉 Special: <>&"\'',
             ]);
 
-            $job = new NatsJob(
-                container: $this->container,
-                nats: $this->queue,
-                job: $payload,
-                connectionName: 'nats',
-                queue: 'test-queue',
-            );
+            $job = createTestJob($payload);
 
             expect($job->payload()['message'])->toContain('🎉');
         });
