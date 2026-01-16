@@ -11,6 +11,11 @@ use LaravelNats\Laravel\Queue\NatsQueue;
 
 describe('Queue Integration', function (): void {
     beforeEach(function (): void {
+        // Ensure NATS is available before trying to connect
+        if (! isPortAvailable(4222)) {
+            $this->markTestSkipped('NATS server not available on port 4222');
+        }
+
         $config = ConnectionConfig::local();
         $this->client = new Client($config);
         $this->client->connect();
@@ -21,7 +26,7 @@ describe('Queue Integration', function (): void {
     });
 
     afterEach(function (): void {
-        if (isset($this->client) && $this->client->isConnected()) {
+        if (isset($this->client) && $this->client !== null && $this->client->isConnected()) {
             $this->client->disconnect();
         }
     });
