@@ -185,6 +185,12 @@ describe('Queue Integration', function (): void {
                     'attempts' => 1,
                 ]);
 
+                // Expected payload after release (attempts incremented)
+                $expectedPayload = json_encode([
+                    'uuid' => 'release-job',
+                    'attempts' => 2,
+                ]);
+
                 // Track released jobs
                 $releasedPayload = null;
                 $client->subscribe('laravel.queue.' . $uniqueQueue, function ($msg) use (&$releasedPayload): void {
@@ -206,7 +212,8 @@ describe('Queue Integration', function (): void {
                 $client->process(0.5);
 
                 expect($job->isReleased())->toBeTrue();
-                expect($releasedPayload)->toBe($payload);
+                // After release, attempts should be incremented
+                expect($releasedPayload)->toBe($expectedPayload);
             } finally {
                 $client->disconnect();
             }
