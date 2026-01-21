@@ -54,6 +54,356 @@ afterEach(function (): void {
 });
 
 describe('NatsJob', function (): void {
+    describe('markAsFailed', function (): void {
+        it('marks job as failed', function (): void {
+            $job = createTestJob();
+
+            expect($job->hasFailed())->toBeFalse();
+
+            $job->markAsFailed();
+
+            expect($job->hasFailed())->toBeTrue();
+        });
+
+        it('can be checked multiple times', function (): void {
+            $job = createTestJob();
+
+            $job->markAsFailed();
+
+            expect($job->hasFailed())->toBeTrue();
+            expect($job->hasFailed())->toBeTrue();
+        });
+    });
+
+    describe('maxTries', function (): void {
+        it('returns maxTries from payload', function (): void {
+            $job = createTestJob();
+            expect($job->maxTries())->toBe(3);
+        });
+
+        it('returns null if maxTries not in payload', function (): void {
+            $payload = json_encode(['uuid' => 'test']);
+            $job = createTestJob($payload);
+
+            expect($job->maxTries())->toBeNull();
+        });
+    });
+
+    describe('maxExceptions', function (): void {
+        it('returns maxExceptions from payload', function (): void {
+            $payload = json_encode(['uuid' => 'test', 'maxExceptions' => 5]);
+            $job = createTestJob($payload);
+
+            expect($job->maxExceptions())->toBe(5);
+        });
+
+        it('returns null if maxExceptions not in payload', function (): void {
+            $job = createTestJob();
+            expect($job->maxExceptions())->toBeNull();
+        });
+    });
+
+    describe('timeout', function (): void {
+        it('returns timeout from payload', function (): void {
+            $payload = json_encode(['uuid' => 'test', 'timeout' => 120]);
+            $job = createTestJob($payload);
+
+            expect($job->timeout())->toBe(120);
+        });
+
+        it('returns null if timeout not in payload', function (): void {
+            $job = createTestJob();
+            expect($job->timeout())->toBeNull();
+        });
+    });
+
+    describe('retryUntil', function (): void {
+        it('returns retryUntil from payload', function (): void {
+            $payload = json_encode(['uuid' => 'test', 'retryUntil' => 1700000000]);
+            $job = createTestJob($payload);
+
+            expect($job->retryUntil())->toBe(1700000000);
+        });
+
+        it('returns null if retryUntil not in payload', function (): void {
+            $job = createTestJob();
+            expect($job->retryUntil())->toBeNull();
+        });
+    });
+
+    describe('shouldFailOnTimeout', function (): void {
+        it('returns true when failOnTimeout is set', function (): void {
+            $payload = json_encode(['uuid' => 'test', 'failOnTimeout' => true]);
+            $job = createTestJob($payload);
+
+            expect($job->shouldFailOnTimeout())->toBeTrue();
+        });
+
+        it('returns false by default', function (): void {
+            $job = createTestJob();
+            expect($job->shouldFailOnTimeout())->toBeFalse();
+        });
+    });
+
+    describe('backoff', function (): void {
+        it('returns integer backoff', function (): void {
+            $payload = json_encode(['uuid' => 'test', 'backoff' => 60]);
+            $job = createTestJob($payload);
+
+            expect($job->backoff())->toBe(60);
+        });
+
+        it('returns array backoff', function (): void {
+            $payload = json_encode(['uuid' => 'test', 'backoff' => [10, 30, 60]]);
+            $job = createTestJob($payload);
+
+            expect($job->backoff())->toBe([10, 30, 60]);
+        });
+
+        it('returns null if backoff not in payload', function (): void {
+            $job = createTestJob();
+            expect($job->backoff())->toBeNull();
+        });
+    });
+
+    describe('getRetryDelay', function (): void {
+        it('returns fixed delay for integer backoff', function (): void {
+            $payload = json_encode(['uuid' => 'test', 'backoff' => 30, 'attempts' => 1]);
+            $queue = createMockQueue();
+            $queue->shouldReceive('getRetryAfter')->andReturn(60);
+            $job = createTestJob($payload, $queue);
+
+            expect($job->getRetryDelay())->toBe(30);
+        });
+
+        it('returns indexed delay for array backoff', function (): void {
+            // Attempt 2 should get the 2nd delay (index 1)
+            $payload = json_encode(['uuid' => 'test', 'backoff' => [10, 30, 60], 'attempts' => 2]);
+            $queue = createMockQueue();
+            $queue->shouldReceive('getRetryAfter')->andReturn(60);
+            $job = createTestJob($payload, $queue);
+
+            expect($job->getRetryDelay())->toBe(30);
+        });
+
+        it('falls back to queue retry_after', function (): void {
+            $payload = json_encode(['uuid' => 'test', 'attempts' => 1]);
+            $queue = createMockQueue();
+            $queue->shouldReceive('getRetryAfter')->andReturn(45);
+            $job = createTestJob($payload, $queue);
+
+            expect($job->getRetryDelay())->toBe(45);
+        });
+    });
+
+    describe('hasExceededMaxAttempts', function (): void {
+        it('returns false when under max attempts', function (): void {
+            $job = createTestJob(); // maxTries: 3, attempts: 2
+
+            expect($job->hasExceededMaxAttempts())->toBeFalse();
+        });
+
+        it('returns true when at max attempts', function (): void {
+            $payload = json_encode(['uuid' => 'test', 'maxTries' => 3, 'attempts' => 3]);
+            $job = createTestJob($payload);
+
+            expect($job->hasExceededMaxAttempts())->toBeTrue();
+        });
+
+        it('returns false when maxTries not set', function (): void {
+            $payload = json_encode(['uuid' => 'test', 'attempts' => 100]);
+            $job = createTestJob($payload);
+
+            expect($job->hasExceededMaxAttempts())->toBeFalse();
+        });
+    });
+
+    describe('canRetry', function (): void {
+        it('returns true when can retry', function (): void {
+            $job = createTestJob(); // maxTries: 3, attempts: 2
+
+            expect($job->canRetry())->toBeTrue();
+        });
+
+        it('returns false when max attempts exceeded', function (): void {
+            $payload = json_encode(['uuid' => 'test', 'maxTries' => 2, 'attempts' => 3]);
+            $job = createTestJob($payload);
+
+            expect($job->canRetry())->toBeFalse();
+        });
+
+        it('returns false when job has failed', function (): void {
+            $job = createTestJob();
+            $job->markAsFailed();
+
+            expect($job->canRetry())->toBeFalse();
+        });
+    });
+
+    describe('remainingAttempts', function (): void {
+        it('returns remaining attempts', function (): void {
+            $job = createTestJob(); // maxTries: 3, attempts: 2
+
+            expect($job->remainingAttempts())->toBe(1);
+        });
+
+        it('returns null when maxTries not set', function (): void {
+            $payload = json_encode(['uuid' => 'test', 'attempts' => 2]);
+            $job = createTestJob($payload);
+
+            expect($job->remainingAttempts())->toBeNull();
+        });
+
+        it('returns zero when exceeded', function (): void {
+            $payload = json_encode(['uuid' => 'test', 'maxTries' => 2, 'attempts' => 5]);
+            $job = createTestJob($payload);
+
+            expect($job->remainingAttempts())->toBe(0);
+        });
+    });
+
+    describe('isFinalAttempt', function (): void {
+        it('returns false when not final attempt', function (): void {
+            $job = createTestJob(); // maxTries: 3, attempts: 2
+
+            expect($job->isFinalAttempt())->toBeFalse();
+        });
+
+        it('returns true when on final attempt', function (): void {
+            $payload = json_encode(['uuid' => 'test', 'maxTries' => 3, 'attempts' => 3]);
+            $job = createTestJob($payload);
+
+            expect($job->isFinalAttempt())->toBeTrue();
+        });
+
+        it('returns false when maxTries not set', function (): void {
+            $payload = json_encode(['uuid' => 'test', 'attempts' => 100]);
+            $job = createTestJob($payload);
+
+            expect($job->isFinalAttempt())->toBeFalse();
+        });
+    });
+
+    describe('getName', function (): void {
+        it('returns displayName from payload', function (): void {
+            $job = createTestJob();
+            expect($job->getName())->toBe('App\\Jobs\\TestJob');
+        });
+
+        it('returns empty string if displayName not in payload', function (): void {
+            $payload = json_encode(['uuid' => 'test']);
+            $job = createTestJob($payload);
+
+            expect($job->getName())->toBe('');
+        });
+    });
+
+    describe('shouldDeleteWhenMissingModels', function (): void {
+        it('returns true by default', function (): void {
+            $job = createTestJob();
+            expect($job->shouldDeleteWhenMissingModels())->toBeTrue();
+        });
+
+        it('returns false when set in payload', function (): void {
+            $payload = json_encode(['uuid' => 'test', 'deleteWhenMissingModels' => false]);
+            $job = createTestJob($payload);
+
+            expect($job->shouldDeleteWhenMissingModels())->toBeFalse();
+        });
+    });
+
+    describe('getBackoffStrategy', function (): void {
+        it('returns BackoffStrategy instance', function (): void {
+            $queue = createMockQueue();
+            $queue->shouldReceive('getRetryAfter')->andReturn(60);
+            $job = createTestJob(null, $queue);
+
+            $strategy = $job->getBackoffStrategy();
+
+            expect($strategy)->toBeInstanceOf(\LaravelNats\Laravel\Queue\BackoffStrategy::class);
+        });
+
+        it('uses backoff from payload when available', function (): void {
+            $payload = json_encode(['uuid' => 'test', 'backoff' => [10, 20, 30], 'attempts' => 1]);
+            $queue = createMockQueue();
+            $queue->shouldReceive('getRetryAfter')->andReturn(60);
+            $job = createTestJob($payload, $queue);
+
+            $strategy = $job->getBackoffStrategy();
+
+            expect($strategy->getType())->toBe(\LaravelNats\Laravel\Queue\BackoffStrategy::STRATEGY_LINEAR);
+        });
+
+        it('falls back to queue retry_after', function (): void {
+            $payload = json_encode(['uuid' => 'test', 'attempts' => 1]);
+            $queue = createMockQueue();
+            $queue->shouldReceive('getRetryAfter')->andReturn(45);
+            $job = createTestJob($payload, $queue);
+
+            $strategy = $job->getBackoffStrategy();
+
+            expect($strategy->getDelay(1))->toBe(45);
+        });
+    });
+
+    describe('releaseWithBackoff', function (): void {
+        it('releases job with calculated delay', function (): void {
+            $payload = json_encode(['uuid' => 'test', 'backoff' => 30, 'attempts' => 1]);
+            $queue = createMockQueue();
+            $queue->shouldReceive('getRetryAfter')->andReturn(60);
+            $queue->shouldReceive('later')
+                ->once()
+                ->withArgs(function ($delay, $payload, $data, $queueName) {
+                    return $delay === 30;
+                })
+                ->andReturn('job-id');
+            $job = createTestJob($payload, $queue);
+
+            $job->releaseWithBackoff();
+
+            expect($job->isReleased())->toBeTrue();
+        });
+
+        it('uses queue default when no backoff configured', function (): void {
+            $payload = json_encode(['uuid' => 'test', 'attempts' => 1]);
+            $queue = createMockQueue();
+            $queue->shouldReceive('getRetryAfter')->andReturn(45);
+            $queue->shouldReceive('later')
+                ->once()
+                ->withArgs(function ($delay, $payload, $data, $queueName) {
+                    return $delay === 45;
+                })
+                ->andReturn('job-id');
+            $job = createTestJob($payload, $queue);
+
+            $job->releaseWithBackoff();
+
+            expect($job->isReleased())->toBeTrue();
+        });
+    });
+
+    describe('getRetryConfiguration', function (): void {
+        it('returns RetryConfiguration instance', function (): void {
+            $queue = createMockQueue();
+            $queue->shouldReceive('getRetryAfter')->andReturn(60);
+            $job = createTestJob(null, $queue);
+
+            $config = $job->getRetryConfiguration();
+
+            expect($config)->toBeInstanceOf(\LaravelNats\Laravel\Queue\RetryConfiguration::class);
+        });
+
+        it('uses maxTries from payload', function (): void {
+            $queue = createMockQueue();
+            $queue->shouldReceive('getRetryAfter')->andReturn(60);
+            $job = createTestJob(null, $queue); // Default payload has maxTries: 3
+
+            $config = $job->getRetryConfiguration();
+
+            expect($config->getMaxTries())->toBe(3);
+        });
+    });
+
     describe('getJobId', function (): void {
         it('returns the job id from uuid field', function (): void {
             $job = createTestJob();
