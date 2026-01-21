@@ -40,20 +40,28 @@ class NatsQueue extends Queue implements QueueContract
     protected string $subjectPrefix = 'laravel.queue.';
 
     /**
+     * The default maximum number of attempts.
+     */
+    protected int $maxTries;
+
+    /**
      * Create a new NATS queue instance.
      *
      * @param Client $client
      * @param string $defaultQueue
      * @param int $retryAfter
+     * @param int $maxTries
      */
     public function __construct(
         Client $client,
         string $defaultQueue = 'default',
         int $retryAfter = 60,
+        int $maxTries = 3,
     ) {
         $this->client = $client;
         $this->defaultQueue = $defaultQueue;
         $this->retryAfter = $retryAfter;
+        $this->maxTries = $maxTries;
     }
 
     /**
@@ -203,6 +211,29 @@ class NatsQueue extends Queue implements QueueContract
     public function getRetryAfter(): int
     {
         return $this->retryAfter;
+    }
+
+    /**
+     * Get the default maximum number of attempts.
+     *
+     * @return int
+     */
+    public function getMaxTries(): int
+    {
+        return $this->maxTries;
+    }
+
+    /**
+     * Get the default retry configuration.
+     *
+     * @return RetryConfiguration
+     */
+    public function getDefaultRetryConfiguration(): RetryConfiguration
+    {
+        return new RetryConfiguration(
+            maxTries: $this->maxTries,
+            retryDelay: $this->retryAfter,
+        );
     }
 
     /**
