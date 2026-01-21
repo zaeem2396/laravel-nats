@@ -235,13 +235,26 @@ class NatsJob extends Job implements JobContract
     }
 
     /**
-     * Get the backoff strategy for the job.
+     * Get the backoff configuration from the job payload.
      *
      * @return array<int>|int|null
      */
     public function backoff(): array|int|null
     {
         return Arr::get($this->payload(), 'backoff');
+    }
+
+    /**
+     * Get the backoff strategy for this job.
+     *
+     * @return BackoffStrategy
+     */
+    public function getBackoffStrategy(): BackoffStrategy
+    {
+        return BackoffStrategy::fromBackoff(
+            $this->backoff(),
+            $this->nats->getRetryAfter(),
+        );
     }
 
     /**
@@ -256,22 +269,7 @@ class NatsJob extends Job implements JobContract
      */
     public function getRetryDelay(): int
     {
-        $backoff = $this->backoff();
-
-        // If backoff is an array, use the attempt-indexed delay
-        if (is_array($backoff)) {
-            $attempt = $this->attempts() - 1; // 0-indexed
-
-            return $backoff[min($attempt, count($backoff) - 1)] ?? 0;
-        }
-
-        // If backoff is an integer, use it directly
-        if (is_int($backoff)) {
-            return $backoff;
-        }
-
-        // Fall back to the queue's retry_after setting
-        return $this->nats->getRetryAfter();
+        return $this->getBackoffStrategy()->getDelay($this->attempts());
     }
 
     /**
