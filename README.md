@@ -228,21 +228,6 @@ composer format:check
 composer format
 ```
 
-## Roadmap
-
-This package is under active development. Current status:
-
-- ✅ **Phase 1:** Core Messaging (Publish, Subscribe, Request/Reply)
-- ✅ **Phase 1:** Laravel Integration (ServiceProvider, Facade, Config)
-- 🔵 **Phase 2:** Laravel Queue Driver (50% Complete)
-  - ✅ Milestone 2.1: Queue Driver Foundation
-  - ✅ Milestone 2.3: Job Lifecycle & Retry
-  - 🔲 Milestone 2.2: Delayed Jobs (requires JetStream)
-- 🔲 **Phase 3:** JetStream Support
-- 🔲 **Phase 4:** Worker & Runtime
-- 🔲 **Phase 5:** Observability & Debugging
-- 🔲 **Phase 6:** Reliability & Resilience
-
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
