@@ -146,31 +146,60 @@ describe('NatsJob', function (): void {
 
     describe('release', function (): void {
         it('releases the job back to queue without delay', function (): void {
-            $payload = createTestPayload();
             $queue = createMockQueue();
+            // The release method now increments attempts from 2 to 3
             $queue->shouldReceive('pushRaw')
                 ->once()
-                ->with($payload, 'test-queue')
+                ->withArgs(function ($payload, $queueName) {
+                    $decoded = json_decode($payload, true);
+
+                    return $decoded['attempts'] === 3 && $queueName === 'test-queue';
+                })
                 ->andReturn('job-uuid-123');
 
-            $job = createTestJob($payload, $queue);
+            $job = createTestJob(null, $queue);
             $job->release();
 
             expect($job->isReleased())->toBeTrue();
         });
 
         it('releases the job with delay', function (): void {
-            $payload = createTestPayload();
             $queue = createMockQueue();
+            // The release method now increments attempts from 2 to 3
             $queue->shouldReceive('later')
                 ->once()
-                ->with(30, $payload, '', 'test-queue')
+                ->withArgs(function ($delay, $payload, $data, $queueName) {
+                    $decoded = json_decode($payload, true);
+
+                    return $delay === 30 && $decoded['attempts'] === 3 && $queueName === 'test-queue';
+                })
                 ->andReturn('job-uuid-123');
 
-            $job = createTestJob($payload, $queue);
+            $job = createTestJob(null, $queue);
             $job->release(30);
 
             expect($job->isReleased())->toBeTrue();
+        });
+
+        it('increments attempts on release', function (): void {
+            $queue = createMockQueue();
+            $capturedPayload = null;
+            $queue->shouldReceive('pushRaw')
+                ->once()
+                ->withArgs(function ($payload, $queueName) use (&$capturedPayload) {
+                    $capturedPayload = $payload;
+
+                    return true;
+                })
+                ->andReturn('job-uuid-123');
+
+            $job = createTestJob(null, $queue);
+            expect($job->attempts())->toBe(2); // Initial attempts
+
+            $job->release();
+
+            $decoded = json_decode($capturedPayload, true);
+            expect($decoded['attempts'])->toBe(3); // Incremented
         });
 
         it('calls parent release method', function (): void {

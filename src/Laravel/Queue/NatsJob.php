@@ -8,6 +8,7 @@ use Illuminate\Container\Container;
 use Illuminate\Contracts\Queue\Job as JobContract;
 use Illuminate\Queue\Jobs\Job;
 use Illuminate\Support\Arr;
+use Throwable;
 
 /**
  * NatsJob wraps a NATS message as a Laravel queue job.
@@ -35,6 +36,18 @@ class NatsJob extends Job implements JobContract
     protected ?array $decoded = null;
 
     /**
+     * Indicates if the job has been marked as failed.
+     *
+     * @var bool
+     */
+    protected $hasFailed = false;
+
+    /**
+     * The exception that caused the job to fail.
+     */
+    protected ?Throwable $failureException = null;
+
+    /**
      * Create a new job instance.
      *
      * @param Container $container
@@ -58,6 +71,18 @@ class NatsJob extends Job implements JobContract
     }
 
     /**
+     * Fire the job.
+     *
+     * This method executes the job handler registered for this job.
+     *
+     * @return void
+     */
+    public function fire(): void
+    {
+        parent::fire();
+    }
+
+    /**
      * Release the job back into the queue.
      *
      * @param int $delay
@@ -68,11 +93,21 @@ class NatsJob extends Job implements JobContract
     {
         parent::release($delay);
 
+        // Increment attempts in the payload
+        $payload = $this->payload();
+        $payload['attempts'] = ($payload['attempts'] ?? 1) + 1;
+        $newPayload = json_encode($payload);
+
+        // json_encode returns false on failure, but this shouldn't happen for a valid payload
+        if ($newPayload === false) {
+            $newPayload = $this->job;
+        }
+
         // Re-publish the job to the queue
         if ($delay > 0) {
-            $this->nats->later($delay, $this->job, '', $this->queue);
+            $this->nats->later($delay, $newPayload, '', $this->queue);
         } else {
-            $this->nats->pushRaw($this->job, $this->queue);
+            $this->nats->pushRaw($newPayload, $this->queue);
         }
     }
 
@@ -90,6 +125,56 @@ class NatsJob extends Job implements JobContract
     }
 
     /**
+     * Mark the job as failed.
+     *
+     * @param Throwable|null $exception
+     *
+     * @return void
+     */
+    public function fail($exception = null): void
+    {
+        $this->markAsFailed();
+        $this->failureException = $exception;
+
+        // Call parent fail if available (Laravel 10+)
+        if (method_exists(parent::class, 'fail')) {
+            parent::fail($exception);
+        } else {
+            $this->delete();
+        }
+    }
+
+    /**
+     * Mark the job as failed internally.
+     *
+     * @return void
+     */
+    public function markAsFailed(): void
+    {
+        $this->hasFailed = true;
+    }
+
+    /**
+     * Determine if the job has been marked as a failure.
+     *
+     * @return bool
+     */
+    public function hasFailed(): bool
+    {
+        return $this->hasFailed;
+    }
+
+    /**
+     * Get the exception that caused the job to fail.
+     *
+     * @return Throwable|null
+     */
+    public function getFailureException(): ?Throwable
+    {
+        return $this->failureException;
+    }
+
+    /**
      * Get the number of times the job has been attempted.
      *
      * @return int
@@ -97,6 +182,96 @@ class NatsJob extends Job implements JobContract
     public function attempts(): int
     {
         return Arr::get($this->payload(), 'attempts', 1);
+    }
+
+    /**
+     * Get the maximum number of attempts allowed.
+     *
+     * @return int|null
+     */
+    public function maxTries(): ?int
+    {
+        return Arr::get($this->payload(), 'maxTries');
+    }
+
+    /**
+     * Get the maximum number of exceptions allowed.
+     *
+     * @return int|null
+     */
+    public function maxExceptions(): ?int
+    {
+        return Arr::get($this->payload(), 'maxExceptions');
+    }
+
+    /**
+     * Get the number of seconds until job should timeout.
+     *
+     * @return int|null
+     */
+    public function timeout(): ?int
+    {
+        return Arr::get($this->payload(), 'timeout');
+    }
+
+    /**
+     * Get the timestamp indicating when the job should timeout.
+     *
+     * @return int|null
+     */
+    public function retryUntil(): ?int
+    {
+        return Arr::get($this->payload(), 'retryUntil');
+    }
+
+    /**
+     * Determine if the job should fail when it timeouts.
+     *
+     * @return bool
+     */
+    public function shouldFailOnTimeout(): bool
+    {
+        return (bool) Arr::get($this->payload(), 'failOnTimeout', false);
+    }
+
+    /**
+     * Get the backoff strategy for the job.
+     *
+     * @return array<int>|int|null
+     */
+    public function backoff(): array|int|null
+    {
+        return Arr::get($this->payload(), 'backoff');
+    }
+
+    /**
+     * Calculate the delay for the next retry attempt.
+     *
+     * Supports:
+     * - Fixed delay (int)
+     * - Linear backoff (array of delays)
+     * - Exponential backoff (via retryAfter with multiplier)
+     *
+     * @return int The delay in seconds
+     */
+    public function getRetryDelay(): int
+    {
+        $backoff = $this->backoff();
+
+        // If backoff is an array, use the attempt-indexed delay
+        if (is_array($backoff)) {
+            $attempt = $this->attempts() - 1; // 0-indexed
+
+            return $backoff[min($attempt, count($backoff) - 1)] ?? 0;
+        }
+
+        // If backoff is an integer, use it directly
+        if (is_int($backoff)) {
+            return $backoff;
+        }
+
+        // Fall back to the queue's retry_after setting
+        return $this->nats->getRetryAfter();
     }
 
     /**
@@ -151,5 +326,118 @@ class NatsJob extends Job implements JobContract
     public function getNatsQueue(): NatsQueue
     {
         return $this->nats;
+    }
+
+    /**
+     * Get the name of the job's handler class.
+     *
+     * @return string
+     */
+    public function getName(): string
+    {
+        return Arr::get($this->payload(), 'displayName', '');
+    }
+
+    /**
+     * Get the resolved name of the job.
+     *
+     * @return string
+     */
+    public function resolveName(): string
+    {
+        return Arr::get($this->payload(), 'displayName', $this->getName());
+    }
+
+    /**
+     * Get the underlying NATS connection name.
+     *
+     * @return string
+     */
+    public function getConnectionName(): string
+    {
+        return $this->connectionName;
+    }
+
+    /**
+     * Determine if the job should be deleted when models are missing.
+     *
+     * @return bool
+     */
+    public function shouldDeleteWhenMissingModels(): bool
+    {
+        return (bool) Arr::get($this->payload(), 'deleteWhenMissingModels', true);
+    }
+
+    /**
+     * Check if the maximum attempts have been exceeded.
+     *
+     * @return bool
+     */
+    public function hasExceededMaxAttempts(): bool
+    {
+        $maxTries = $this->maxTries();
+
+        if ($maxTries === null) {
+            return false;
+        }
+
+        return $this->attempts() >= $maxTries;
+    }
+
+    /**
+     * Check if the maximum exceptions have been exceeded.
+     *
+     * @return bool
+     */
+    public function hasExceededMaxExceptions(): bool
+    {
+        $maxExceptions = $this->maxExceptions();
+
+        if ($maxExceptions === null) {
+            return false;
+        }
+
+        return $this->attempts() >= $maxExceptions;
+    }
+
+    /**
+     * Check if the job has exceeded its retry deadline.
+     *
+     * @return bool
+     */
+    public function hasExceededRetryDeadline(): bool
+    {
+        $retryUntil = $this->retryUntil();
+
+        if ($retryUntil === null) {
+            return false;
+        }
+
+        return time() >= $retryUntil;
+    }
+
+    /**
+     * Check if the job can be retried.
+     *
+     * @return bool
+     */
+    public function canRetry(): bool
+    {
+        // Cannot retry if already failed
+        if ($this->hasFailed()) {
+            return false;
+        }
+
+        // Cannot retry if max attempts exceeded
+        if ($this->hasExceededMaxAttempts()) {
+            return false;
+        }
+
+        // Cannot retry if retry deadline exceeded
+        if ($this->hasExceededRetryDeadline()) {
+            return false;
+        }
+
+        return true;
     }
 }
