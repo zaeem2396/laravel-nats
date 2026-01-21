@@ -34,6 +34,7 @@ class NatsConnector implements ConnectorInterface
             client: $client,
             defaultQueue: $config['queue'] ?? 'default',
             retryAfter: $config['retry_after'] ?? 60,
+            maxTries: $config['tries'] ?? 3,
         );
     }
 

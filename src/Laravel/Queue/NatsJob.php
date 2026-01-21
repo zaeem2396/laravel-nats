@@ -440,4 +440,64 @@ class NatsJob extends Job implements JobContract
 
         return true;
     }
+
+    /**
+     * Get the retry configuration for this job.
+     *
+     * @return RetryConfiguration
+     */
+    public function getRetryConfiguration(): RetryConfiguration
+    {
+        return RetryConfiguration::fromPayload(
+            $this->payload(),
+            RetryConfiguration::DEFAULT_MAX_TRIES,
+            $this->nats->getRetryAfter(),
+        );
+    }
+
+    /**
+     * Release the job with automatic retry delay calculation.
+     *
+     * This method uses the job's backoff configuration to determine
+     * the appropriate delay for the next retry attempt.
+     *
+     * @return void
+     */
+    public function releaseWithBackoff(): void
+    {
+        $delay = $this->getRetryDelay();
+        $this->release($delay);
+    }
+
+    /**
+     * Get remaining attempts before the job will fail.
+     *
+     * @return int|null Returns null if maxTries is not set
+     */
+    public function remainingAttempts(): ?int
+    {
+        $maxTries = $this->maxTries();
+
+        if ($maxTries === null) {
+            return null;
+        }
+
+        return max(0, $maxTries - $this->attempts());
+    }
+
+    /**
+     * Check if this is the final attempt.
+     *
+     * @return bool
+     */
+    public function isFinalAttempt(): bool
+    {
+        $maxTries = $this->maxTries();
+
+        if ($maxTries === null) {
+            return false;
+        }
+
+        return $this->attempts() >= $maxTries;
+    }
 }
