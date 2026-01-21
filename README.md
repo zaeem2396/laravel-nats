@@ -151,11 +151,34 @@ dispatch(new ProcessOrder($order))->onConnection('nats');
 // QUEUE_CONNECTION=nats
 ```
 
+### Job Lifecycle & Retry
+
+Configure retry behavior on your jobs:
+
+```php
+class ProcessOrder implements ShouldQueue
+{
+    use InteractsWithQueue;
+
+    public $tries = 5;           // Maximum attempts
+    public $backoff = [10, 30, 60]; // Linear backoff: 10s, 30s, 60s delays
+    
+    // Or use exponential backoff
+    // public $backoff = 60;     // Fixed 60s delay between retries
+}
+```
+
+The queue driver supports:
+- **Configurable max attempts** (`$tries` or `maxTries`)
+- **Linear backoff** (array of delays)
+- **Fixed delay** (integer delay)
+- **Retry deadlines** (`retryUntil`)
+- **Exception limits** (`maxExceptions`)
+
 ### Current Limitations
 
 - **Delayed jobs:** Not yet supported (requires JetStream, coming in v1.0)
 - **Queue size:** Returns 0 (NATS Core doesn't track queue size)
-- **Job retries:** Basic support, advanced backoff coming soon
 
 ## Authentication
 
@@ -211,7 +234,10 @@ This package is under active development. Current status:
 
 - ✅ **Phase 1:** Core Messaging (Publish, Subscribe, Request/Reply)
 - ✅ **Phase 1:** Laravel Integration (ServiceProvider, Facade, Config)
-- 🔵 **Phase 2:** Laravel Queue Driver (Milestone 2.1 ✅ Complete)
+- 🔵 **Phase 2:** Laravel Queue Driver (50% Complete)
+  - ✅ Milestone 2.1: Queue Driver Foundation
+  - ✅ Milestone 2.3: Job Lifecycle & Retry
+  - 🔲 Milestone 2.2: Delayed Jobs (requires JetStream)
 - 🔲 **Phase 3:** JetStream Support
 - 🔲 **Phase 4:** Worker & Runtime
 - 🔲 **Phase 5:** Observability & Debugging
