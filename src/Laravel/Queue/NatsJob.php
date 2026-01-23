@@ -552,13 +552,18 @@ class NatsJob extends Job implements JobContract
         try {
             $payload = $this->payload();
 
-            if (! isset($payload['data']['commandName'])) {
+            if (! isset($payload['data']['commandName']) || ! isset($payload['data']['command'])) {
                 return null;
             }
 
-            $command = unserialize($payload['data']['command']);
+            $command = @unserialize($payload['data']['command']);
 
-            return $command;
+            // unserialize returns false on failure
+            if ($command === false) {
+                return null;
+            }
+
+            return is_object($command) ? $command : null;
         } catch (Throwable $e) {
             return null;
         }
