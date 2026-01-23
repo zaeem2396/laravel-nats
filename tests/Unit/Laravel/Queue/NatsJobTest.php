@@ -631,4 +631,53 @@ describe('NatsJob', function (): void {
             expect($job->payload()['message'])->toContain('🎉');
         });
     });
+
+    describe('fail', function (): void {
+        it('marks job as failed', function (): void {
+            $job = createTestJob();
+            $exception = new RuntimeException('Test failure');
+
+            $job->fail($exception);
+
+            expect($job->hasFailed())->toBeTrue();
+            expect($job->getFailureException())->toBe($exception);
+        });
+
+        it('handles null exception', function (): void {
+            $job = createTestJob();
+
+            $job->fail(null);
+
+            expect($job->hasFailed())->toBeTrue();
+        });
+
+        it('stores exception details', function (): void {
+            $job = createTestJob();
+            $exception = new InvalidArgumentException('Invalid input', 400);
+
+            $job->fail($exception);
+
+            $storedException = $job->getFailureException();
+            expect($storedException)->toBe($exception);
+            expect($storedException->getMessage())->toBe('Invalid input');
+            expect($storedException->getCode())->toBe(400);
+        });
+    });
+
+    describe('getFailureException', function (): void {
+        it('returns null when no exception', function (): void {
+            $job = createTestJob();
+
+            expect($job->getFailureException())->toBeNull();
+        });
+
+        it('returns exception after fail', function (): void {
+            $job = createTestJob();
+            $exception = new RuntimeException('Error');
+
+            $job->fail($exception);
+
+            expect($job->getFailureException())->toBe($exception);
+        });
+    });
 });

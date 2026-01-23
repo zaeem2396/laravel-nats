@@ -271,4 +271,68 @@ describe('NatsQueue', function (): void {
             }
         });
     });
+
+    describe('Dead Letter Queue', function (): void {
+        it('returns null when DLQ not configured', function (): void {
+            $setup = createQueueTestSetup();
+
+            try {
+                expect($setup['queue']->getDeadLetterQueueSubject())->toBeNull();
+            } finally {
+                $setup['client']->disconnect();
+            }
+        });
+
+        it('returns DLQ subject when configured', function (): void {
+            $setup = createQueueTestSetup();
+            $dlqSubject = 'laravel.queue.failed';
+
+            try {
+                $queue = new NatsQueue(
+                    $setup['client'],
+                    'test-queue',
+                    60,
+                    3,
+                    $dlqSubject
+                );
+
+                expect($queue->getDeadLetterQueueSubject())->toBe($dlqSubject);
+            } finally {
+                $setup['client']->disconnect();
+            }
+        });
+
+        it('allows setting DLQ subject', function (): void {
+            $setup = createQueueTestSetup();
+
+            try {
+                $setup['queue']->setDeadLetterQueueSubject('custom.dlq');
+
+                expect($setup['queue']->getDeadLetterQueueSubject())->toBe('custom.dlq');
+            } finally {
+                $setup['client']->disconnect();
+            }
+        });
+
+        it('allows clearing DLQ subject', function (): void {
+            $setup = createQueueTestSetup();
+            $queue = new NatsQueue(
+                $setup['client'],
+                'test-queue',
+                60,
+                3,
+                'laravel.queue.failed'
+            );
+
+            try {
+                expect($queue->getDeadLetterQueueSubject())->toBe('laravel.queue.failed');
+
+                $queue->setDeadLetterQueueSubject(null);
+
+                expect($queue->getDeadLetterQueueSubject())->toBeNull();
+            } finally {
+                $setup['client']->disconnect();
+            }
+        });
+    });
 });
