@@ -111,13 +111,41 @@ class NatsFailedJobProvider implements FailedJobProviderInterface
     }
 
     /**
+     * Get a list of all of the failed job IDs.
+     *
+     * @param string|null $queue Optional queue name filter
+     *
+     * @return array<int>
+     */
+    public function ids($queue = null)
+    {
+        $query = DB::connection($this->connection)
+            ->table($this->table)
+            ->orderBy('id', 'desc');
+
+        if ($queue !== null) {
+            $query->where('queue', $queue);
+        }
+
+        return $query->pluck('id')->all();
+    }
+
+    /**
      * Flush all of the failed jobs from storage.
+     *
+     * @param int|null $hours Optional: only flush jobs older than N hours
      *
      * @return void
      */
-    public function flush()
+    public function flush($hours = null)
     {
-        DB::connection($this->connection)->table($this->table)->delete();
+        $query = DB::connection($this->connection)->table($this->table);
+
+        if ($hours !== null) {
+            $query->where('failed_at', '<', now()->subHours($hours)->timestamp);
+        }
+
+        $query->delete();
     }
 
     /**
