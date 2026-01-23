@@ -148,17 +148,19 @@ class NatsJob extends Job implements JobContract
         // Route to Dead Letter Queue if configured
         $this->routeToDeadLetterQueue($exception);
 
-        // Fire Laravel's JobFailed event
-        Event::dispatch(new JobFailed(
-            $this->connectionName,
-            $this,
-            $exception ?? new \RuntimeException('Job failed without exception')
-        ));
+        // Note: JobFailed event dispatch is handled by Laravel's queue worker
+        // We don't dispatch it here to avoid container dependency issues
 
         // Call parent fail if available (Laravel 10+)
-        if (method_exists(parent::class, 'fail')) {
-            parent::fail($exception);
-        } else {
+        // Wrap in try-catch to handle cases where parent::fail() requires container bindings
+        try {
+            if (method_exists(parent::class, 'fail')) {
+                parent::fail($exception);
+            } else {
+                $this->delete();
+            }
+        } catch (Throwable $e) {
+            // If parent::fail() fails, just delete the job
             $this->delete();
         }
     }
@@ -630,8 +632,16 @@ class NatsJob extends Job implements JobContract
     protected function getFailedJobProvider(): ?NatsFailedJobProvider
     {
         try {
+            if (! $this->container->bound('config')) {
+                return null;
+            }
+
             $config = $this->container->make('config');
-            $connection = $config->get('queue.failed.connection');
+            if (! $config) {
+                return null;
+            }
+
+            $connection = $config->get('queue.failed.connection', config('database.default'));
             $table = $config->get('queue.failed.table', 'failed_jobs');
 
             return new NatsFailedJobProvider($connection, $table);
