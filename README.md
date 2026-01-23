@@ -175,6 +175,71 @@ The queue driver supports:
 - **Retry deadlines** (`retryUntil`)
 - **Exception limits** (`maxExceptions`)
 
+### Failed Jobs
+
+Failed jobs are automatically stored in Laravel's `failed_jobs` table when:
+- Maximum attempts are exceeded
+- An exception is thrown during job execution
+- The job explicitly calls `$this->fail($exception)`
+
+#### Handling Failed Jobs
+
+```php
+class ProcessOrder implements ShouldQueue
+{
+    use InteractsWithQueue;
+
+    public function failed(Throwable $exception): void
+    {
+        // Handle the failure
+        logger()->error('Order processing failed', [
+            'order_id' => $this->orderId,
+            'exception' => $exception->getMessage(),
+        ]);
+    }
+}
+```
+
+#### Dead Letter Queue (DLQ)
+
+Configure a Dead Letter Queue to route failed jobs to a separate NATS subject:
+
+```php
+// config/queue.php
+'nats' => [
+    'driver' => 'nats',
+    'host' => env('NATS_HOST', 'localhost'),
+    'port' => env('NATS_PORT', 4222),
+    'queue' => env('NATS_QUEUE', 'default'),
+    'retry_after' => 60,
+    'dead_letter_queue' => env('NATS_QUEUE_DLQ', 'failed'), // Optional
+],
+```
+
+When a job fails, it will be:
+1. Stored in the `failed_jobs` database table
+2. Routed to the DLQ subject (if configured) with enhanced metadata:
+   - Original queue name
+   - Failure exception message
+   - Failure timestamp
+   - Stack trace
+
+You can subscribe to the DLQ to process failed jobs:
+
+```php
+use LaravelNats\Laravel\Facades\Nats;
+
+Nats::subscribe('laravel.queue.failed', function ($message) {
+    $payload = $message->getDecodedPayload();
+    
+    // Process failed job
+    logger()->error('Failed job received', [
+        'original_queue' => $payload['original_queue'],
+        'failure_message' => $payload['failure_message'],
+    ]);
+});
+```
+
 ### Current Limitations
 
 - **Delayed jobs:** Not yet supported (requires JetStream, coming in v1.0)
@@ -234,10 +299,12 @@ This package is under active development. Current status:
 
 - ✅ **Phase 1:** Core Messaging (Publish, Subscribe, Request/Reply)
 - ✅ **Phase 1:** Laravel Integration (ServiceProvider, Facade, Config)
-- 🔵 **Phase 2:** Laravel Queue Driver (50% Complete)
+- 🔵 **Phase 2:** Laravel Queue Driver (70% Complete)
   - ✅ Milestone 2.1: Queue Driver Foundation
   - ✅ Milestone 2.3: Job Lifecycle & Retry
+  - ✅ Milestone 2.4: Failed Jobs & DLQ
   - 🔲 Milestone 2.2: Delayed Jobs (requires JetStream)
+  - 🔲 Milestone 2.5: Queue Worker Compatibility
 - 🔲 **Phase 3:** JetStream Support
 - 🔲 **Phase 4:** Worker & Runtime
 - 🔲 **Phase 5:** Observability & Debugging
