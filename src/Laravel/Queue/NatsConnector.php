@@ -30,11 +30,20 @@ class NatsConnector implements ConnectorInterface
         $client = new Client($connectionConfig);
         $client->connect();
 
+        $prefix = $config['prefix'] ?? 'laravel.queue.';
+        $dlqSubject = $config['dead_letter_queue'] ?? null;
+
+        // If DLQ is a relative path, prepend the prefix
+        if ($dlqSubject !== null && ! str_contains($dlqSubject, '.')) {
+            $dlqSubject = $prefix . $dlqSubject;
+        }
+
         return new NatsQueue(
             client: $client,
             defaultQueue: $config['queue'] ?? 'default',
             retryAfter: $config['retry_after'] ?? 60,
             maxTries: $config['tries'] ?? 3,
+            deadLetterQueue: $dlqSubject,
         );
     }
 
