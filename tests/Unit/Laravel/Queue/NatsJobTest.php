@@ -13,6 +13,8 @@ function createMockQueue(): \Mockery\MockInterface
 {
     $queue = Mockery::mock(NatsQueue::class);
     $queue->shouldReceive('getQueue')->andReturn('test-queue');
+    $queue->shouldReceive('getDeadLetterQueueSubject')->andReturn(null); // No DLQ = no getClient() call
+    $queue->shouldReceive('getRetryAfter')->andReturn(60);
 
     return $queue;
 }
