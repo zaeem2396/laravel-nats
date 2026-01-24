@@ -65,17 +65,12 @@ jobs:
 
     services:
       # Primary NATS server (no authentication)
+      # Note: Health check removed - NATS starts quickly and wait script verifies readiness
       nats:
         image: nats:2.10
         ports:
           - 4222:4222
           - 8222:8222
-        options: >-
-          --health-cmd "sh -c 'echo > /dev/tcp/localhost/4222'"
-          --health-interval 5s
-          --health-timeout 10s
-          --health-retries 20
-          --health-start-period 10s
 
     steps:
       - name: Checkout code
