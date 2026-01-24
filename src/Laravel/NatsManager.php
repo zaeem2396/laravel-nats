@@ -11,6 +11,8 @@ use LaravelNats\Contracts\Messaging\MessageInterface;
 use LaravelNats\Contracts\Serialization\SerializerInterface;
 use LaravelNats\Core\Client;
 use LaravelNats\Core\Connection\ConnectionConfig;
+use LaravelNats\Core\JetStream\JetStreamClient;
+use LaravelNats\Core\JetStream\JetStreamConfig;
 use LaravelNats\Core\Serialization\JsonSerializer;
 use LaravelNats\Core\Serialization\PhpSerializer;
 
@@ -155,6 +157,26 @@ class NatsManager
         $this->disconnect($name);
 
         return $this->connection($name);
+    }
+
+    /**
+     * Get a JetStream client for a connection.
+     *
+     * @param string|null $name Connection name (null for default)
+     * @param JetStreamConfig|null $config JetStream configuration (null to use config file)
+     *
+     * @return JetStreamClient
+     */
+    public function jetstream(?string $name = null, ?JetStreamConfig $config = null): JetStreamClient
+    {
+        $client = $this->connection($name);
+
+        if ($config === null) {
+            $jsConfig = $this->config->get('nats.jetstream', []);
+            $config = JetStreamConfig::fromArray($jsConfig);
+        }
+
+        return $client->getJetStream($config);
     }
 
     /**
