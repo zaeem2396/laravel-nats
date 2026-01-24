@@ -148,21 +148,12 @@ class NatsJob extends Job implements JobContract
         // Route to Dead Letter Queue if configured
         $this->routeToDeadLetterQueue($exception);
 
-        // Note: JobFailed event dispatch is handled by Laravel's queue worker
-        // We don't dispatch it here to avoid container dependency issues
-
-        // Call parent fail if available (Laravel 10+)
-        // Wrap in try-catch to handle cases where parent::fail() requires container bindings
-        try {
-            if (method_exists(parent::class, 'fail')) {
-                parent::fail($exception);
-            } else {
-                $this->delete();
-            }
-        } catch (Throwable $e) {
-            // If parent::fail() fails, just delete the job
-            $this->delete();
-        }
+        // Note: We don't call parent::fail() because:
+        // 1. We've already handled all failure logic (store, DLQ, etc.)
+        // 2. parent::fail() may trigger deprecation warnings in Laravel 10+
+        // 3. parent::fail() requires container bindings that may not exist
+        // Instead, we just delete the job to clean up
+        $this->delete();
     }
 
     /**
