@@ -63,29 +63,22 @@ jobs:
             testbench: '10.*'
             stability: prefer-stable
 
-    services:
-      # Primary NATS server (no authentication, JetStream enabled)
-      nats:
-        image: nats:2.10
-        ports:
-          - 4222:4222
-          - 8222:8222
-        options: >-
-          --jetstream
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Start authenticated NATS servers
+      - name: Start NATS servers
         run: |
+          # Start primary NATS server with JetStream (no authentication)
+          docker run -d --name nats -p 4222:4222 -p 8222:8222 nats:2.10 --jetstream
+          
           # Start NATS with username/password authentication and JetStream
           docker run -d --name nats-secured -p 4223:4222 -p 8223:8222 nats:2.10 --jetstream --user testuser --pass testpass
           
           # Start NATS with token authentication and JetStream
           docker run -d --name nats-token -p 4224:4222 -p 8224:8222 nats:2.10 --jetstream --auth secret-token-12345
           
-          echo "Started authenticated NATS containers with JetStream"
+          echo "Started all NATS containers with JetStream enabled"
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
