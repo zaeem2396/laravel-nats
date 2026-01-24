@@ -254,7 +254,7 @@ describe('Long-running Stability', function (): void {
                         $request = $msg->getDecodedPayload();
                         $client->publish(
                             $msg->getReplyTo(),
-                            ['echo' => $request['message'] ?? 'no-message']
+                            ['echo' => $request['message'] ?? 'no-message'],
                         );
                     }
                 });
