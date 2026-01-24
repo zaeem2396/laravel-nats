@@ -240,10 +240,40 @@ Nats::subscribe('laravel.queue.failed', function ($message) {
 });
 ```
 
+### Running Queue Workers
+
+Use Laravel's standard queue worker commands:
+
+```bash
+# Start a queue worker
+php artisan queue:work nats
+
+# Process jobs from a specific queue
+php artisan queue:work nats --queue=high,default
+
+# Set maximum job attempts
+php artisan queue:work nats --tries=3
+
+# Set job timeout
+php artisan queue:work nats --timeout=60
+
+# Set memory limit
+php artisan queue:work nats --memory=128
+```
+
+**Supported Worker Options:**
+- `--queue` - Specify which queues to process
+- `--tries` - Maximum number of attempts for a job
+- `--timeout` - Seconds a child process can run
+- `--memory` - Memory limit in megabytes
+- `--sleep` - Seconds to sleep when no job available
+- `--once` - Process a single job and exit
+
 ### Current Limitations
 
 - **Delayed jobs:** Not yet supported (requires JetStream, coming in v1.0)
 - **Queue size:** Returns 0 (NATS Core doesn't track queue size)
+- **Priority queues:** Not supported in NATS Core
 
 ## Authentication
 
