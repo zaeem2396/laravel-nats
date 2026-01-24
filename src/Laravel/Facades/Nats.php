@@ -7,6 +7,8 @@ namespace LaravelNats\Laravel\Facades;
 use Illuminate\Support\Facades\Facade;
 use LaravelNats\Contracts\Messaging\MessageInterface;
 use LaravelNats\Core\Client;
+use LaravelNats\Core\JetStream\JetStreamClient;
+use LaravelNats\Core\JetStream\JetStreamConfig;
 
 /**
  * Nats Facade provides static access to NATS messaging.
@@ -30,6 +32,7 @@ use LaravelNats\Core\Client;
  * @method static int process(float $timeout = 0.0) Process incoming messages
  * @method static bool isConnected() Check if connected to NATS
  * @method static void ping() Send a ping to the server
+ * @method static JetStreamClient jetstream(string|null $name = null, JetStreamConfig|null $config = null) Get a JetStream client
  *
  * @see \LaravelNats\Laravel\NatsManager
  * @see \LaravelNats\Core\Client

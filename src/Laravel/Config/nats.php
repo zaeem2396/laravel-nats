@@ -115,6 +115,27 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | JetStream Configuration
+    |--------------------------------------------------------------------------
+    |
+    | Configuration for NATS JetStream (persistence and streaming).
+    | JetStream must be enabled on your NATS server for these features.
+    |
+    | 'domain': JetStream domain for multi-tenancy (optional)
+    |           When set, API subjects use: $JS.<domain>.API.*
+    |           When null, uses default: $JS.API.*
+    |
+    | 'timeout': Default timeout for JetStream API requests (seconds)
+    |
+    */
+
+    'jetstream' => [
+        'domain' => env('NATS_JETSTREAM_DOMAIN'),
+        'timeout' => (float) env('NATS_JETSTREAM_TIMEOUT', 5.0),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Queue Configuration
     |--------------------------------------------------------------------------
     |
