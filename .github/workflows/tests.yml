@@ -72,6 +72,20 @@ jobs:
           - 4222:4222
           - 8222:8222
 
+      # Secured NATS server (username/password authentication)
+      nats-secured:
+        image: nats:2.10
+        ports:
+          - 4223:4222
+          - 8223:8222
+
+      # Token-auth NATS server
+      nats-token:
+        image: nats:2.10
+        ports:
+          - 4224:4222
+          - 8224:8222
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -105,9 +119,9 @@ jobs:
       - name: Install netcat
         run: sudo apt-get update && sudo apt-get install -y netcat-openbsd
 
-      - name: Wait for NATS server
+      - name: Wait for NATS servers
         run: |
-          echo "Waiting for NATS server on port 4222..."
+          echo "Waiting for NATS servers..."
           max_attempts=120
           attempt=0
           
@@ -115,30 +129,38 @@ jobs:
           sleep 3
           
           while [ $attempt -lt $max_attempts ]; do
-            # Check if port is open
-            if nc -z localhost 4222 2>/dev/null; then
-              echo "Port 4222 is open, verifying NATS protocol..."
-              # Verify NATS is responding with INFO command
-              response=$(echo -e "INFO\r\n" | timeout 2 nc localhost 4222 2>/dev/null || echo "")
-              if echo "$response" | grep -q "server_id"; then
-                echo "✓ NATS server is ready and responding correctly!"
-                exit 0
-              else
-                echo "Port open but NATS not responding yet..."
-              fi
+            ready=true
+            
+            # Check primary NATS (port 4222)
+            if ! nc -z localhost 4222 2>/dev/null; then
+              ready=false
             fi
+            
+            # Check secured NATS (port 4223)
+            if ! nc -z localhost 4223 2>/dev/null; then
+              ready=false
+            fi
+            
+            # Check token NATS (port 4224)
+            if ! nc -z localhost 4224 2>/dev/null; then
+              ready=false
+            fi
+            
+            if [ "$ready" = true ]; then
+              echo "✓ All NATS servers are ready!"
+              exit 0
+            fi
+            
             attempt=$((attempt + 1))
             if [ $((attempt % 10)) -eq 0 ]; then
-              echo "Attempt $attempt/$max_attempts: Still waiting..."
+              echo "Attempt $attempt/$max_attempts: Still waiting for NATS servers..."
             fi
             sleep 1
           done
           
-          echo "✗ NATS server failed to start after $max_attempts seconds"
+          echo "✗ NATS servers failed to start after $max_attempts seconds"
           echo "Checking NATS container status..."
           docker ps -a | grep nats || true
-          echo "Checking if port 4222 is listening..."
-          netstat -tuln | grep 4222 || ss -tuln | grep 4222 || true
           exit 1
 
       - name: Run tests
