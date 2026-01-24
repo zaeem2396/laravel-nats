@@ -182,6 +182,8 @@ jobs:
           echo "✗ NATS servers failed to start after $max_attempts seconds"
           echo "Checking NATS container status..."
           docker ps -a | grep nats || true
+          echo "Checking ports..."
+          netstat -tuln | grep -E "4222|4223|4224" || ss -tuln | grep -E "4222|4223|4224" || true
           exit 1
 
       - name: Run tests
