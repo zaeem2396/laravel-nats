@@ -323,18 +323,85 @@ composer format:check
 composer format
 ```
 
+## Troubleshooting
+
+### Connection Refused
+
+**Error:** `Connection to localhost:4222 refused`
+
+**Solution:** Ensure the NATS server is running:
+
+```bash
+# Using Docker
+docker run -d --name nats -p 4222:4222 -p 8222:8222 nats:2.10
+
+# Or with Docker Compose
+docker-compose up -d
+```
+
+### Authentication Failed
+
+**Error:** `Authorization Violation`
+
+**Solutions:**
+1. Verify credentials in your `.env` file match the NATS server configuration
+2. Check if using token auth vs. username/password auth
+3. Ensure the NATS server is configured for the authentication method you're using
+
+### Queue Jobs Not Processing
+
+**Possible causes:**
+
+1. **Worker not running:** Start the queue worker:
+   ```bash
+   php artisan queue:work nats
+   ```
+
+2. **Wrong queue name:** Ensure your job is dispatched to the correct queue:
+   ```php
+   dispatch(new MyJob())->onQueue('high');
+   ```
+   Then process that queue:
+   ```bash
+   php artisan queue:work nats --queue=high
+   ```
+
+3. **NATS connection issues:** Check NATS server logs for errors
+
+### Message Size Limits
+
+NATS has a default maximum message size of 1MB. For larger payloads:
+
+1. Store the data externally (S3, database) and pass a reference
+2. Configure NATS server with a higher `max_payload` setting
+
+## API Stability
+
+This package follows [Semantic Versioning](https://semver.org/). After v1.0.0:
+
+- **Stable API:** Classes in the `LaravelNats\Laravel` namespace
+  - `Nats` facade
+  - `NatsManager`
+  - `NatsQueue`, `NatsJob`, `NatsConnector`
+  - Configuration structure
+
+- **Internal API:** Classes in the `LaravelNats\Core` namespace
+  - May change in minor versions
+  - Use the facade for stability
+
 ## Roadmap
 
 This package is under active development. Current status:
 
 - ✅ **Phase 1:** Core Messaging (Publish, Subscribe, Request/Reply)
 - ✅ **Phase 1:** Laravel Integration (ServiceProvider, Facade, Config)
-- 🔵 **Phase 2:** Laravel Queue Driver (70% Complete)
+- ✅ **Phase 2:** Laravel Queue Driver (Complete)
   - ✅ Milestone 2.1: Queue Driver Foundation
   - ✅ Milestone 2.3: Job Lifecycle & Retry
   - ✅ Milestone 2.4: Failed Jobs & DLQ
+  - ✅ Milestone 2.5: Queue Worker Compatibility
+  - ✅ Milestone 2.6: Queue Driver Stabilization
   - 🔲 Milestone 2.2: Delayed Jobs (requires JetStream)
-  - 🔲 Milestone 2.5: Queue Worker Compatibility
 - 🔲 **Phase 3:** JetStream Support
 - 🔲 **Phase 4:** Worker & Runtime
 - 🔲 **Phase 5:** Observability & Debugging
