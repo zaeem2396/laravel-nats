@@ -70,6 +70,12 @@ jobs:
         ports:
           - 4222:4222
           - 8222:8222
+        options: >-
+          --health-cmd "sh -c 'echo > /dev/tcp/localhost/4222'"
+          --health-interval 5s
+          --health-timeout 10s
+          --health-retries 20
+          --health-start-period 10s
 
     steps:
       - name: Checkout code
@@ -107,15 +113,24 @@ jobs:
       - name: Wait for NATS server
         run: |
           echo "Waiting for NATS server on port 4222..."
-          for i in {1..60}; do
+          max_attempts=90
+          attempt=0
+          while [ $attempt -lt $max_attempts ]; do
             if nc -z localhost 4222 2>/dev/null; then
-              echo "NATS server is ready"
-              exit 0
+              echo "NATS server is ready!"
+              # Verify NATS is actually responding
+              if echo "INFO" | nc localhost 4222 2>/dev/null | grep -q "server_id"; then
+                echo "NATS server is responding correctly"
+                exit 0
+              fi
             fi
-            echo "Attempt $i/60: NATS server not ready yet..."
+            attempt=$((attempt + 1))
+            echo "Attempt $attempt/$max_attempts: NATS server not ready yet..."
             sleep 2
           done
-          echo "NATS server failed to start after 120 seconds"
+          echo "NATS server failed to start after $((max_attempts * 2)) seconds"
+          echo "Checking NATS container status..."
+          docker ps -a | grep nats || true
           exit 1
 
       - name: Run tests
