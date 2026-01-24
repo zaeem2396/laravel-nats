@@ -556,14 +556,31 @@ class NatsJob extends Job implements JobContract
                 return null;
             }
 
-            $command = @unserialize($payload['data']['command']);
+            $commandData = $payload['data']['command'];
 
-            // unserialize returns false on failure
-            if ($command === false) {
+            // Skip if command is not a string (shouldn't happen, but be safe)
+            if (! is_string($commandData)) {
                 return null;
             }
 
-            return is_object($command) ? $command : null;
+            // Check if it looks like valid PHP serialized data
+            // PHP serialized data starts with: O (object), a (array), s (string), i (int), d (double), b (bool), N (null)
+            // Format: type:length:value or type:value
+            if (! preg_match('/^[aOsidbN]:\d+:/', $commandData)) {
+                return null;
+            }
+
+            // Use error suppression and check result
+            $errorReporting = error_reporting(0);
+            $command = unserialize($commandData, ['allowed_classes' => true]);
+            error_reporting($errorReporting);
+
+            // unserialize returns false on failure, or throws exception
+            if ($command === false || ! is_object($command)) {
+                return null;
+            }
+
+            return $command;
         } catch (Throwable $e) {
             return null;
         }
