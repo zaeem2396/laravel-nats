@@ -70,11 +70,6 @@ jobs:
         ports:
           - 4222:4222
           - 8222:8222
-        options: >-
-          --health-cmd "nc -z localhost 4222 || exit 1"
-          --health-interval 5s
-          --health-timeout 3s
-          --health-retries 10
 
     steps:
       - name: Checkout code
