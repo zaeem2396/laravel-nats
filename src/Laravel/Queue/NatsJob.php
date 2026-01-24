@@ -6,10 +6,8 @@ namespace LaravelNats\Laravel\Queue;
 
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Queue\Job as JobContract;
-use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\Jobs\Job;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Event;
 use LaravelNats\Laravel\Queue\Failed\NatsFailedJobProvider;
 use Throwable;
 
