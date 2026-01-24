@@ -190,7 +190,9 @@ describe('NatsJob', function (): void {
 
         it('falls back to queue retry_after', function (): void {
             $payload = json_encode(['uuid' => 'test', 'attempts' => 1]);
-            $queue = createMockQueue();
+            $queue = Mockery::mock(NatsQueue::class);
+            $queue->shouldReceive('getQueue')->andReturn('test-queue');
+            $queue->shouldReceive('getDeadLetterQueueSubject')->andReturn(null);
             $queue->shouldReceive('getRetryAfter')->andReturn(45);
             $job = createTestJob($payload, $queue);
 
@@ -338,7 +340,9 @@ describe('NatsJob', function (): void {
 
         it('falls back to queue retry_after', function (): void {
             $payload = json_encode(['uuid' => 'test', 'attempts' => 1]);
-            $queue = createMockQueue();
+            $queue = Mockery::mock(NatsQueue::class);
+            $queue->shouldReceive('getQueue')->andReturn('test-queue');
+            $queue->shouldReceive('getDeadLetterQueueSubject')->andReturn(null);
             $queue->shouldReceive('getRetryAfter')->andReturn(45);
             $job = createTestJob($payload, $queue);
 
@@ -368,7 +372,9 @@ describe('NatsJob', function (): void {
 
         it('uses queue default when no backoff configured', function (): void {
             $payload = json_encode(['uuid' => 'test', 'attempts' => 1]);
-            $queue = createMockQueue();
+            $queue = Mockery::mock(NatsQueue::class);
+            $queue->shouldReceive('getQueue')->andReturn('test-queue');
+            $queue->shouldReceive('getDeadLetterQueueSubject')->andReturn(null);
             $queue->shouldReceive('getRetryAfter')->andReturn(45);
             $queue->shouldReceive('later')
                 ->once()

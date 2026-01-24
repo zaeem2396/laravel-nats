@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-use Illuminate\Support\Facades\DB;
 use LaravelNats\Laravel\Queue\Failed\NatsFailedJobProvider;
 
 describe('NatsFailedJobProvider', function (): void {

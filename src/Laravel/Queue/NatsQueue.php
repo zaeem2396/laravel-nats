@@ -245,18 +245,6 @@ class NatsQueue extends Queue implements QueueContract
     }
 
     /**
-     * Get the NATS subject for a queue.
-     *
-     * @param string|null $queue
-     *
-     * @return string
-     */
-    protected function getSubject(?string $queue = null): string
-    {
-        return $this->subjectPrefix . $this->getQueue($queue);
-    }
-
-    /**
      * Get the Dead Letter Queue subject.
      *
      * @return string|null
@@ -276,5 +264,17 @@ class NatsQueue extends Queue implements QueueContract
     public function setDeadLetterQueueSubject(?string $subject): void
     {
         $this->deadLetterQueue = $subject;
+    }
+
+    /**
+     * Get the NATS subject for a queue.
+     *
+     * @param string|null $queue
+     *
+     * @return string
+     */
+    protected function getSubject(?string $queue = null): string
+    {
+        return $this->subjectPrefix . $this->getQueue($queue);
     }
 }

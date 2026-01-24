@@ -293,7 +293,7 @@ describe('NatsQueue', function (): void {
                     'test-queue',
                     60,
                     3,
-                    $dlqSubject
+                    $dlqSubject,
                 );
 
                 expect($queue->getDeadLetterQueueSubject())->toBe($dlqSubject);
@@ -321,7 +321,7 @@ describe('NatsQueue', function (): void {
                 'test-queue',
                 60,
                 3,
-                'laravel.queue.failed'
+                'laravel.queue.failed',
             );
 
             try {

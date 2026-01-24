@@ -586,7 +586,7 @@ class NatsJob extends Job implements JobContract
                     $this->connectionName,
                     $this->queue,
                     $this->job,
-                    $exception ?? new \RuntimeException('Job failed without exception')
+                    $exception ?? new \RuntimeException('Job failed without exception'),
                 );
             }
         } catch (Throwable $e) {
@@ -621,6 +621,11 @@ class NatsJob extends Job implements JobContract
             $payload['original_connection'] = $this->connectionName;
 
             $dlqPayload = json_encode($payload);
+
+            // json_encode returns false on failure, skip DLQ routing if encoding fails
+            if ($dlqPayload === false) {
+                return;
+            }
 
             // Publish to DLQ
             $this->nats->getClient()->publishRaw($dlqSubject, $dlqPayload);

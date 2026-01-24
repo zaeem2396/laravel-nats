@@ -137,7 +137,7 @@ class NatsFailedJobProvider implements FailedJobProviderInterface
      *
      * @return void
      */
-    public function flush($hours = null)
+    public function flush($hours = null): void
     {
         $query = DB::connection($this->connection)->table($this->table);
 
@@ -166,4 +166,3 @@ class NatsFailedJobProvider implements FailedJobProviderInterface
         return $decoded['uuid'] ?? $decoded['id'] ?? (string) md5($payload);
     }
 }
-
