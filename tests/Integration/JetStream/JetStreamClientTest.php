@@ -29,6 +29,12 @@ function createJetStreamTestClient(): Client
     $client = new Client($config);
     $client->connect();
 
+    // Ensure connection is fully established and ServerInfo is available
+    $serverInfo = $client->getServerInfo();
+    if ($serverInfo === null) {
+        throw new RuntimeException('Failed to get ServerInfo after connection');
+    }
+
     return $client;
 }
 
