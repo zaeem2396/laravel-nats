@@ -10,6 +10,8 @@ use LaravelNats\Contracts\Messaging\SubscriberInterface;
 use LaravelNats\Contracts\Serialization\SerializerInterface;
 use LaravelNats\Core\Connection\Connection;
 use LaravelNats\Core\Connection\ConnectionConfig;
+use LaravelNats\Core\JetStream\JetStreamClient;
+use LaravelNats\Core\JetStream\JetStreamConfig;
 use LaravelNats\Core\Messaging\Message;
 use LaravelNats\Core\Protocol\ServerInfo;
 use LaravelNats\Core\Serialization\JsonSerializer;
@@ -161,6 +163,18 @@ final class Client implements PublisherInterface, SubscriberInterface
     public function getSerializer(): SerializerInterface
     {
         return $this->serializer;
+    }
+
+    /**
+     * Get a JetStream client for this connection.
+     *
+     * @param JetStreamConfig|null $config JetStream configuration
+     *
+     * @return JetStreamClient
+     */
+    public function getJetStream(?JetStreamConfig $config = null): JetStreamClient
+    {
+        return new JetStreamClient($this, $config);
     }
 
     /**
