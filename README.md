@@ -389,6 +389,52 @@ This package follows [Semantic Versioning](https://semver.org/). After v1.0.0:
   - May change in minor versions
   - Use the facade for stability
 
+## JetStream Support
+
+JetStream is NATS's persistence and streaming layer. This package provides access to JetStream functionality.
+
+### Prerequisites
+
+Ensure your NATS server has JetStream enabled:
+
+```bash
+# Docker example
+docker run -d --name nats -p 4222:4222 -p 8222:8222 nats:2.10 --jetstream
+```
+
+### Basic Usage
+
+```php
+use LaravelNats\Laravel\Facades\Nats;
+
+// Get JetStream client
+$js = Nats::jetstream();
+
+// Check if JetStream is available
+if ($js->isAvailable()) {
+    // Use JetStream features
+}
+```
+
+### Configuration
+
+Configure JetStream in `config/nats.php`:
+
+```php
+'jetstream' => [
+    'domain' => env('NATS_JETSTREAM_DOMAIN'),  // Optional: for multi-tenancy
+    'timeout' => (float) env('NATS_JETSTREAM_TIMEOUT', 5.0),
+],
+```
+
+### Domain Support
+
+For multi-tenant setups, you can use JetStream domains:
+
+```php
+$js = Nats::jetstream(null, new \LaravelNats\Core\JetStream\JetStreamConfig('my-domain'));
+```
+
 ## Roadmap
 
 This package is under active development. Current status:
@@ -402,7 +448,12 @@ This package is under active development. Current status:
   - ✅ Milestone 2.5: Queue Worker Compatibility
   - ✅ Milestone 2.6: Queue Driver Stabilization
   - 🔲 Milestone 2.2: Delayed Jobs (requires JetStream)
-- 🔲 **Phase 3:** JetStream Support
+- 🔵 **Phase 3:** JetStream Support (In Progress)
+  - ✅ Milestone 3.1: JetStream Connection
+  - 🔲 Milestone 3.2: Stream Management
+  - 🔲 Milestone 3.3: Consumer Management
+  - 🔲 Milestone 3.4: Acknowledgement System
+  - 🔲 Milestone 3.5: Artisan Commands
 - 🔲 **Phase 4:** Worker & Runtime
 - 🔲 **Phase 5:** Observability & Debugging
 - 🔲 **Phase 6:** Reliability & Resilience
