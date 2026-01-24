@@ -65,37 +65,25 @@ jobs:
 
     services:
       # Primary NATS server (no authentication)
-      # Note: Health check removed - NATS starts quickly and wait script verifies readiness
       nats:
         image: nats:2.10
         ports:
           - 4222:4222
           - 8222:8222
-      
-      # Secured NATS server (username/password authentication)
-      # Required for AuthenticationTest.php
-      nats-secured:
-        image: nats:2.10
-        ports:
-          - 4223:4222
-          - 8223:8222
-        options: >-
-          --user=testuser
-          --pass=testpass
-      
-      # Token-auth NATS server
-      # Required for AuthenticationTest.php
-      nats-token:
-        image: nats:2.10
-        ports:
-          - 4224:4222
-          - 8224:8222
-        options: >-
-          --auth=secret-token-12345
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Start authenticated NATS servers
+        run: |
+          # Start NATS with username/password authentication
+          docker run -d --name nats-secured -p 4223:4222 -p 8223:8222 nats:2.10 --user testuser --pass testpass
+          
+          # Start NATS with token authentication
+          docker run -d --name nats-token -p 4224:4222 -p 8224:8222 nats:2.10 --auth secret-token-12345
+          
+          echo "Started authenticated NATS containers"
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
