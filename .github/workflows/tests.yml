@@ -70,6 +70,11 @@ jobs:
         ports:
           - 4222:4222
           - 8222:8222
+        options: >-
+          --health-cmd "wget --spider http://localhost:8222/healthz || exit 1"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 5
 
     steps:
       - name: Checkout code
@@ -101,17 +106,21 @@ jobs:
           composer require "laravel/framework:${{ matrix.laravel }}" "orchestra/testbench:${{ matrix.testbench }}" --no-interaction --no-update
           composer update --${{ matrix.stability }} --prefer-dist --no-interaction --no-progress
 
+      - name: Install netcat
+        run: sudo apt-get update && sudo apt-get install -y netcat-openbsd
+
       - name: Wait for NATS server
         run: |
           echo "Waiting for NATS server on port 4222..."
-          for i in {1..30}; do
+          for i in {1..60}; do
             if nc -z localhost 4222 2>/dev/null; then
               echo "NATS server is ready"
               exit 0
             fi
-            sleep 1
+            echo "Attempt $i/60: NATS server not ready yet..."
+            sleep 2
           done
-          echo "NATS server failed to start"
+          echo "NATS server failed to start after 120 seconds"
           exit 1
 
       - name: Run tests

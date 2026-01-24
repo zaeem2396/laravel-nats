@@ -34,7 +34,7 @@ class NatsConnector implements ConnectorInterface
         $dlqSubject = $config['dead_letter_queue'] ?? null;
 
         // If DLQ is a relative path, prepend the prefix
-        if ($dlqSubject !== null && ! str_contains($dlqSubject, '.')) {
+        if ($dlqSubject !== null && $dlqSubject !== '' && ! str_contains($dlqSubject, '.')) {
             $dlqSubject = $prefix . $dlqSubject;
         }
 
