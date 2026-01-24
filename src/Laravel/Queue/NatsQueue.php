@@ -45,23 +45,31 @@ class NatsQueue extends Queue implements QueueContract
     protected int $maxTries;
 
     /**
+     * The Dead Letter Queue subject (optional).
+     */
+    protected ?string $deadLetterQueue = null;
+
+    /**
      * Create a new NATS queue instance.
      *
      * @param Client $client
      * @param string $defaultQueue
      * @param int $retryAfter
      * @param int $maxTries
+     * @param string|null $deadLetterQueue
      */
     public function __construct(
         Client $client,
         string $defaultQueue = 'default',
         int $retryAfter = 60,
         int $maxTries = 3,
+        ?string $deadLetterQueue = null,
     ) {
         $this->client = $client;
         $this->defaultQueue = $defaultQueue;
         $this->retryAfter = $retryAfter;
         $this->maxTries = $maxTries;
+        $this->deadLetterQueue = $deadLetterQueue;
     }
 
     /**
@@ -234,6 +242,28 @@ class NatsQueue extends Queue implements QueueContract
             maxTries: $this->maxTries,
             retryDelay: $this->retryAfter,
         );
+    }
+
+    /**
+     * Get the Dead Letter Queue subject.
+     *
+     * @return string|null
+     */
+    public function getDeadLetterQueueSubject(): ?string
+    {
+        return $this->deadLetterQueue;
+    }
+
+    /**
+     * Set the Dead Letter Queue subject.
+     *
+     * @param string|null $subject
+     *
+     * @return void
+     */
+    public function setDeadLetterQueueSubject(?string $subject): void
+    {
+        $this->deadLetterQueue = $subject;
     }
 
     /**

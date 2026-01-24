@@ -8,6 +8,7 @@ use Illuminate\Container\Container;
 use Illuminate\Contracts\Queue\Job as JobContract;
 use Illuminate\Queue\Jobs\Job;
 use Illuminate\Support\Arr;
+use LaravelNats\Laravel\Queue\Failed\NatsFailedJobProvider;
 use Throwable;
 
 /**
@@ -136,12 +137,21 @@ class NatsJob extends Job implements JobContract
         $this->markAsFailed();
         $this->failureException = $exception;
 
-        // Call parent fail if available (Laravel 10+)
-        if (method_exists(parent::class, 'fail')) {
-            parent::fail($exception);
-        } else {
-            $this->delete();
-        }
+        // Resolve the job instance to call failed() method
+        $this->resolveAndCallFailed($exception);
+
+        // Store in failed_jobs table
+        $this->storeFailedJob($exception);
+
+        // Route to Dead Letter Queue if configured
+        $this->routeToDeadLetterQueue($exception);
+
+        // Note: We don't call parent::fail() because:
+        // 1. We've already handled all failure logic (store, DLQ, etc.)
+        // 2. parent::fail() may trigger deprecation warnings in Laravel 10+
+        // 3. parent::fail() requires container bindings that may not exist
+        // Instead, we just delete the job to clean up
+        $this->delete();
     }
 
     /**
@@ -497,5 +507,162 @@ class NatsJob extends Job implements JobContract
         }
 
         return $this->attempts() >= $maxTries;
+    }
+
+    /**
+     * Resolve the job instance and call its failed() method if it exists.
+     *
+     * @param Throwable|null $exception
+     *
+     * @return void
+     */
+    protected function resolveAndCallFailed(?Throwable $exception): void
+    {
+        try {
+            $payload = $this->payload();
+            $job = $this->resolveJob();
+
+            if ($job && method_exists($job, 'failed')) {
+                $job->failed($exception ?? new \RuntimeException('Job failed without exception'));
+            }
+        } catch (Throwable $e) {
+            // Silently fail if we can't resolve the job
+            // This prevents cascading failures
+        }
+    }
+
+    /**
+     * Resolve the job instance from the payload.
+     *
+     * @return object|null
+     */
+    protected function resolveJob(): ?object
+    {
+        try {
+            $payload = $this->payload();
+
+            if (! isset($payload['data']['commandName']) || ! isset($payload['data']['command'])) {
+                return null;
+            }
+
+            $commandData = $payload['data']['command'];
+
+            // Skip if command is not a string (shouldn't happen, but be safe)
+            if (! is_string($commandData)) {
+                return null;
+            }
+
+            // Check if it looks like valid PHP serialized data
+            // PHP serialized data starts with: O (object), a (array), s (string), i (int), d (double), b (bool), N (null)
+            // Format: type:length:value or type:value
+            if (! preg_match('/^[aOsidbN]:\d+:/', $commandData)) {
+                return null;
+            }
+
+            // Use error suppression and check result
+            $errorReporting = error_reporting(0);
+            $command = unserialize($commandData, ['allowed_classes' => true]);
+            error_reporting($errorReporting);
+
+            // unserialize returns false on failure, or throws exception
+            if ($command === false || ! is_object($command)) {
+                return null;
+            }
+
+            return $command;
+        } catch (Throwable $e) {
+            return null;
+        }
+    }
+
+    /**
+     * Store the failed job in the database.
+     *
+     * @param Throwable|null $exception
+     *
+     * @return void
+     */
+    protected function storeFailedJob(?Throwable $exception): void
+    {
+        try {
+            $provider = $this->getFailedJobProvider();
+
+            if ($provider) {
+                $provider->log(
+                    $this->connectionName,
+                    $this->queue,
+                    $this->job,
+                    $exception ?? new \RuntimeException('Job failed without exception'),
+                );
+            }
+        } catch (Throwable $e) {
+            // Silently fail if we can't store the failed job
+            // Log the error but don't throw
+        }
+    }
+
+    /**
+     * Route the failed job to the Dead Letter Queue if configured.
+     *
+     * @param Throwable|null $exception
+     *
+     * @return void
+     */
+    protected function routeToDeadLetterQueue(?Throwable $exception): void
+    {
+        $dlqSubject = $this->nats->getDeadLetterQueueSubject();
+
+        if ($dlqSubject === null) {
+            return;
+        }
+
+        try {
+            // Create enhanced payload with failure metadata
+            $payload = $this->payload();
+            $payload['failed_at'] = time();
+            $payload['failure_exception'] = $exception ? (string) $exception : null;
+            $payload['failure_message'] = $exception?->getMessage();
+            $payload['failure_trace'] = $exception?->getTraceAsString();
+            $payload['original_queue'] = $this->queue;
+            $payload['original_connection'] = $this->connectionName;
+
+            $dlqPayload = json_encode($payload);
+
+            // json_encode returns false on failure, skip DLQ routing if encoding fails
+            if ($dlqPayload === false) {
+                return;
+            }
+
+            // Publish to DLQ
+            $this->nats->getClient()->publishRaw($dlqSubject, $dlqPayload);
+        } catch (Throwable $e) {
+            // Silently fail if we can't route to DLQ
+        }
+    }
+
+    /**
+     * Get the failed job provider instance.
+     *
+     * @return NatsFailedJobProvider|null
+     */
+    protected function getFailedJobProvider(): ?NatsFailedJobProvider
+    {
+        try {
+            if (! $this->container->bound('config')) {
+                return null;
+            }
+
+            $config = $this->container->make('config');
+            if (! $config) {
+                return null;
+            }
+
+            $connection = $config->get('queue.failed.connection', config('database.default'));
+            $table = $config->get('queue.failed.table', 'failed_jobs');
+
+            return new NatsFailedJobProvider($connection, $table);
+        } catch (Throwable $e) {
+            return null;
+        }
     }
 }

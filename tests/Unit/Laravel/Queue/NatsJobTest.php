@@ -13,6 +13,8 @@ function createMockQueue(): \Mockery\MockInterface
 {
     $queue = Mockery::mock(NatsQueue::class);
     $queue->shouldReceive('getQueue')->andReturn('test-queue');
+    $queue->shouldReceive('getDeadLetterQueueSubject')->andReturn(null); // No DLQ = no getClient() call
+    $queue->shouldReceive('getRetryAfter')->andReturn(60);
 
     return $queue;
 }
@@ -188,7 +190,9 @@ describe('NatsJob', function (): void {
 
         it('falls back to queue retry_after', function (): void {
             $payload = json_encode(['uuid' => 'test', 'attempts' => 1]);
-            $queue = createMockQueue();
+            $queue = Mockery::mock(NatsQueue::class);
+            $queue->shouldReceive('getQueue')->andReturn('test-queue');
+            $queue->shouldReceive('getDeadLetterQueueSubject')->andReturn(null);
             $queue->shouldReceive('getRetryAfter')->andReturn(45);
             $job = createTestJob($payload, $queue);
 
@@ -336,7 +340,9 @@ describe('NatsJob', function (): void {
 
         it('falls back to queue retry_after', function (): void {
             $payload = json_encode(['uuid' => 'test', 'attempts' => 1]);
-            $queue = createMockQueue();
+            $queue = Mockery::mock(NatsQueue::class);
+            $queue->shouldReceive('getQueue')->andReturn('test-queue');
+            $queue->shouldReceive('getDeadLetterQueueSubject')->andReturn(null);
             $queue->shouldReceive('getRetryAfter')->andReturn(45);
             $job = createTestJob($payload, $queue);
 
@@ -366,7 +372,9 @@ describe('NatsJob', function (): void {
 
         it('uses queue default when no backoff configured', function (): void {
             $payload = json_encode(['uuid' => 'test', 'attempts' => 1]);
-            $queue = createMockQueue();
+            $queue = Mockery::mock(NatsQueue::class);
+            $queue->shouldReceive('getQueue')->andReturn('test-queue');
+            $queue->shouldReceive('getDeadLetterQueueSubject')->andReturn(null);
             $queue->shouldReceive('getRetryAfter')->andReturn(45);
             $queue->shouldReceive('later')
                 ->once()
@@ -629,6 +637,55 @@ describe('NatsJob', function (): void {
             $job = createTestJob($payload);
 
             expect($job->payload()['message'])->toContain('🎉');
+        });
+    });
+
+    describe('fail', function (): void {
+        it('marks job as failed', function (): void {
+            $job = createTestJob();
+            $exception = new RuntimeException('Test failure');
+
+            $job->fail($exception);
+
+            expect($job->hasFailed())->toBeTrue();
+            expect($job->getFailureException())->toBe($exception);
+        });
+
+        it('handles null exception', function (): void {
+            $job = createTestJob();
+
+            $job->fail(null);
+
+            expect($job->hasFailed())->toBeTrue();
+        });
+
+        it('stores exception details', function (): void {
+            $job = createTestJob();
+            $exception = new InvalidArgumentException('Invalid input', 400);
+
+            $job->fail($exception);
+
+            $storedException = $job->getFailureException();
+            expect($storedException)->toBe($exception);
+            expect($storedException->getMessage())->toBe('Invalid input');
+            expect($storedException->getCode())->toBe(400);
+        });
+    });
+
+    describe('getFailureException', function (): void {
+        it('returns null when no exception', function (): void {
+            $job = createTestJob();
+
+            expect($job->getFailureException())->toBeNull();
+        });
+
+        it('returns exception after fail', function (): void {
+            $job = createTestJob();
+            $exception = new RuntimeException('Error');
+
+            $job->fail($exception);
+
+            expect($job->getFailureException())->toBe($exception);
         });
     });
 });

@@ -311,4 +311,127 @@ describe('Queue Integration', function (): void {
             }
         });
     });
+
+    describe('failed jobs', function (): void {
+        it('marks job as failed when fail() is called', function (): void {
+            $client = createQueueTestClient();
+
+            try {
+                $uniqueQueue = 'failed-test-' . uniqid();
+                $queue = new NatsQueue($client, $uniqueQueue, 60);
+                $queue->setContainer(new Container());
+                $queue->setConnectionName('nats');
+
+                $payload = json_encode([
+                    'uuid' => 'failed-job-test',
+                    'displayName' => 'TestJob',
+                    'job' => 'Illuminate\\Queue\\CallQueuedHandler@call',
+                    'data' => ['message' => 'This will fail'],
+                ]);
+
+                // Create job directly from payload (simulating received job)
+                $job = new NatsJob(
+                    container: new Container(),
+                    nats: $queue,
+                    job: $payload,
+                    connectionName: 'nats',
+                    queue: $uniqueQueue,
+                );
+
+                expect($job->hasFailed())->toBeFalse();
+
+                // Fail the job
+                $exception = new RuntimeException('Test failure');
+                $job->fail($exception);
+
+                expect($job->hasFailed())->toBeTrue();
+                expect($job->getFailureException())->toBe($exception);
+            } finally {
+                $client->disconnect();
+            }
+        });
+
+        it('routes failed job to DLQ when configured', function (): void {
+            $client = createQueueTestClient();
+
+            try {
+                $uniqueQueue = 'dlq-test-' . uniqid();
+                $dlqSubject = 'laravel.queue.dlq-' . uniqid();
+                $queue = new NatsQueue($client, $uniqueQueue, 60, 3, $dlqSubject);
+                $queue->setContainer(new Container());
+                $queue->setConnectionName('nats');
+
+                $payload = json_encode([
+                    'uuid' => 'dlq-job-test',
+                    'displayName' => 'TestJob',
+                    'job' => 'Illuminate\\Queue\\CallQueuedHandler@call',
+                    'data' => ['message' => 'This will go to DLQ'],
+                ]);
+
+                // Subscribe to DLQ first
+                $dlqMessage = null;
+                $client->subscribe($dlqSubject, function ($msg) use (&$dlqMessage): void {
+                    $dlqMessage = $msg;
+                });
+
+                // Create job directly and fail it
+                $job = new NatsJob(
+                    container: new Container(),
+                    nats: $queue,
+                    job: $payload,
+                    connectionName: 'nats',
+                    queue: $uniqueQueue,
+                );
+
+                // Fail the job
+                $exception = new RuntimeException('DLQ test failure');
+                $job->fail($exception);
+
+                // Process to receive DLQ message
+                $client->process(0.5);
+
+                expect($dlqMessage)->not->toBeNull();
+                $dlqPayload = json_decode($dlqMessage->getPayload(), true);
+                expect($dlqPayload['uuid'])->toBe('dlq-job-test');
+                expect($dlqPayload['original_queue'])->toBe($uniqueQueue);
+                expect($dlqPayload['failure_message'])->toContain('DLQ test failure');
+            } finally {
+                $client->disconnect();
+            }
+        });
+
+        it('does not route to DLQ when not configured', function (): void {
+            $client = createQueueTestClient();
+
+            try {
+                $uniqueQueue = 'no-dlq-test-' . uniqid();
+                $queue = new NatsQueue($client, $uniqueQueue, 60);
+                $queue->setContainer(new Container());
+                $queue->setConnectionName('nats');
+
+                expect($queue->getDeadLetterQueueSubject())->toBeNull();
+
+                $payload = json_encode([
+                    'uuid' => 'no-dlq-job',
+                    'displayName' => 'TestJob',
+                ]);
+
+                // Create job directly
+                $job = new NatsJob(
+                    container: new Container(),
+                    nats: $queue,
+                    job: $payload,
+                    connectionName: 'nats',
+                    queue: $uniqueQueue,
+                );
+
+                // Fail the job - should not throw or route to DLQ
+                $job->fail(new RuntimeException('Test'));
+
+                expect($job->hasFailed())->toBeTrue();
+            } finally {
+                $client->disconnect();
+            }
+        });
+    });
 });

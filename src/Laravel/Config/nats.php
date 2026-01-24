@@ -143,6 +143,12 @@ return [
 
         // Block timeout when waiting for jobs (seconds)
         'block_for' => (int) env('NATS_QUEUE_BLOCK_FOR', 0),
+
+        // Dead Letter Queue (DLQ) subject for failed jobs
+        // Set to null to disable DLQ routing
+        // If set to a simple name (e.g., 'failed'), it will be prefixed automatically
+        // If set to a full subject (e.g., 'laravel.queue.failed'), it will be used as-is
+        'dead_letter_queue' => env('NATS_QUEUE_DLQ', null),
     ],
 
 ];
