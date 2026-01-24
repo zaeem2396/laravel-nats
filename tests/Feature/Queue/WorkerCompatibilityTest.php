@@ -15,11 +15,6 @@ declare(strict_types=1);
  */
 
 use Illuminate\Container\Container;
-use Illuminate\Queue\Events\JobExceptionOccurred;
-use Illuminate\Queue\Events\JobFailed;
-use Illuminate\Queue\Events\JobProcessed;
-use Illuminate\Queue\Events\JobProcessing;
-use Illuminate\Support\Facades\Event;
 use LaravelNats\Core\Client;
 use LaravelNats\Core\Connection\ConnectionConfig;
 use LaravelNats\Laravel\Queue\NatsJob;
@@ -499,7 +494,7 @@ describe('Queue Worker Compatibility', function (): void {
                 });
 
                 for ($i = 0; $i < 5; $i++) {
-                    $queue->pushRaw(json_encode(['uuid' => "job-$i"]), $uniqueQueue);
+                    $queue->pushRaw(json_encode(['uuid' => "job-{$i}"]), $uniqueQueue);
                 }
 
                 $client->process(1.0);
@@ -512,4 +507,3 @@ describe('Queue Worker Compatibility', function (): void {
         });
     });
 });
-
