@@ -31,10 +31,16 @@ class NatsConnector implements ConnectorInterface
         $client->connect();
 
         $prefix = $config['prefix'] ?? 'laravel.queue.';
-        $dlqSubject = $config['dead_letter_queue'] ?? null;
+        // Support both 'dead_letter_queue' and 'dlq_subject' for backward compatibility
+        $dlqSubject = $config['dead_letter_queue'] ?? $config['dlq_subject'] ?? null;
+
+        // Normalize empty string to null
+        if ($dlqSubject === '') {
+            $dlqSubject = null;
+        }
 
         // If DLQ is a relative path, prepend the prefix
-        if ($dlqSubject !== null && $dlqSubject !== '' && ! str_contains($dlqSubject, '.')) {
+        if ($dlqSubject !== null && is_string($dlqSubject) && ! str_contains($dlqSubject, '.')) {
             $dlqSubject = $prefix . $dlqSubject;
         }
 
