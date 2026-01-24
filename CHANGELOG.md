@@ -8,7 +8,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- Initial release of Laravel NATS integration
+
+#### JetStream Support (Phase 3 - Milestone 3.1)
+- `JetStreamClient` - Core client for interacting with NATS JetStream
+- `JetStreamConfig` - Configuration class for JetStream settings (domain, timeout)
+- `Client::getJetStream()` - Method to access JetStream client from NATS client
+- `NatsManager::jetstream()` - Method to get JetStream client via manager
+- `Nats::jetstream()` - Facade method for convenient JetStream access
+- JetStream availability detection via `isAvailable()` method
+- JetStream API request support with configurable timeout
+- Multi-tenant domain support for JetStream
+- JetStream configuration section in `config/nats.php`
+- Comprehensive unit and integration tests for JetStream connection
 
 ## [1.0.0] - 2026-01-24
 
