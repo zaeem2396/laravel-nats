@@ -187,6 +187,164 @@ final class JetStreamClient
     }
 
     /**
+     * Create a new stream.
+     *
+     * @param StreamConfig $config Stream configuration
+     * @param float|null $timeout Request timeout
+     *
+     * @throws NatsException If JetStream is not available or creation fails
+     * @throws TimeoutException If request times out
+     * @throws ConnectionException If not connected
+     *
+     * @return StreamInfo Created stream information
+     */
+    public function createStream(StreamConfig $config, ?float $timeout = null): StreamInfo
+    {
+        $timeout = $timeout ?? $this->config->getTimeout();
+        $subject = 'STREAM.CREATE.' . $config->getName();
+        $payload = $config->toArray();
+
+        $response = $this->apiRequest($subject, $payload, $timeout);
+
+        return StreamInfo::fromArray($response);
+    }
+
+    /**
+     * Get stream information.
+     *
+     * @param string $streamName Stream name
+     * @param float|null $timeout Request timeout
+     *
+     * @throws NatsException If JetStream is not available or stream not found
+     * @throws TimeoutException If request times out
+     * @throws ConnectionException If not connected
+     *
+     * @return StreamInfo Stream information
+     */
+    public function getStreamInfo(string $streamName, ?float $timeout = null): StreamInfo
+    {
+        $timeout = $timeout ?? $this->config->getTimeout();
+        $subject = 'STREAM.INFO.' . $streamName;
+
+        $response = $this->apiRequest($subject, [], $timeout);
+
+        return StreamInfo::fromArray($response);
+    }
+
+    /**
+     * Update stream configuration.
+     *
+     * @param StreamConfig $config Stream configuration
+     * @param float|null $timeout Request timeout
+     *
+     * @throws NatsException If JetStream is not available or update fails
+     * @throws TimeoutException If request times out
+     * @throws ConnectionException If not connected
+     *
+     * @return StreamInfo Updated stream information
+     */
+    public function updateStream(StreamConfig $config, ?float $timeout = null): StreamInfo
+    {
+        $timeout = $timeout ?? $this->config->getTimeout();
+        $subject = 'STREAM.UPDATE.' . $config->getName();
+        $payload = $config->toArray();
+
+        $response = $this->apiRequest($subject, $payload, $timeout);
+
+        return StreamInfo::fromArray($response);
+    }
+
+    /**
+     * Delete a stream.
+     *
+     * @param string $streamName Stream name
+     * @param float|null $timeout Request timeout
+     *
+     * @throws NatsException If JetStream is not available or deletion fails
+     * @throws TimeoutException If request times out
+     * @throws ConnectionException If not connected
+     *
+     * @return bool True if deleted successfully
+     */
+    public function deleteStream(string $streamName, ?float $timeout = null): bool
+    {
+        $timeout = $timeout ?? $this->config->getTimeout();
+        $subject = 'STREAM.DELETE.' . $streamName;
+
+        $this->apiRequest($subject, [], $timeout);
+
+        return true;
+    }
+
+    /**
+     * Purge all messages from a stream.
+     *
+     * @param string $streamName Stream name
+     * @param float|null $timeout Request timeout
+     *
+     * @throws NatsException If JetStream is not available or purge fails
+     * @throws TimeoutException If request times out
+     * @throws ConnectionException If not connected
+     *
+     * @return bool True if purged successfully
+     */
+    public function purgeStream(string $streamName, ?float $timeout = null): bool
+    {
+        $timeout = $timeout ?? $this->config->getTimeout();
+        $subject = 'STREAM.PURGE.' . $streamName;
+
+        $this->apiRequest($subject, [], $timeout);
+
+        return true;
+    }
+
+    /**
+     * Get a message from a stream by sequence number.
+     *
+     * @param string $streamName Stream name
+     * @param int $sequence Sequence number
+     * @param float|null $timeout Request timeout
+     *
+     * @throws NatsException If JetStream is not available or message not found
+     * @throws TimeoutException If request times out
+     * @throws ConnectionException If not connected
+     *
+     * @return array<string, mixed> Message data
+     */
+    public function getMessage(string $streamName, int $sequence, ?float $timeout = null): array
+    {
+        $timeout = $timeout ?? $this->config->getTimeout();
+        $subject = 'STREAM.MSG.GET.' . $streamName;
+        $payload = ['seq' => $sequence];
+
+        return $this->apiRequest($subject, $payload, $timeout);
+    }
+
+    /**
+     * Delete a message from a stream by sequence number.
+     *
+     * @param string $streamName Stream name
+     * @param int $sequence Sequence number
+     * @param float|null $timeout Request timeout
+     *
+     * @throws NatsException If JetStream is not available or deletion fails
+     * @throws TimeoutException If request times out
+     * @throws ConnectionException If not connected
+     *
+     * @return bool True if deleted successfully
+     */
+    public function deleteMessage(string $streamName, int $sequence, ?float $timeout = null): bool
+    {
+        $timeout = $timeout ?? $this->config->getTimeout();
+        $subject = 'STREAM.MSG.DELETE.' . $streamName;
+        $payload = ['seq' => $sequence];
+
+        $this->apiRequest($subject, $payload, $timeout);
+
+        return true;
+    }
+
+    /**
      * Build a full JetStream API subject.
      *
      * @param string $subject The API subject (e.g., 'STREAM.CREATE.stream-name')
