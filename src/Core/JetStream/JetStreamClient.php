@@ -158,11 +158,15 @@ final class JetStreamClient
         }
 
         $fullSubject = $this->buildApiSubject($subject);
-        $requestPayload = json_encode($payload);
+        
+        // Convert empty array to empty object for JetStream API
+        $jsonPayload = empty($payload) ? '{}' : json_encode($payload);
 
-        if ($requestPayload === false) {
+        if ($jsonPayload === false) {
             throw new NatsException('Failed to encode JetStream API request payload');
         }
+        
+        $requestPayload = $jsonPayload;
 
         try {
             $response = $this->client->request($fullSubject, $requestPayload, $timeout);

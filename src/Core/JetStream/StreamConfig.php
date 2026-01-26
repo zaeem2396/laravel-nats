@@ -500,7 +500,8 @@ final class StreamConfig
         }
 
         if ($this->maxAge !== null) {
-            $data['max_age'] = $this->maxAge;
+            // Convert seconds to nanoseconds (JetStream expects nanoseconds)
+            $data['max_age'] = $this->maxAge * 1_000_000_000;
         }
 
         if ($this->duplicateWindow !== null) {

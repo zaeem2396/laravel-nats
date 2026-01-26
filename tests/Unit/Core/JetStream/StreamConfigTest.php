@@ -152,4 +152,3 @@ describe('StreamConfig', function (): void {
         });
     });
 });
-
