@@ -205,16 +205,16 @@ describe('Stream Management', function (): void {
 
             try {
                 $streamName = 'full-config-stream-' . uniqid();
-                $config = new StreamConfig($streamName, ['full.>'])
-                    ->withDescription('Full configuration test')
-                    ->withRetention(StreamConfig::RETENTION_INTEREST)
-                    ->withMaxMessages(1000)
-                    ->withMaxBytes(1024000)
-                    ->withMaxAge(3600)
-                    ->withStorage(StreamConfig::STORAGE_MEMORY)
-                    ->withReplicas(1)
-                    ->withDiscard(StreamConfig::DISCARD_NEW)
-                    ->withAllowDirect(true);
+                $config = new StreamConfig($streamName, ['full.>']);
+                $config = $config->withDescription('Full configuration test');
+                $config = $config->withRetention(StreamConfig::RETENTION_INTEREST);
+                $config = $config->withMaxMessages(1000);
+                $config = $config->withMaxBytes(1024000);
+                $config = $config->withMaxAge(3600);
+                $config = $config->withStorage(StreamConfig::STORAGE_MEMORY);
+                $config = $config->withReplicas(1);
+                $config = $config->withDiscard(StreamConfig::DISCARD_NEW);
+                $config = $config->withAllowDirect(true);
 
                 $info = $js->createStream($config);
 
