@@ -101,13 +101,13 @@ describe('StreamConfig', function (): void {
 
     describe('toArray', function (): void {
         it('converts to array with all fields', function (): void {
-            $config = new StreamConfig('test-stream', ['foo.>'])
-                ->withDescription('Test description')
-                ->withMaxMessages(100)
-                ->withMaxBytes(1024)
-                ->withMaxAge(3600)
-                ->withDuplicateWindow(120000000000)
-                ->withAllowDirect(true);
+            $config = new StreamConfig('test-stream', ['foo.>']);
+            $config = $config->withDescription('Test description');
+            $config = $config->withMaxMessages(100);
+            $config = $config->withMaxBytes(1024);
+            $config = $config->withMaxAge(3600);
+            $config = $config->withDuplicateWindow(120000000000);
+            $config = $config->withAllowDirect(true);
 
             $array = $config->toArray();
 
