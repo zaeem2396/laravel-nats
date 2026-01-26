@@ -435,6 +435,53 @@ For multi-tenant setups, you can use JetStream domains:
 $js = Nats::jetstream(null, new \LaravelNats\Core\JetStream\JetStreamConfig('my-domain'));
 ```
 
+### Stream Management
+
+Create and manage JetStream streams:
+
+```php
+use LaravelNats\Core\JetStream\StreamConfig;
+use LaravelNats\Laravel\Facades\Nats;
+
+$js = Nats::jetstream();
+
+// Create a stream
+$config = new StreamConfig('my-stream', ['events.>'])
+    ->withDescription('Event stream')
+    ->withMaxMessages(10000)
+    ->withMaxBytes(104857600) // 100MB
+    ->withStorage(StreamConfig::STORAGE_FILE);
+
+$info = $js->createStream($config);
+
+// Get stream information
+$info = $js->getStreamInfo('my-stream');
+echo $info->getMessageCount(); // Number of messages
+echo $info->getByteCount();    // Total bytes stored
+
+// Update stream configuration
+$updated = $config->withMaxMessages(20000);
+$info = $js->updateStream($updated);
+
+// Purge all messages
+$js->purgeStream('my-stream');
+
+// Delete stream
+$js->deleteStream('my-stream');
+```
+
+### Stream Operations
+
+Get and delete individual messages:
+
+```php
+// Get message by sequence number
+$message = $js->getMessage('my-stream', 123);
+
+// Delete message by sequence number
+$js->deleteMessage('my-stream', 123);
+```
+
 ## Roadmap
 
 This package is under active development. Current status:
@@ -450,7 +497,7 @@ This package is under active development. Current status:
   - 🔲 Milestone 2.2: Delayed Jobs (requires JetStream)
 - 🔵 **Phase 3:** JetStream Support (In Progress)
   - ✅ Milestone 3.1: JetStream Connection
-  - 🔲 Milestone 3.2: Stream Management
+  - ✅ Milestone 3.2: Stream Management
   - 🔲 Milestone 3.3: Consumer Management
   - 🔲 Milestone 3.4: Acknowledgement System
   - 🔲 Milestone 3.5: Artisan Commands
