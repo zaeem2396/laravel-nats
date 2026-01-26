@@ -3,7 +3,6 @@
 declare(strict_types=1);
 
 use LaravelNats\Core\Client;
-use LaravelNats\Core\Connection\ConnectionConfig;
 use LaravelNats\Core\JetStream\JetStreamClient;
 use LaravelNats\Core\JetStream\StreamConfig;
 

@@ -44,9 +44,10 @@ abstract class TestCase extends BaseTestCase
      * This helper ensures the connection is fully established
      * and JetStream is available before returning the client.
      *
-     * @return \LaravelNats\Core\Client Connected and verified client
      *
      * @throws \RuntimeException If connection fails or JetStream is unavailable
+     *
+     * @return \LaravelNats\Core\Client Connected and verified client
      */
     public static function createConnectedJetStreamClient(): \LaravelNats\Core\Client
     {

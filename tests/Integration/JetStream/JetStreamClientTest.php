@@ -22,20 +22,12 @@ use LaravelNats\Exceptions\ConnectionException;
 
 /**
  * Helper to create a connected client for JetStream tests.
+ *
+ * Uses the shared helper from TestCase to ensure proper connection handling.
  */
 function createJetStreamTestClient(): Client
 {
-    $config = ConnectionConfig::local();
-    $client = new Client($config);
-    $client->connect();
-
-    // Ensure connection is fully established and ServerInfo is available
-    $serverInfo = $client->getServerInfo();
-    if ($serverInfo === null) {
-        throw new RuntimeException('Failed to get ServerInfo after connection');
-    }
-
-    return $client;
+    return \LaravelNats\Tests\TestCase::createConnectedJetStreamClient();
 }
 
 describe('JetStream Client', function (): void {
