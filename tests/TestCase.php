@@ -39,6 +39,53 @@ abstract class TestCase extends BaseTestCase
     }
 
     /**
+     * Create a connected NATS client for JetStream tests.
+     *
+     * This helper ensures the connection is fully established
+     * and JetStream is available before returning the client.
+     *
+     * @return \LaravelNats\Core\Client Connected and verified client
+     *
+     * @throws \RuntimeException If connection fails or JetStream is unavailable
+     */
+    protected function createConnectedJetStreamClient(): \LaravelNats\Core\Client
+    {
+        $config = \LaravelNats\Core\Connection\ConnectionConfig::local();
+        $client = new \LaravelNats\Core\Client($config);
+        $client->connect();
+
+        // Wait for connection to be fully established
+        $maxAttempts = 10;
+        $attempt = 0;
+        while ($attempt < $maxAttempts) {
+            if ($client->isConnected()) {
+                $serverInfo = $client->getServerInfo();
+                if ($serverInfo !== null && $serverInfo->jetStreamEnabled) {
+                    break;
+                }
+            }
+            usleep(100000); // 100ms
+            $attempt++;
+        }
+
+        // Verify connection and JetStream availability
+        if (! $client->isConnected()) {
+            throw new \RuntimeException('Failed to establish NATS connection');
+        }
+
+        $serverInfo = $client->getServerInfo();
+        if ($serverInfo === null) {
+            throw new \RuntimeException('Failed to get ServerInfo after connection');
+        }
+
+        if (! $serverInfo->jetStreamEnabled) {
+            throw new \RuntimeException('JetStream is not available on the NATS server');
+        }
+
+        return $client;
+    }
+
+    /**
      * Check if a NATS server is available.
      *
      * This method attempts a TCP connection to the NATS server

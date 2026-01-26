@@ -9,40 +9,15 @@ use LaravelNats\Core\JetStream\StreamConfig;
 
 /**
  * Helper to create a connected JetStream client for stream tests.
+ *
+ * Uses the shared helper from TestCase to ensure proper connection handling.
  */
 function createStreamTestClient(): JetStreamClient
 {
-    $config = ConnectionConfig::local();
-    $client = new Client($config);
-    $client->connect();
+    $testCase = new class extends \LaravelNats\Tests\TestCase {
+    };
 
-    // Wait for connection to be fully established
-    $maxAttempts = 10;
-    $attempt = 0;
-    while ($attempt < $maxAttempts) {
-        if ($client->isConnected()) {
-            $serverInfo = $client->getServerInfo();
-            if ($serverInfo !== null && $serverInfo->jetStreamEnabled) {
-                break;
-            }
-        }
-        usleep(100000); // 100ms
-        $attempt++;
-    }
-
-    // Verify connection and JetStream availability
-    if (! $client->isConnected()) {
-        throw new RuntimeException('Failed to establish NATS connection');
-    }
-
-    $serverInfo = $client->getServerInfo();
-    if ($serverInfo === null) {
-        throw new RuntimeException('Failed to get ServerInfo after connection');
-    }
-
-    if (! $serverInfo->jetStreamEnabled) {
-        throw new RuntimeException('JetStream is not available on the NATS server');
-    }
+    $client = $testCase->createConnectedJetStreamClient();
 
     return new JetStreamClient($client);
 }
