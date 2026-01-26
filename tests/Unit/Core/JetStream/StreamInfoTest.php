@@ -124,4 +124,3 @@ describe('StreamInfo', function (): void {
         });
     });
 });
-

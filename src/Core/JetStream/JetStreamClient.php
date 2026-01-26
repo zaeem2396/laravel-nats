@@ -200,7 +200,7 @@ final class JetStreamClient
      */
     public function createStream(StreamConfig $config, ?float $timeout = null): StreamInfo
     {
-        $timeout = $timeout ?? $this->config->getTimeout();
+        $timeout ??= $this->config->getTimeout();
         $subject = 'STREAM.CREATE.' . $config->getName();
         $payload = $config->toArray();
 
@@ -223,7 +223,7 @@ final class JetStreamClient
      */
     public function getStreamInfo(string $streamName, ?float $timeout = null): StreamInfo
     {
-        $timeout = $timeout ?? $this->config->getTimeout();
+        $timeout ??= $this->config->getTimeout();
         $subject = 'STREAM.INFO.' . $streamName;
 
         $response = $this->apiRequest($subject, [], $timeout);
@@ -245,7 +245,7 @@ final class JetStreamClient
      */
     public function updateStream(StreamConfig $config, ?float $timeout = null): StreamInfo
     {
-        $timeout = $timeout ?? $this->config->getTimeout();
+        $timeout ??= $this->config->getTimeout();
         $subject = 'STREAM.UPDATE.' . $config->getName();
         $payload = $config->toArray();
 
@@ -268,7 +268,7 @@ final class JetStreamClient
      */
     public function deleteStream(string $streamName, ?float $timeout = null): bool
     {
-        $timeout = $timeout ?? $this->config->getTimeout();
+        $timeout ??= $this->config->getTimeout();
         $subject = 'STREAM.DELETE.' . $streamName;
 
         $this->apiRequest($subject, [], $timeout);
@@ -290,7 +290,7 @@ final class JetStreamClient
      */
     public function purgeStream(string $streamName, ?float $timeout = null): bool
     {
-        $timeout = $timeout ?? $this->config->getTimeout();
+        $timeout ??= $this->config->getTimeout();
         $subject = 'STREAM.PURGE.' . $streamName;
 
         $this->apiRequest($subject, [], $timeout);
@@ -313,7 +313,7 @@ final class JetStreamClient
      */
     public function getMessage(string $streamName, int $sequence, ?float $timeout = null): array
     {
-        $timeout = $timeout ?? $this->config->getTimeout();
+        $timeout ??= $this->config->getTimeout();
         $subject = 'STREAM.MSG.GET.' . $streamName;
         $payload = ['seq' => $sequence];
 
@@ -335,7 +335,7 @@ final class JetStreamClient
      */
     public function deleteMessage(string $streamName, int $sequence, ?float $timeout = null): bool
     {
-        $timeout = $timeout ?? $this->config->getTimeout();
+        $timeout ??= $this->config->getTimeout();
         $subject = 'STREAM.MSG.DELETE.' . $streamName;
         $payload = ['seq' => $sequence];
 

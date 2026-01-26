@@ -510,4 +510,3 @@ final class StreamConfig
         return $data;
     }
 }
-
