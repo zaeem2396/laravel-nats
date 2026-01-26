@@ -11,13 +11,11 @@ use LaravelNats\Core\JetStream\StreamConfig;
  * Helper to create a connected JetStream client for stream tests.
  *
  * Uses the shared helper from TestCase to ensure proper connection handling.
+ * This ensures consistent connection behavior across all JetStream tests.
  */
 function createStreamTestClient(): JetStreamClient
 {
-    $testCase = new class extends \LaravelNats\Tests\TestCase {
-    };
-
-    $client = $testCase->createConnectedJetStreamClient();
+    $client = \LaravelNats\Tests\TestCase::createConnectedJetStreamClient();
 
     return new JetStreamClient($client);
 }

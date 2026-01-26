@@ -48,7 +48,7 @@ abstract class TestCase extends BaseTestCase
      *
      * @throws \RuntimeException If connection fails or JetStream is unavailable
      */
-    protected function createConnectedJetStreamClient(): \LaravelNats\Core\Client
+    public static function createConnectedJetStreamClient(): \LaravelNats\Core\Client
     {
         $config = \LaravelNats\Core\Connection\ConnectionConfig::local();
         $client = new \LaravelNats\Core\Client($config);
