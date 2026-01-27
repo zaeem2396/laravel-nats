@@ -155,9 +155,11 @@ final class Connection implements ConnectionInterface
             return false;
         }
 
-        // Proactive check: use stream_get_meta_data to detect issues
+        // Proactive check: use stream_get_meta_data to detect EOF.
+        // Do not treat timed_out as disconnect: it can be set by a prior read that was
+        // waiting for data; a subsequent read may succeed. Only EOF indicates the peer closed.
         $meta = stream_get_meta_data($this->socket);
-        if ($meta['eof'] || $meta['timed_out']) {
+        if ($meta['eof']) {
             $this->markDisconnected();
 
             return false;
