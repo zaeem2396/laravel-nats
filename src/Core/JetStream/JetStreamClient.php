@@ -349,6 +349,80 @@ final class JetStreamClient
     }
 
     /**
+     * Create a durable consumer on a stream.
+     *
+     * @param string $streamName Stream name
+     * @param string $consumerName Durable consumer name
+     * @param ConsumerConfig $config Consumer configuration
+     * @param float|null $timeout Request timeout
+     *
+     * @throws NatsException If JetStream is not available or creation fails
+     * @throws TimeoutException If request times out
+     * @throws ConnectionException If not connected
+     *
+     * @return ConsumerInfo Created consumer information
+     */
+    public function createConsumer(string $streamName, string $consumerName, ConsumerConfig $config, ?float $timeout = null): ConsumerInfo
+    {
+        $timeout ??= $this->config->getTimeout();
+        $subject = 'CONSUMER.DURABLE.CREATE.' . $streamName . '.' . $consumerName;
+        $payload = [
+            'stream_name' => $streamName,
+            'config' => $config->toArray(),
+        ];
+
+        $response = $this->apiRequest($subject, $payload, $timeout);
+
+        return ConsumerInfo::fromArray($response);
+    }
+
+    /**
+     * Get consumer information.
+     *
+     * @param string $streamName Stream name
+     * @param string $consumerName Consumer name
+     * @param float|null $timeout Request timeout
+     *
+     * @throws NatsException If JetStream is not available or consumer not found
+     * @throws TimeoutException If request times out
+     * @throws ConnectionException If not connected
+     *
+     * @return ConsumerInfo Consumer information
+     */
+    public function getConsumerInfo(string $streamName, string $consumerName, ?float $timeout = null): ConsumerInfo
+    {
+        $timeout ??= $this->config->getTimeout();
+        $subject = 'CONSUMER.INFO.' . $streamName . '.' . $consumerName;
+
+        $response = $this->apiRequest($subject, [], $timeout);
+
+        return ConsumerInfo::fromArray($response);
+    }
+
+    /**
+     * Delete a consumer.
+     *
+     * @param string $streamName Stream name
+     * @param string $consumerName Consumer name
+     * @param float|null $timeout Request timeout
+     *
+     * @throws NatsException If JetStream is not available or deletion fails
+     * @throws TimeoutException If request times out
+     * @throws ConnectionException If not connected
+     *
+     * @return bool True if deleted successfully
+     */
+    public function deleteConsumer(string $streamName, string $consumerName, ?float $timeout = null): bool
+    {
+        $timeout ??= $this->config->getTimeout();
+        $subject = 'CONSUMER.DELETE.' . $streamName . '.' . $consumerName;
+
+        $this->apiRequest($subject, [], $timeout);
+
+        return true;
+    }
+
+    /**
      * Build a full JetStream API subject.
      *
      * @param string $subject The API subject (e.g., 'STREAM.CREATE.stream-name')
