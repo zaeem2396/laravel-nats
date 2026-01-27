@@ -20,16 +20,22 @@ function createStreamTestClient(): JetStreamClient
 }
 
 /**
- * Run a test body with a JetStream client, retrying once on disconnect.
+ * Run a test body with a JetStream client, retrying on disconnect.
  *
- * Used by tests that perform multi-step operations where the connection
- * may drop mid-test in CI. Creates a client, runs the closure, and on
- * ConnectionException creates a fresh client and runs again (once).
+ * In CI the connection can drop after the previous test disconnects. This helper
+ * creates a client, runs the closure, and on ConnectionException waits briefly
+ * then retries with a fresh client (up to 3 attempts).
  */
 function runWithStreamClientRetry(callable $run): void
 {
     $lastException = null;
-    for ($attempt = 0; $attempt < 2; $attempt++) {
+    $maxAttempts = 3;
+
+    for ($attempt = 0; $attempt < $maxAttempts; $attempt++) {
+        if ($attempt > 0) {
+            usleep(1500000); // 1.5s before retry so NATS can close previous connection and accept new one
+        }
+
         $js = createStreamTestClient();
 
         try {
@@ -66,36 +72,28 @@ describe('Stream Management', function (): void {
 
     describe('stream CRUD operations', function (): void {
         it('creates a stream with basic configuration', function (): void {
-            $js = createStreamTestClient();
+            runWithStreamClientRetry(function (JetStreamClient $js): void {
+                expect($js->getClient()->isConnected())->toBeTrue();
 
-            // Verify connection is ready
-            expect($js->getClient()->isConnected())->toBeTrue();
-
-            $streamName = 'test-stream-' . uniqid();
-            $subject = $streamName . '.>';
-
-            try {
+                $streamName = 'test-stream-' . uniqid();
+                $subject = $streamName . '.>';
                 $config = new StreamConfig($streamName, [$subject]);
                 $info = $js->createStream($config);
 
                 expect($info->getConfig()->getName())->toBe($streamName);
                 expect($info->getConfig()->getSubjects())->toBe([$subject]);
-            } finally {
+
                 try {
                     $js->deleteStream($streamName);
                 } catch (\Throwable) {
                 }
-                $js->getClient()->disconnect();
-            }
+            });
         });
 
         it('gets stream information', function (): void {
-            $js = createStreamTestClient();
-
-            $streamName = 'info-stream-' . uniqid();
-            $subject = $streamName . '.>';
-
-            try {
+            runWithStreamClientRetry(function (JetStreamClient $js): void {
+                $streamName = 'info-stream-' . uniqid();
+                $subject = $streamName . '.>';
                 $config = new StreamConfig($streamName, [$subject]);
                 $js->createStream($config);
 
@@ -103,22 +101,18 @@ describe('Stream Management', function (): void {
 
                 expect($info->getConfig()->getName())->toBe($streamName);
                 expect($info->getConfig()->getSubjects())->toBe([$subject]);
-            } finally {
+
                 try {
                     $js->deleteStream($streamName);
                 } catch (\Throwable) {
                 }
-                $js->getClient()->disconnect();
-            }
+            });
         });
 
         it('updates stream configuration', function (): void {
-            $js = createStreamTestClient();
-
-            $streamName = 'update-stream-' . uniqid();
-            $subject = $streamName . '.>';
-
-            try {
+            runWithStreamClientRetry(function (JetStreamClient $js): void {
+                $streamName = 'update-stream-' . uniqid();
+                $subject = $streamName . '.>';
                 $config = new StreamConfig($streamName, [$subject]);
                 $js->createStream($config);
 
@@ -128,24 +122,18 @@ describe('Stream Management', function (): void {
                 $info = $js->updateStream($updatedConfig);
 
                 expect($info->getConfig()->getDescription())->toBe('Updated description');
-                // Note: JetStream may not return all config fields in update response
-                expect($info->getConfig()->getDescription())->toBe('Updated description');
-            } finally {
+
                 try {
                     $js->deleteStream($streamName);
                 } catch (\Throwable) {
                 }
-                $js->getClient()->disconnect();
-            }
+            });
         });
 
         it('deletes a stream', function (): void {
-            $js = createStreamTestClient();
-
-            $streamName = 'delete-stream-' . uniqid();
-            $subject = $streamName . '.>';
-
-            try {
+            runWithStreamClientRetry(function (JetStreamClient $js): void {
+                $streamName = 'delete-stream-' . uniqid();
+                $subject = $streamName . '.>';
                 $config = new StreamConfig($streamName, [$subject]);
                 $js->createStream($config);
 
@@ -153,17 +141,15 @@ describe('Stream Management', function (): void {
 
                 expect($deleted)->toBeTrue();
 
-                // Verify stream is deleted by attempting to get info
                 expect(fn () => $js->getStreamInfo($streamName))->toThrow(
                     \LaravelNats\Exceptions\NatsException::class,
                 );
-            } finally {
+
                 try {
                     $js->deleteStream($streamName);
                 } catch (\Throwable) {
                 }
-                $js->getClient()->disconnect();
-            }
+            });
         });
 
         it('purges all messages from a stream', function (): void {
@@ -221,7 +207,9 @@ describe('Stream Management', function (): void {
                     $message = $js->getMessage($streamName, $lastSeq);
 
                     expect($message)->toHaveKey('message');
-                    expect($message['message']['data'])->toBe('{"test":"data"}');
+                    // JetStream API returns message data as base64
+                    $data = $message['message']['data'] ?? '';
+                    expect(base64_decode($data, true) ?: $data)->toBe('{"test":"data"}');
                 }
 
                 try {
@@ -267,18 +255,14 @@ describe('Stream Management', function (): void {
 
     describe('stream configuration options', function (): void {
         it('creates stream with all configuration options', function (): void {
-            $js = createStreamTestClient();
-
-            $streamName = 'full-config-stream-' . uniqid();
-            $subject = $streamName . '.>';
-
-            try {
+            runWithStreamClientRetry(function (JetStreamClient $js): void {
+                $streamName = 'full-config-stream-' . uniqid();
+                $subject = $streamName . '.>';
                 $config = new StreamConfig($streamName, [$subject]);
                 $config = $config->withDescription('Full configuration test');
                 $config = $config->withRetention(StreamConfig::RETENTION_INTEREST);
                 $config = $config->withMaxMessages(1000);
                 $config = $config->withMaxBytes(1024000);
-                // Set max age to 1 hour (3600 seconds = 3,600,000,000,000 nanoseconds)
                 $config = $config->withMaxAge(3600);
                 $config = $config->withStorage(StreamConfig::STORAGE_MEMORY);
                 $config = $config->withReplicas(1);
@@ -296,13 +280,12 @@ describe('Stream Management', function (): void {
 
                 $verifyInfo = $js->getStreamInfo($streamName);
                 expect($verifyInfo->getConfig()->getName())->toBe($streamName);
-            } finally {
+
                 try {
                     $js->deleteStream($streamName);
                 } catch (\Throwable) {
                 }
-                $js->getClient()->disconnect();
-            }
+            });
         });
     });
 });

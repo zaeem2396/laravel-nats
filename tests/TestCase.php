@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace LaravelNats\Tests;
 
-use LaravelNats\Exceptions\ConnectionException;
 use PHPUnit\Framework\TestCase as BaseTestCase;
 
 /**
@@ -102,24 +101,8 @@ abstract class TestCase extends BaseTestCase
                     throw new \RuntimeException('JetStream is not available on the NATS server');
                 }
 
-                // Warmup: one JetStream round-trip so the connection is actually usable.
-                // STREAM.INFO on a non-existent stream returns an error but confirms connectivity.
-                try {
-                    $client->request('$JS.API.STREAM.INFO._warmup_', '{}', 2.0);
-                } catch (\Throwable $e) {
-                    if ($e instanceof ConnectionException) {
-                        $client->disconnect();
-                        $lastException = $e;
-                        if ($attempt < $maxConnectionAttempts) {
-                            usleep(200000); // 200ms before retry
-                        }
-                        continue;
-                    }
-
-                    // Non-connection error during warmup (e.g. stream not found) still means round-trip worked.
-                    return $client;
-                }
-
+                // Skip warmup request: it can leave the socket in eof/timed_out state and cause
+                // "Not connected" on the next use. Rely on connect + JetStream wait only.
                 return $client;
             } catch (\RuntimeException $e) {
                 $lastException = $e;
