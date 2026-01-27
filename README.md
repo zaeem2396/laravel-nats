@@ -482,6 +482,40 @@ $message = $js->getMessage('my-stream', 123);
 $js->deleteMessage('my-stream', 123);
 ```
 
+### Consumer Management
+
+Create and manage durable consumers on a stream:
+
+```php
+use LaravelNats\Core\JetStream\ConsumerConfig;
+use LaravelNats\Laravel\Facades\Nats;
+
+$js = Nats::jetstream();
+
+// Create a durable consumer
+$config = (new ConsumerConfig('my-consumer'))
+    ->withFilterSubject('events.>')
+    ->withDeliverPolicy(ConsumerConfig::DELIVER_NEW)
+    ->withAckPolicy(ConsumerConfig::ACK_EXPLICIT);
+
+$info = $js->createConsumer('my-stream', 'my-consumer', $config);
+
+// Get consumer information
+$info = $js->getConsumerInfo('my-stream', 'my-consumer');
+echo $info->getNumPending();   // Messages awaiting delivery
+echo $info->getNumAckPending(); // Messages awaiting ack
+
+// List consumers (paged)
+$result = $js->listConsumers('my-stream', offset: 0);
+foreach ($result['consumers'] as $consumer) {
+    echo $consumer->getName();
+}
+// $result has: total, offset, limit, consumers
+
+// Delete a consumer
+$js->deleteConsumer('my-stream', 'my-consumer');
+```
+
 ## Roadmap
 
 This package is under active development. Current status:

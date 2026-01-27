@@ -132,5 +132,34 @@ describe('Consumer Management', function (): void {
                 }
             });
         });
+
+        it('lists consumers for a stream', function (): void {
+            runWithConsumerClientRetry(function (JetStreamClient $js): void {
+                $streamName = 'consumer-list-stream-' . uniqid();
+                $subject = $streamName . '.>';
+                $js->createStream(new StreamConfig($streamName, [$subject]));
+
+                $name1 = 'list-consumer-a-' . uniqid();
+                $name2 = 'list-consumer-b-' . uniqid();
+                $js->createConsumer($streamName, $name1, new ConsumerConfig($name1));
+                $js->createConsumer($streamName, $name2, new ConsumerConfig($name2));
+
+                $result = $js->listConsumers($streamName);
+
+                expect($result)->toHaveKeys(['total', 'offset', 'limit', 'consumers']);
+                expect($result['total'])->toBeGreaterThanOrEqual(2);
+                expect($result['consumers'])->toBeArray();
+                $names = array_map(fn (ConsumerInfo $c) => $c->getName(), $result['consumers']);
+                expect($names)->toContain($name1);
+                expect($names)->toContain($name2);
+
+                try {
+                    $js->deleteConsumer($streamName, $name1);
+                    $js->deleteConsumer($streamName, $name2);
+                    $js->deleteStream($streamName);
+                } catch (\Throwable) {
+                }
+            });
+        });
     });
 });
