@@ -9,6 +9,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+#### JetStream Support (Phase 3 - Milestone 3.3 Consumer Management)
+- `ConsumerConfig` - Value object for consumer configuration (durable name, filter subject, deliver/ack/replay policies, ack_wait, max_deliver, etc.)
+- `ConsumerInfo` - Value object for consumer state (stream name, consumer name, config, num_pending, num_ack_pending, num_waiting)
+- `JetStreamClient::createConsumer()` - Create durable consumer (CONSUMER.DURABLE.CREATE)
+- `JetStreamClient::getConsumerInfo()` - Get consumer information (CONSUMER.INFO)
+- `JetStreamClient::deleteConsumer()` - Delete a consumer (CONSUMER.DELETE)
+- `JetStreamClient::listConsumers()` - Paged list of consumers (CONSUMER.LIST), returns total, offset, limit, consumers
+- Unit tests for ConsumerConfig and ConsumerInfo
+- Integration tests for consumer CRUD and listConsumers
+- README Consumer Management section and docs
+
 #### JetStream Support (Phase 3 - Milestone 3.1)
 - `JetStreamClient` - Core client for interacting with NATS JetStream
 - `JetStreamConfig` - Configuration class for JetStream settings (domain, timeout)

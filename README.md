@@ -532,7 +532,7 @@ This package is under active development. Current status:
 - 🔵 **Phase 3:** JetStream Support (In Progress)
   - ✅ Milestone 3.1: JetStream Connection
   - ✅ Milestone 3.2: Stream Management
-  - 🔲 Milestone 3.3: Consumer Management
+  - ✅ Milestone 3.3: Consumer Management
   - 🔲 Milestone 3.4: Acknowledgement System
   - 🔲 Milestone 3.5: Artisan Commands
 - 🔲 **Phase 4:** Worker & Runtime
