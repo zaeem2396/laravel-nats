@@ -349,6 +349,129 @@ final class JetStreamClient
     }
 
     /**
+     * Create a durable consumer on a stream.
+     *
+     * @param string $streamName Stream name
+     * @param string $consumerName Durable consumer name
+     * @param ConsumerConfig $config Consumer configuration
+     * @param float|null $timeout Request timeout
+     *
+     * @throws NatsException If JetStream is not available or creation fails
+     * @throws TimeoutException If request times out
+     * @throws ConnectionException If not connected
+     *
+     * @return ConsumerInfo Created consumer information
+     */
+    public function createConsumer(string $streamName, string $consumerName, ConsumerConfig $config, ?float $timeout = null): ConsumerInfo
+    {
+        $timeout ??= $this->config->getTimeout();
+        $subject = 'CONSUMER.DURABLE.CREATE.' . $streamName . '.' . $consumerName;
+        $payload = [
+            'stream_name' => $streamName,
+            'config' => $config->toArray(),
+        ];
+
+        $response = $this->apiRequest($subject, $payload, $timeout);
+
+        return ConsumerInfo::fromArray($response);
+    }
+
+    /**
+     * Get consumer information.
+     *
+     * @param string $streamName Stream name
+     * @param string $consumerName Consumer name
+     * @param float|null $timeout Request timeout
+     *
+     * @throws NatsException If JetStream is not available or consumer not found
+     * @throws TimeoutException If request times out
+     * @throws ConnectionException If not connected
+     *
+     * @return ConsumerInfo Consumer information
+     */
+    public function getConsumerInfo(string $streamName, string $consumerName, ?float $timeout = null): ConsumerInfo
+    {
+        $timeout ??= $this->config->getTimeout();
+        $subject = 'CONSUMER.INFO.' . $streamName . '.' . $consumerName;
+
+        $response = $this->apiRequest($subject, [], $timeout);
+
+        return ConsumerInfo::fromArray($response);
+    }
+
+    /**
+     * Delete a consumer.
+     *
+     * @param string $streamName Stream name
+     * @param string $consumerName Consumer name
+     * @param float|null $timeout Request timeout
+     *
+     * @throws NatsException If JetStream is not available or deletion fails
+     * @throws TimeoutException If request times out
+     * @throws ConnectionException If not connected
+     *
+     * @return bool True if deleted successfully
+     */
+    public function deleteConsumer(string $streamName, string $consumerName, ?float $timeout = null): bool
+    {
+        $timeout ??= $this->config->getTimeout();
+        $subject = 'CONSUMER.DELETE.' . $streamName . '.' . $consumerName;
+
+        $this->apiRequest($subject, [], $timeout);
+
+        return true;
+    }
+
+    /**
+     * List consumers for a stream (paged).
+     *
+     * @param string $streamName Stream name
+     * @param int $offset Pagination offset (default 0)
+     * @param float|null $timeout Request timeout
+     *
+     * @throws NatsException If JetStream is not available or stream not found
+     * @throws TimeoutException If request times out
+     * @throws ConnectionException If not connected
+     *
+     * @return array{total: int, offset: int, limit: int, consumers: list<ConsumerInfo>}
+     */
+    public function listConsumers(string $streamName, int $offset = 0, ?float $timeout = null): array
+    {
+        $timeout ??= $this->config->getTimeout();
+        $subject = 'CONSUMER.LIST.' . $streamName;
+        $payload = ['offset' => $offset];
+
+        $response = $this->apiRequest($subject, $payload, $timeout);
+
+        $total = (int) ($response['total'] ?? 0);
+        $off = (int) ($response['offset'] ?? 0);
+        $limit = (int) ($response['limit'] ?? 0);
+        $items = $response['consumers'] ?? [];
+
+        $consumers = [];
+        foreach ($items as $item) {
+            $state = [
+                'num_pending' => $item['num_pending'] ?? 0,
+                'num_ack_pending' => $item['num_ack_pending'] ?? 0,
+                'num_waiting' => $item['num_waiting'] ?? 0,
+            ];
+            $consumers[] = ConsumerInfo::fromArray([
+                'stream_name' => $item['stream_name'] ?? $streamName,
+                'name' => $item['name'] ?? '',
+                'config' => $item['config'] ?? [],
+                'state' => $state,
+            ]);
+        }
+
+        return [
+            'total' => $total,
+            'offset' => $off,
+            'limit' => $limit,
+            'consumers' => $consumers,
+        ];
+    }
+
+    /**
      * Build a full JetStream API subject.
      *
      * @param string $subject The API subject (e.g., 'STREAM.CREATE.stream-name')
