@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-use LaravelNats\Core\Client;
 use LaravelNats\Core\JetStream\JetStreamClient;
 use LaravelNats\Core\JetStream\StreamConfig;
+use LaravelNats\Exceptions\ConnectionException;
 
 /**
  * Helper to create a connected JetStream client for stream tests.
@@ -19,10 +19,42 @@ function createStreamTestClient(): JetStreamClient
     return new JetStreamClient($client);
 }
 
+/**
+ * Run a test body with a JetStream client, retrying once on disconnect.
+ *
+ * Used by tests that perform multi-step operations where the connection
+ * may drop mid-test in CI. Creates a client, runs the closure, and on
+ * ConnectionException creates a fresh client and runs again (once).
+ */
+function runWithStreamClientRetry(callable $run): void
+{
+    $lastException = null;
+    for ($attempt = 0; $attempt < 2; $attempt++) {
+        $js = createStreamTestClient();
+
+        try {
+            $run($js);
+
+            return;
+        } catch (ConnectionException $e) {
+            $lastException = $e;
+        } finally {
+            try {
+                $js->getClient()->disconnect();
+            } catch (\Throwable) {
+                // ignore
+            }
+        }
+    }
+
+    if ($lastException !== null) {
+        throw $lastException;
+    }
+}
+
 describe('Stream Management', function (): void {
     beforeEach(function (): void {
-        // Ensure NATS is available before running tests
-        if (! $this->isNatsAvailable()) {
+        if (! \LaravelNats\Tests\TestCase::isNatsReachable()) {
             $this->markTestSkipped('NATS server not available');
         }
     });
@@ -108,9 +140,7 @@ describe('Stream Management', function (): void {
         });
 
         it('purges all messages from a stream', function (): void {
-            $js = createStreamTestClient();
-
-            try {
+            runWithStreamClientRetry(function (JetStreamClient $js): void {
                 $streamName = 'purge-stream-' . uniqid();
                 $config = new StreamConfig($streamName, ['purge.>']);
                 $js->createStream($config);
@@ -135,17 +165,13 @@ describe('Stream Management', function (): void {
 
                 $infoAfter = $js->getStreamInfo($streamName);
                 expect($infoAfter->getMessageCount())->toBe(0);
-            } finally {
-                $js->getClient()->disconnect();
-            }
+            });
         });
     });
 
     describe('stream operations', function (): void {
         it('gets a message by sequence number', function (): void {
-            $js = createStreamTestClient();
-
-            try {
+            runWithStreamClientRetry(function (JetStreamClient $js): void {
                 $streamName = 'get-msg-stream-' . uniqid();
                 $config = new StreamConfig($streamName, ['getmsg.>']);
                 $js->createStream($config);
@@ -166,15 +192,11 @@ describe('Stream Management', function (): void {
                     expect($message)->toHaveKey('message');
                     expect($message['message']['data'])->toBe('{"test":"data"}');
                 }
-            } finally {
-                $js->getClient()->disconnect();
-            }
+            });
         });
 
         it('deletes a message by sequence number', function (): void {
-            $js = createStreamTestClient();
-
-            try {
+            runWithStreamClientRetry(function (JetStreamClient $js): void {
                 $streamName = 'del-msg-stream-' . uniqid();
                 $config = new StreamConfig($streamName, ['delmsg.>']);
                 $js->createStream($config);
@@ -200,9 +222,7 @@ describe('Stream Management', function (): void {
                     $infoAfter = $js->getStreamInfo($streamName);
                     expect($infoAfter->getMessageCount())->toBeLessThan($infoBefore->getMessageCount());
                 }
-            } finally {
-                $js->getClient()->disconnect();
-            }
+            });
         });
     });
 

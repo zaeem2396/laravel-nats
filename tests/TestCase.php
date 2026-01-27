@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace LaravelNats\Tests;
 
+use LaravelNats\Exceptions\ConnectionException;
 use PHPUnit\Framework\TestCase as BaseTestCase;
 
 /**
@@ -41,49 +42,114 @@ abstract class TestCase extends BaseTestCase
     /**
      * Create a connected NATS client for JetStream tests.
      *
-     * This helper ensures the connection is fully established
-     * and JetStream is available before returning the client.
+     * Uses env NATS_HOST/NATS_PORT (same as isNatsAvailable), retries the full
+     * connection up to 3 times, waits for JetStream, and performs one warmup
+     * round-trip so the returned client is ready for use. This reduces flaky
+     * "Not connected to NATS server" failures in CI and long test runs.
      *
-     *
-     * @throws \RuntimeException If connection fails or JetStream is unavailable
+     * @throws \RuntimeException If connection fails or JetStream is unavailable after retries
      *
      * @return \LaravelNats\Core\Client Connected and verified client
      */
     public static function createConnectedJetStreamClient(): \LaravelNats\Core\Client
     {
-        $config = \LaravelNats\Core\Connection\ConnectionConfig::local();
-        $client = new \LaravelNats\Core\Client($config);
-        $client->connect();
+        $host = getenv('NATS_HOST') ?: 'localhost';
+        $port = (int) (getenv('NATS_PORT') ?: '4222');
+        $config = \LaravelNats\Core\Connection\ConnectionConfig::fromArray([
+            'host' => $host,
+            'port' => $port,
+            'timeout' => 5.0,
+        ]);
 
-        // Wait for connection to be fully established
-        $maxAttempts = 10;
-        $attempt = 0;
-        while ($attempt < $maxAttempts) {
-            if ($client->isConnected()) {
+        $lastException = null;
+        $maxConnectionAttempts = 3;
+
+        for ($attempt = 1; $attempt <= $maxConnectionAttempts; $attempt++) {
+            try {
+                $client = new \LaravelNats\Core\Client($config);
+                $client->connect();
+
+                // Wait for connection and JetStream to be ready (up to ~2.5s)
+                $waitAttempts = 25;
+                $waitAttempt = 0;
+                while ($waitAttempt < $waitAttempts) {
+                    if ($client->isConnected()) {
+                        $serverInfo = $client->getServerInfo();
+                        if ($serverInfo !== null && $serverInfo->jetStreamEnabled) {
+                            break;
+                        }
+                    }
+                    usleep(100000); // 100ms
+                    $waitAttempt++;
+                }
+
+                if (! $client->isConnected()) {
+                    $client->disconnect();
+
+                    throw new \RuntimeException('Failed to establish NATS connection');
+                }
+
                 $serverInfo = $client->getServerInfo();
-                if ($serverInfo !== null && $serverInfo->jetStreamEnabled) {
-                    break;
+                if ($serverInfo === null) {
+                    $client->disconnect();
+
+                    throw new \RuntimeException('Failed to get ServerInfo after connection');
+                }
+
+                if (! $serverInfo->jetStreamEnabled) {
+                    $client->disconnect();
+
+                    throw new \RuntimeException('JetStream is not available on the NATS server');
+                }
+
+                // Warmup: one JetStream round-trip so the connection is actually usable.
+                // STREAM.INFO on a non-existent stream returns an error but confirms connectivity.
+                try {
+                    $client->request('$JS.API.STREAM.INFO._warmup_', '{}', 2.0);
+                } catch (\Throwable $e) {
+                    if ($e instanceof ConnectionException) {
+                        $client->disconnect();
+                        $lastException = $e;
+                        if ($attempt < $maxConnectionAttempts) {
+                            usleep(200000); // 200ms before retry
+                        }
+                        continue;
+                    }
+
+                    // Non-connection error during warmup (e.g. stream not found) still means round-trip worked.
+                    return $client;
+                }
+
+                return $client;
+            } catch (\RuntimeException $e) {
+                $lastException = $e;
+                if ($attempt < $maxConnectionAttempts) {
+                    usleep(200000);
                 }
             }
-            usleep(100000); // 100ms
-            $attempt++;
         }
 
-        // Verify connection and JetStream availability
-        if (! $client->isConnected()) {
-            throw new \RuntimeException('Failed to establish NATS connection');
+        throw $lastException;
+    }
+
+    /**
+     * Check if NATS is reachable (for use in Pest/beforeEach where $this type may not be resolved).
+     *
+     * @return bool True if NATS host:port is reachable
+     */
+    public static function isNatsReachable(): bool
+    {
+        $host = getenv('NATS_HOST') ?: 'localhost';
+        $port = (int) (getenv('NATS_PORT') ?: '4222');
+        $socket = @fsockopen($host, $port, $errno, $errstr, 1);
+
+        if ($socket !== false) {
+            fclose($socket);
+
+            return true;
         }
 
-        $serverInfo = $client->getServerInfo();
-        if ($serverInfo === null) {
-            throw new \RuntimeException('Failed to get ServerInfo after connection');
-        }
-
-        if (! $serverInfo->jetStreamEnabled) {
-            throw new \RuntimeException('JetStream is not available on the NATS server');
-        }
-
-        return $client;
+        return false;
     }
 
     /**
