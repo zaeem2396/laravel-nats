@@ -27,9 +27,10 @@
         "laravel/framework": "^10.0|^11.0|^12.0",
         "mockery/mockery": "^1.6",
         "orchestra/testbench": "^8.0|^9.0|^10.0",
-        "pestphp/pest": "^2.0|^3.0",
+        "pestphp/pest": "^2.0.2|^3.0",
         "pestphp/pest-plugin-laravel": "^2.0|^3.0",
-        "phpstan/phpstan": "^1.10"
+        "phpstan/phpstan": "^1.10",
+        "phpunit/phpunit": "^10.0.16 !=10.5.63"
     },
     "autoload": {
         "psr-4": {
@@ -67,4 +68,3 @@
     "minimum-stability": "dev",
     "prefer-stable": true
 }
-
