@@ -482,6 +482,40 @@ $message = $js->getMessage('my-stream', 123);
 $js->deleteMessage('my-stream', 123);
 ```
 
+### Consumer Management
+
+Create and manage durable consumers on a stream:
+
+```php
+use LaravelNats\Core\JetStream\ConsumerConfig;
+use LaravelNats\Laravel\Facades\Nats;
+
+$js = Nats::jetstream();
+
+// Create a durable consumer
+$config = (new ConsumerConfig('my-consumer'))
+    ->withFilterSubject('events.>')
+    ->withDeliverPolicy(ConsumerConfig::DELIVER_NEW)
+    ->withAckPolicy(ConsumerConfig::ACK_EXPLICIT);
+
+$info = $js->createConsumer('my-stream', 'my-consumer', $config);
+
+// Get consumer information
+$info = $js->getConsumerInfo('my-stream', 'my-consumer');
+echo $info->getNumPending();   // Messages awaiting delivery
+echo $info->getNumAckPending(); // Messages awaiting ack
+
+// List consumers (paged)
+$result = $js->listConsumers('my-stream', offset: 0);
+foreach ($result['consumers'] as $consumer) {
+    echo $consumer->getName();
+}
+// $result has: total, offset, limit, consumers
+
+// Delete a consumer
+$js->deleteConsumer('my-stream', 'my-consumer');
+```
+
 ## Roadmap
 
 This package is under active development. Current status:
@@ -498,7 +532,7 @@ This package is under active development. Current status:
 - 🔵 **Phase 3:** JetStream Support (In Progress)
   - ✅ Milestone 3.1: JetStream Connection
   - ✅ Milestone 3.2: Stream Management
-  - 🔲 Milestone 3.3: Consumer Management
+  - ✅ Milestone 3.3: Consumer Management
   - 🔲 Milestone 3.4: Acknowledgement System
   - 🔲 Milestone 3.5: Artisan Commands
 - 🔲 **Phase 4:** Worker & Runtime
