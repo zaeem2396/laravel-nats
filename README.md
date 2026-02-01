@@ -516,6 +516,36 @@ foreach ($result['consumers'] as $consumer) {
 $js->deleteConsumer('my-stream', 'my-consumer');
 ```
 
+### Pull consumer and acknowledgements
+
+Consume messages from a pull consumer and acknowledge them:
+
+```php
+use LaravelNats\Core\JetStream\ConsumerConfig;
+use LaravelNats\Core\JetStream\JetStreamConsumedMessage;
+use LaravelNats\Laravel\Facades\Nats;
+
+$js = Nats::jetstream();
+
+// Create a pull consumer (no deliver_subject) with explicit ack
+$config = (new ConsumerConfig('my-consumer'))
+    ->withAckPolicy(ConsumerConfig::ACK_EXPLICIT)
+    ->withDeliverPolicy(ConsumerConfig::DELIVER_ALL);
+$js->createConsumer('my-stream', 'my-consumer', $config);
+
+// Fetch next message (returns null when no_wait and no message)
+$msg = $js->fetchNextMessage('my-stream', 'my-consumer', timeout: 5.0, noWait: true);
+
+if ($msg instanceof JetStreamConsumedMessage) {
+    echo $msg->getPayload();
+    $js->ack($msg);           // Positive ack
+    // $js->nak($msg);        // Redeliver
+    // $js->nak($msg, 30_000_000_000);  // Redeliver after 30s (nanoseconds)
+    // $js->term($msg);       // Terminate (do not redeliver)
+    // $js->inProgress($msg); // Extend ack wait (work in progress)
+}
+```
+
 ## Roadmap
 
 This package is under active development. Current status:
@@ -533,7 +563,7 @@ This package is under active development. Current status:
   - ✅ Milestone 3.1: JetStream Connection
   - ✅ Milestone 3.2: Stream Management
   - ✅ Milestone 3.3: Consumer Management
-  - 🔲 Milestone 3.4: Acknowledgement System
+  - ✅ Milestone 3.4: Acknowledgement System
   - 🔲 Milestone 3.5: Artisan Commands
 - 🔲 **Phase 4:** Worker & Runtime
 - 🔲 **Phase 5:** Observability & Debugging
