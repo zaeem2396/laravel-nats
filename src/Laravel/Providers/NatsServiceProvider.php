@@ -7,6 +7,7 @@ namespace LaravelNats\Laravel\Providers;
 use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Support\ServiceProvider;
 use LaravelNats\Core\Client;
+use LaravelNats\Laravel\Console\Commands\NatsStreamInfoCommand;
 use LaravelNats\Laravel\Console\Commands\NatsStreamListCommand;
 use LaravelNats\Laravel\NatsManager;
 use LaravelNats\Laravel\Queue\NatsConnector;
@@ -51,6 +52,7 @@ class NatsServiceProvider extends ServiceProvider implements DeferrableProvider
 
         $this->commands([
             NatsStreamListCommand::class,
+            NatsStreamInfoCommand::class,
         ]);
     }
 
