@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **PHP requirements:** Minimum PHP raised from 8.1 to 8.2 (Pest/PHPUnit compatibility). PHP 8.4 added to CI test matrix (Laravel 10, 11, 12).
+
 ### Added
 
 #### JetStream Support (Phase 3 - Milestone 3.4 Acknowledgement System)
