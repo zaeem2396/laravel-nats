@@ -473,8 +473,8 @@ final class JetStreamClient
             );
         }
 
-        // Server may respond with Status 404 when no messages (no_wait)
-        if ($this->isNoMessageResponse($response)) {
+        // Server may respond with Status 404 or no reply-to when no messages (no_wait)
+        if ($this->isNoMessageResponse($response) || $response->getReplyTo() === null || $response->getReplyTo() === '') {
             return null;
         }
 
