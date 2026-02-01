@@ -13,6 +13,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+#### JetStream Support (Phase 3 - Milestone 3.5 Artisan Commands)
+- `JetStreamClient::listStreams()` - List streams (paged) via STREAM.LIST API
+- Artisan commands: `nats:stream:list`, `nats:stream:info`, `nats:stream:create`, `nats:stream:delete`
+- Artisan commands: `nats:consumer:list`, `nats:consumer:info`, `nats:consumer:create`, `nats:consumer:delete`
+- Commands support `--connection=` for non-default NATS connection
+- README Artisan Commands section and roadmap update
+
 #### JetStream Support (Phase 3 - Milestone 3.4 Acknowledgement System)
 - `JetStreamConsumedMessage` - Value object for consumed pull messages (ack subject, stream/consumer name, sequences, payload)
 - `JetStreamClient::fetchNextMessage()` - Fetch next message from pull consumer (CONSUMER.MSG.NEXT), optional no_wait

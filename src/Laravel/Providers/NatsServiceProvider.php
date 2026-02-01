@@ -7,6 +7,14 @@ namespace LaravelNats\Laravel\Providers;
 use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Support\ServiceProvider;
 use LaravelNats\Core\Client;
+use LaravelNats\Laravel\Console\Commands\NatsConsumerCreateCommand;
+use LaravelNats\Laravel\Console\Commands\NatsConsumerDeleteCommand;
+use LaravelNats\Laravel\Console\Commands\NatsConsumerInfoCommand;
+use LaravelNats\Laravel\Console\Commands\NatsConsumerListCommand;
+use LaravelNats\Laravel\Console\Commands\NatsStreamCreateCommand;
+use LaravelNats\Laravel\Console\Commands\NatsStreamDeleteCommand;
+use LaravelNats\Laravel\Console\Commands\NatsStreamInfoCommand;
+use LaravelNats\Laravel\Console\Commands\NatsStreamListCommand;
 use LaravelNats\Laravel\NatsManager;
 use LaravelNats\Laravel\Queue\NatsConnector;
 
@@ -36,6 +44,7 @@ class NatsServiceProvider extends ServiceProvider implements DeferrableProvider
     {
         $this->publishConfig();
         $this->registerQueueDriver();
+        $this->registerJetStreamCommands();
     }
 
     /**
@@ -50,6 +59,27 @@ class NatsServiceProvider extends ServiceProvider implements DeferrableProvider
             NatsManager::class,
             Client::class,
         ];
+    }
+
+    /**
+     * Register JetStream Artisan commands.
+     */
+    protected function registerJetStreamCommands(): void
+    {
+        if (! $this->app->runningInConsole()) {
+            return;
+        }
+
+        $this->commands([
+            NatsStreamListCommand::class,
+            NatsStreamInfoCommand::class,
+            NatsStreamCreateCommand::class,
+            NatsStreamDeleteCommand::class,
+            NatsConsumerListCommand::class,
+            NatsConsumerInfoCommand::class,
+            NatsConsumerCreateCommand::class,
+            NatsConsumerDeleteCommand::class,
+        ]);
     }
 
     /**

@@ -282,6 +282,47 @@ final class JetStreamClient
     }
 
     /**
+     * List streams (paged).
+     *
+     * @param int $offset Pagination offset
+     * @param float|null $timeout Request timeout
+     *
+     * @throws NatsException If JetStream is not available
+     * @throws TimeoutException If request times out
+     * @throws ConnectionException If not connected
+     *
+     * @return array{total: int, offset: int, limit: int, streams: list<string>}
+     */
+    public function listStreams(int $offset = 0, ?float $timeout = null): array
+    {
+        $timeout ??= $this->config->getTimeout();
+        $subject = 'STREAM.LIST';
+        $payload = ['offset' => $offset];
+
+        $response = $this->apiRequest($subject, $payload, $timeout);
+
+        $total = (int) ($response['total'] ?? 0);
+        $off = (int) ($response['offset'] ?? 0);
+        $limit = (int) ($response['limit'] ?? 0);
+        $items = $response['streams'] ?? [];
+
+        $streams = [];
+        foreach ($items as $item) {
+            $name = is_array($item) ? ($item['name'] ?? '') : (string) $item;
+            if ($name !== '') {
+                $streams[] = $name;
+            }
+        }
+
+        return [
+            'total' => $total,
+            'offset' => $off,
+            'limit' => $limit,
+            'streams' => $streams,
+        ];
+    }
+
+    /**
      * Purge all messages from a stream.
      *
      * @param string $streamName Stream name
