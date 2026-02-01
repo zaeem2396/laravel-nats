@@ -482,6 +482,55 @@ final class JetStreamClient
     }
 
     /**
+     * Acknowledge a consumed message (positive ack).
+     *
+     * @param JetStreamConsumedMessage $message The message to acknowledge
+     */
+    public function ack(JetStreamConsumedMessage $message): void
+    {
+        $this->sendAck($message->getAckSubject(), JetStreamConsumedMessage::ACK);
+    }
+
+    /**
+     * Negative acknowledge (redeliver the message).
+     *
+     * @param JetStreamConsumedMessage $message The message to nak
+     * @param int|null $delayNanos Optional delay before redelivery (nanoseconds)
+     */
+    public function nak(JetStreamConsumedMessage $message, ?int $delayNanos = null): void
+    {
+        $payload = JetStreamConsumedMessage::NAK;
+        if ($delayNanos !== null && $delayNanos > 0) {
+            $payload = json_encode(['delay' => $delayNanos]);
+            if ($payload === false) {
+                $payload = JetStreamConsumedMessage::NAK;
+            }
+        }
+
+        $this->client->publishRaw($message->getAckSubject(), $payload);
+    }
+
+    /**
+     * Terminate the message (do not redeliver).
+     *
+     * @param JetStreamConsumedMessage $message The message to terminate
+     */
+    public function term(JetStreamConsumedMessage $message): void
+    {
+        $this->sendAck($message->getAckSubject(), JetStreamConsumedMessage::TERM);
+    }
+
+    /**
+     * Signal work in progress (extend ack wait, do not redeliver yet).
+     *
+     * @param JetStreamConsumedMessage $message The message to signal in progress
+     */
+    public function inProgress(JetStreamConsumedMessage $message): void
+    {
+        $this->sendAck($message->getAckSubject(), JetStreamConsumedMessage::IN_PROGRESS);
+    }
+
+    /**
      * List consumers for a stream (paged).
      *
      * @param string $streamName Stream name
@@ -528,6 +577,18 @@ final class JetStreamClient
             'limit' => $limit,
             'consumers' => $consumers,
         ];
+    }
+
+    /**
+     * Send an ack payload to the ack subject.
+     */
+    private function sendAck(string $ackSubject, string $payload): void
+    {
+        if (! $this->isAvailable()) {
+            throw new NatsException('JetStream is not available on this server');
+        }
+
+        $this->client->publishRaw($ackSubject, $payload);
     }
 
     /**
