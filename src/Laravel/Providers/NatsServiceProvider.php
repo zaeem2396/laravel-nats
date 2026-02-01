@@ -48,6 +48,20 @@ class NatsServiceProvider extends ServiceProvider implements DeferrableProvider
     }
 
     /**
+     * Get the services provided by the provider.
+     *
+     * @return array<string>
+     */
+    public function provides(): array
+    {
+        return [
+            'nats',
+            NatsManager::class,
+            Client::class,
+        ];
+    }
+
+    /**
      * Register JetStream Artisan commands.
      */
     protected function registerJetStreamCommands(): void
@@ -66,20 +80,6 @@ class NatsServiceProvider extends ServiceProvider implements DeferrableProvider
             NatsConsumerCreateCommand::class,
             NatsConsumerDeleteCommand::class,
         ]);
-    }
-
-    /**
-     * Get the services provided by the provider.
-     *
-     * @return array<string>
-     */
-    public function provides(): array
-    {
-        return [
-            'nats',
-            NatsManager::class,
-            Client::class,
-        ];
     }
 
     /**

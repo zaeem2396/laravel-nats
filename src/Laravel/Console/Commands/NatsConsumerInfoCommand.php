@@ -75,7 +75,7 @@ class NatsConsumerInfoCommand extends Command
                     ['Ack wait (s)', (string) ($config->getAckWait() ?? '—')],
                     ['Max deliver', (string) ($config->getMaxDeliver() ?? '—')],
                     ['Replay policy', $config->getReplayPolicy()],
-                ]
+                ],
             );
             $this->newLine();
             $this->line('<comment>State</comment>');
@@ -85,7 +85,7 @@ class NatsConsumerInfoCommand extends Command
                     ['Pending', (string) $info->getNumPending()],
                     ['Ack pending', (string) $info->getNumAckPending()],
                     ['Waiting', (string) $info->getNumWaiting()],
-                ]
+                ],
             );
 
             return self::SUCCESS;

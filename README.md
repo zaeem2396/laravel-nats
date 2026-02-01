@@ -546,6 +546,26 @@ if ($msg instanceof JetStreamConsumedMessage) {
 }
 ```
 
+### Artisan Commands (JetStream)
+
+Manage streams and consumers from the CLI:
+
+```bash
+# Streams
+php artisan nats:stream:list [--connection=] [--offset=0]
+php artisan nats:stream:info {stream} [--connection=]
+php artisan nats:stream:create {name} {subjects*} [--connection=] [--description=] [--storage=file|memory] [--retention=limits|interest|workqueue]
+php artisan nats:stream:delete {stream} [--connection=] [--force]
+
+# Consumers
+php artisan nats:consumer:list {stream} [--connection=] [--offset=0]
+php artisan nats:consumer:info {stream} {consumer} [--connection=]
+php artisan nats:consumer:create {stream} {name} [--connection=] [--filter-subject=] [--deliver-policy=all|last|new] [--ack-policy=none|all|explicit]
+php artisan nats:consumer:delete {stream} {consumer} [--connection=] [--force]
+```
+
+Use `--connection=` to target a non-default NATS connection from `config/nats.php`.
+
 ## Roadmap
 
 This package is under active development. Current status:
@@ -564,7 +584,7 @@ This package is under active development. Current status:
   - ✅ Milestone 3.2: Stream Management
   - ✅ Milestone 3.3: Consumer Management
   - ✅ Milestone 3.4: Acknowledgement System
-  - 🔲 Milestone 3.5: Artisan Commands
+  - ✅ Milestone 3.5: Artisan Commands
 - 🔲 **Phase 4:** Worker & Runtime
 - 🔲 **Phase 5:** Observability & Debugging
 - 🔲 **Phase 6:** Reliability & Resilience

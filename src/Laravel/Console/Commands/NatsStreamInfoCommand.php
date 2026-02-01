@@ -71,7 +71,7 @@ class NatsStreamInfoCommand extends Command
                     ['Max messages', (string) ($config->getMaxMessages() ?? '—')],
                     ['Max bytes', (string) ($config->getMaxBytes() ?? '—')],
                     ['Max age (s)', (string) ($config->getMaxAge() ?? '—')],
-                ]
+                ],
             );
             $this->newLine();
             $this->line('<comment>State</comment>');
@@ -83,7 +83,7 @@ class NatsStreamInfoCommand extends Command
                     ['First sequence', (string) ($info->getFirstSequence() ?? '—')],
                     ['Last sequence', (string) ($info->getLastSequence() ?? '—')],
                     ['Consumers', (string) $info->getConsumerCount()],
-                ]
+                ],
             );
 
             return self::SUCCESS;
