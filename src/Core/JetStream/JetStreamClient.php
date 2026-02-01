@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace LaravelNats\Core\JetStream;
 
+use LaravelNats\Contracts\Messaging\MessageInterface;
 use LaravelNats\Core\Client;
 use LaravelNats\Core\Connection\ConnectionConfig;
 use LaravelNats\Core\Protocol\ServerInfo;
@@ -423,6 +424,64 @@ final class JetStreamClient
     }
 
     /**
+     * Fetch the next message(s) from a pull consumer (batch size 1).
+     *
+     * Sends a request to CONSUMER.MSG.NEXT and returns the consumed message, or null when
+     * no_wait is true and no message is available (server responds with Status 404).
+     *
+     * @param string $streamName Stream name
+     * @param string $consumerName Consumer name
+     * @param float|null $timeout Request timeout in seconds
+     * @param bool $noWait If true, return null when no message available instead of waiting
+     *
+     * @throws NatsException If JetStream is not available or consumer not found
+     * @throws TimeoutException If request times out (when no_wait is false and no message)
+     * @throws ConnectionException If not connected
+     *
+     * @return JetStreamConsumedMessage|null The consumed message, or null when no_wait and no message
+     */
+    public function fetchNextMessage(
+        string $streamName,
+        string $consumerName,
+        ?float $timeout = null,
+        bool $noWait = false,
+    ): ?JetStreamConsumedMessage {
+        $timeout ??= $this->config->getTimeout();
+        $subject = 'CONSUMER.MSG.NEXT.' . $streamName . '.' . $consumerName;
+        $fullSubject = $this->buildApiSubject($subject);
+
+        if (! $this->isAvailable()) {
+            throw new NatsException('JetStream is not available on this server');
+        }
+
+        $payload = ['batch' => 1];
+        if ($noWait) {
+            $payload['no_wait'] = true;
+        }
+
+        try {
+            $response = $this->client->request($fullSubject, $payload, $timeout);
+        } catch (TimeoutException $e) {
+            if ($noWait) {
+                return null;
+            }
+
+            throw new TimeoutException(
+                "JetStream fetch next message timed out after {$timeout} seconds",
+                0,
+                $e,
+            );
+        }
+
+        // Server may respond with Status 404 when no messages (no_wait)
+        if ($this->isNoMessageResponse($response)) {
+            return null;
+        }
+
+        return JetStreamConsumedMessage::fromNatsMessage($response);
+    }
+
+    /**
      * List consumers for a stream (paged).
      *
      * @param string $streamName Stream name
@@ -469,6 +528,16 @@ final class JetStreamClient
             'limit' => $limit,
             'consumers' => $consumers,
         ];
+    }
+
+    /**
+     * Check if the response indicates no message available (404).
+     */
+    private function isNoMessageResponse(MessageInterface $message): bool
+    {
+        $status = $message->getHeader('Status');
+
+        return $status === '404' || $status === '404 ';
     }
 
     /**
