@@ -7,6 +7,7 @@ namespace LaravelNats\Laravel\Providers;
 use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Support\ServiceProvider;
 use LaravelNats\Core\Client;
+use LaravelNats\Laravel\Console\Commands\NatsStreamListCommand;
 use LaravelNats\Laravel\NatsManager;
 use LaravelNats\Laravel\Queue\NatsConnector;
 
@@ -36,6 +37,21 @@ class NatsServiceProvider extends ServiceProvider implements DeferrableProvider
     {
         $this->publishConfig();
         $this->registerQueueDriver();
+        $this->registerJetStreamCommands();
+    }
+
+    /**
+     * Register JetStream Artisan commands.
+     */
+    protected function registerJetStreamCommands(): void
+    {
+        if (! $this->app->runningInConsole()) {
+            return;
+        }
+
+        $this->commands([
+            NatsStreamListCommand::class,
+        ]);
     }
 
     /**
