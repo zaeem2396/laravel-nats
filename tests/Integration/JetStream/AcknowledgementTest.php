@@ -94,7 +94,7 @@ describe('Acknowledgement (pull consumer)', function (): void {
             });
         } catch (TimeoutException $e) {
             $this->markTestSkipped(
-                'JetStream fetch next message timed out. Ensure NATS with JetStream is running and responsive (e.g. in CI).'
+                'JetStream fetch next message timed out. Ensure NATS with JetStream is running and responsive (e.g. in CI).',
             );
         }
     });
