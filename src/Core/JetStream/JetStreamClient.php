@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace LaravelNats\Core\JetStream;
 
+use LaravelNats\Contracts\Messaging\MessageInterface;
 use LaravelNats\Core\Client;
 use LaravelNats\Core\Connection\ConnectionConfig;
 use LaravelNats\Core\Protocol\ServerInfo;
@@ -423,6 +424,113 @@ final class JetStreamClient
     }
 
     /**
+     * Fetch the next message(s) from a pull consumer (batch size 1).
+     *
+     * Sends a request to CONSUMER.MSG.NEXT and returns the consumed message, or null when
+     * no_wait is true and no message is available (server responds with Status 404).
+     *
+     * @param string $streamName Stream name
+     * @param string $consumerName Consumer name
+     * @param float|null $timeout Request timeout in seconds
+     * @param bool $noWait If true, return null when no message available instead of waiting
+     *
+     * @throws NatsException If JetStream is not available or consumer not found
+     * @throws TimeoutException If request times out (when no_wait is false and no message)
+     * @throws ConnectionException If not connected
+     *
+     * @return JetStreamConsumedMessage|null The consumed message, or null when no_wait and no message
+     */
+    public function fetchNextMessage(
+        string $streamName,
+        string $consumerName,
+        ?float $timeout = null,
+        bool $noWait = false,
+    ): ?JetStreamConsumedMessage {
+        $timeout ??= $this->config->getTimeout();
+        $subject = 'CONSUMER.MSG.NEXT.' . $streamName . '.' . $consumerName;
+        $fullSubject = $this->buildApiSubject($subject);
+
+        if (! $this->isAvailable()) {
+            throw new NatsException('JetStream is not available on this server');
+        }
+
+        $payload = ['batch' => 1];
+        if ($noWait) {
+            $payload['no_wait'] = true;
+        }
+
+        try {
+            $response = $this->client->request($fullSubject, $payload, $timeout);
+        } catch (TimeoutException $e) {
+            if ($noWait) {
+                return null;
+            }
+
+            throw new TimeoutException(
+                "JetStream fetch next message timed out after {$timeout} seconds",
+                0,
+                $e,
+            );
+        }
+
+        // Server may respond with Status 404 or no reply-to when no messages (no_wait)
+        if ($this->isNoMessageResponse($response) || $response->getReplyTo() === null || $response->getReplyTo() === '') {
+            return null;
+        }
+
+        return JetStreamConsumedMessage::fromNatsMessage($response);
+    }
+
+    /**
+     * Acknowledge a consumed message (positive ack).
+     *
+     * @param JetStreamConsumedMessage $message The message to acknowledge
+     */
+    public function ack(JetStreamConsumedMessage $message): void
+    {
+        $this->sendAck($message->getAckSubject(), JetStreamConsumedMessage::ACK);
+    }
+
+    /**
+     * Negative acknowledge (redeliver the message).
+     *
+     * @param JetStreamConsumedMessage $message The message to nak
+     * @param int|null $delayNanos Optional delay before redelivery (nanoseconds)
+     */
+    public function nak(JetStreamConsumedMessage $message, ?int $delayNanos = null): void
+    {
+        $payload = JetStreamConsumedMessage::NAK;
+        if ($delayNanos !== null && $delayNanos > 0) {
+            $payload = json_encode(['delay' => $delayNanos]);
+            if ($payload === false) {
+                $payload = JetStreamConsumedMessage::NAK;
+            }
+        }
+
+        $this->client->publishRaw($message->getAckSubject(), $payload);
+    }
+
+    /**
+     * Terminate the message (do not redeliver).
+     *
+     * @param JetStreamConsumedMessage $message The message to terminate
+     */
+    public function term(JetStreamConsumedMessage $message): void
+    {
+        $this->sendAck($message->getAckSubject(), JetStreamConsumedMessage::TERM);
+    }
+
+    /**
+     * Signal work in progress (extend ack wait, do not redeliver yet).
+     *
+     * @param JetStreamConsumedMessage $message The message to signal in progress
+     */
+    public function inProgress(JetStreamConsumedMessage $message): void
+    {
+        $this->sendAck($message->getAckSubject(), JetStreamConsumedMessage::IN_PROGRESS);
+    }
+
+    /**
      * List consumers for a stream (paged).
      *
      * @param string $streamName Stream name
@@ -469,6 +577,28 @@ final class JetStreamClient
             'limit' => $limit,
             'consumers' => $consumers,
         ];
+    }
+
+    /**
+     * Send an ack payload to the ack subject.
+     */
+    private function sendAck(string $ackSubject, string $payload): void
+    {
+        if (! $this->isAvailable()) {
+            throw new NatsException('JetStream is not available on this server');
+        }
+
+        $this->client->publishRaw($ackSubject, $payload);
+    }
+
+    /**
+     * Check if the response indicates no message available (404).
+     */
+    private function isNoMessageResponse(MessageInterface $message): bool
+    {
+        $status = $message->getHeader('Status');
+
+        return $status === '404' || $status === '404 ';
     }
 
     /**

@@ -9,6 +9,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+#### JetStream Support (Phase 3 - Milestone 3.4 Acknowledgement System)
+- `JetStreamConsumedMessage` - Value object for consumed pull messages (ack subject, stream/consumer name, sequences, payload)
+- `JetStreamClient::fetchNextMessage()` - Fetch next message from pull consumer (CONSUMER.MSG.NEXT), optional no_wait
+- `JetStreamClient::ack()` - Positive acknowledgment (+ACK)
+- `JetStreamClient::nak()` - Negative acknowledgment (-NAK), optional delay (nanoseconds)
+- `JetStreamClient::term()` - Terminate message (+TERM)
+- `JetStreamClient::inProgress()` - Work in progress (+WPI)
+- Unit tests for JetStreamConsumedMessage
+- Integration tests for pull consumer and ack (AcknowledgementTest)
+
 #### JetStream Support (Phase 3 - Milestone 3.3 Consumer Management)
 - `ConsumerConfig` - Value object for consumer configuration (durable name, filter subject, deliver/ack/replay policies, ack_wait, max_deliver, etc.)
 - `ConsumerInfo` - Value object for consumer state (stream name, consumer name, config, num_pending, num_ack_pending, num_waiting)
