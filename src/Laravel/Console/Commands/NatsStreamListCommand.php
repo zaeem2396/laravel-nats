@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace LaravelNats\Laravel\Console\Commands;
 
 use Illuminate\Console\Command;
+use LaravelNats\Laravel\NatsManager;
 
 /**
  * List JetStream streams.
@@ -32,8 +33,42 @@ class NatsStreamListCommand extends Command
      *
      * @return int
      */
-    public function handle(): int
+    public function handle(NatsManager $nats): int
     {
-        return self::SUCCESS;
+        $connection = $this->option('connection');
+        $connectionName = is_string($connection) ? $connection : null;
+        $offset = (int) $this->option('offset');
+
+        try {
+            $js = $nats->jetstream($connectionName);
+
+            if (! $js->isAvailable()) {
+                $this->error('JetStream is not available on this server.');
+
+                return self::FAILURE;
+            }
+
+            $result = $js->listStreams($offset);
+
+            if ($result['streams'] === []) {
+                $this->info('No streams found.');
+
+                return self::SUCCESS;
+            }
+
+            $rows = [];
+            foreach ($result['streams'] as $name) {
+                $rows[] = [$name];
+            }
+
+            $this->table(['Stream'], $rows);
+            $this->line(sprintf('Total: %d', $result['total']));
+
+            return self::SUCCESS;
+        } catch (\Throwable $e) {
+            $this->error($e->getMessage());
+
+            return self::FAILURE;
+        }
     }
 }
