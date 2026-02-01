@@ -7,6 +7,8 @@ namespace LaravelNats\Laravel\Providers;
 use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Support\ServiceProvider;
 use LaravelNats\Core\Client;
+use LaravelNats\Laravel\Console\Commands\NatsConsumerCreateCommand;
+use LaravelNats\Laravel\Console\Commands\NatsConsumerDeleteCommand;
 use LaravelNats\Laravel\Console\Commands\NatsConsumerInfoCommand;
 use LaravelNats\Laravel\Console\Commands\NatsConsumerListCommand;
 use LaravelNats\Laravel\Console\Commands\NatsStreamCreateCommand;
@@ -61,6 +63,8 @@ class NatsServiceProvider extends ServiceProvider implements DeferrableProvider
             NatsStreamDeleteCommand::class,
             NatsConsumerListCommand::class,
             NatsConsumerInfoCommand::class,
+            NatsConsumerCreateCommand::class,
+            NatsConsumerDeleteCommand::class,
         ]);
     }
 
