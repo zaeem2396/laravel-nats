@@ -13,6 +13,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+#### Queue Driver - Delayed Jobs (Phase 2 - Milestone 2.2)
+- Delayed jobs support using JetStream: enable via `queue.delayed.enabled` in queue connection or `config/nats.php`
+- Config `queue.delayed`: `stream`, `subject_prefix`, `consumer` (with `NATS_QUEUE_DELAYED_*` env vars)
+- `DelayStreamBootstrap`: ensures JetStream delay stream and durable consumer exist (idempotent)
+- `DelayStreamBootstrap::ensureStreamAndConsumer()` for use with an existing JetStream client
+- NatsConnector: when delayed enabled, bootstraps delay stream/consumer and passes JetStream + delayed config to NatsQueue
+- NatsQueue: optional `jetStream` and `delayedConfig` constructor params for `later()` (JetStream path)
+- README: Delayed Jobs (JetStream) section and roadmap update
+
 #### JetStream Support (Phase 3 - Milestone 3.5 Artisan Commands)
 - `JetStreamClient::listStreams()` - List streams (paged) via STREAM.LIST API
 - Artisan commands: `nats:stream:list`, `nats:stream:info`, `nats:stream:create`, `nats:stream:delete`
