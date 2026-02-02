@@ -240,6 +240,45 @@ Nats::subscribe('laravel.queue.failed', function ($message) {
 });
 ```
 
+#### Delayed Jobs (JetStream)
+
+Delayed jobs require **JetStream** to be enabled on your NATS server. When enabled, jobs dispatched with `later()` are stored in a JetStream stream and delivered to the queue when due.
+
+**1. Enable delayed jobs** in your queue connection or in `config/nats.php`:
+
+```php
+// config/queue.php – enable on the connection
+'nats' => [
+    'driver' => 'nats',
+    'host' => env('NATS_HOST', 'localhost'),
+    'port' => env('NATS_PORT', 4222),
+    'queue' => env('NATS_QUEUE', 'default'),
+    'retry_after' => 60,
+    'delayed' => [
+        'enabled' => true,
+        'stream' => env('NATS_QUEUE_DELAYED_STREAM', 'laravel_delayed'),
+        'subject_prefix' => env('NATS_QUEUE_DELAYED_SUBJECT_PREFIX', 'laravel.delayed.'),
+        'consumer' => env('NATS_QUEUE_DELAYED_CONSUMER', 'laravel_delayed_worker'),
+    ],
+],
+```
+
+Defaults for `stream`, `subject_prefix`, and `consumer` are also defined under `queue.delayed` in `config/nats.php` (or via `NATS_QUEUE_DELAYED_*` env vars).
+
+**2. Use `later()`** to schedule jobs:
+
+```php
+use Illuminate\Support\Facades\Queue;
+
+// Run job in 5 minutes
+Queue::connection('nats')->later(now()->addMinutes(5), new SendReminder($user));
+
+// Or with a delay in seconds
+Queue::connection('nats')->later(60, new ProcessOrder($order));
+```
+
+When delayed is enabled, the connector automatically ensures the JetStream delay stream and durable consumer exist at connect time. A delay processor (or worker) consumes from the delay stream and pushes jobs to the main queue when they are due.
+
 ### Running Queue Workers
 
 Use Laravel's standard queue worker commands:
@@ -271,7 +310,7 @@ php artisan queue:work nats --memory=128
 
 ### Current Limitations
 
-- **Delayed jobs:** Not yet supported (requires JetStream, coming in v1.0)
+- **Delayed jobs:** Require JetStream; enable via `queue.delayed.enabled` (see [Delayed Jobs (JetStream)](#delayed-jobs-jetstream)).
 - **Queue size:** Returns 0 (NATS Core doesn't track queue size)
 - **Priority queues:** Not supported in NATS Core
 
@@ -574,11 +613,11 @@ This package is under active development. Current status:
 - ✅ **Phase 1:** Laravel Integration (ServiceProvider, Facade, Config)
 - ✅ **Phase 2:** Laravel Queue Driver (Complete)
   - ✅ Milestone 2.1: Queue Driver Foundation
+  - ✅ Milestone 2.2: Delayed Jobs (JetStream)
   - ✅ Milestone 2.3: Job Lifecycle & Retry
   - ✅ Milestone 2.4: Failed Jobs & DLQ
   - ✅ Milestone 2.5: Queue Worker Compatibility
   - ✅ Milestone 2.6: Queue Driver Stabilization
-  - 🔲 Milestone 2.2: Delayed Jobs (requires JetStream)
 - 🔵 **Phase 3:** JetStream Support (In Progress)
   - ✅ Milestone 3.1: JetStream Connection
   - ✅ Milestone 3.2: Stream Management

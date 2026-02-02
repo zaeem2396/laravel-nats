@@ -170,6 +170,15 @@ return [
         // If set to a simple name (e.g., 'failed'), it will be prefixed automatically
         // If set to a full subject (e.g., 'laravel.queue.failed'), it will be used as-is
         'dead_letter_queue' => env('NATS_QUEUE_DLQ', null),
+
+        // Delayed jobs (requires JetStream)
+        // Set 'enabled' => true in your queue connection to use JetStream for later()
+        'delayed' => [
+            'enabled' => (bool) env('NATS_QUEUE_DELAYED_ENABLED', false),
+            'stream' => env('NATS_QUEUE_DELAYED_STREAM', 'laravel_delayed'),
+            'subject_prefix' => env('NATS_QUEUE_DELAYED_SUBJECT_PREFIX', 'laravel.delayed.'),
+            'consumer' => env('NATS_QUEUE_DELAYED_CONSUMER', 'laravel_delayed_worker'),
+        ],
     ],
 
 ];
