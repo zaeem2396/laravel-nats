@@ -8,12 +8,15 @@ use Illuminate\Contracts\Queue\Queue;
 use Illuminate\Queue\Connectors\ConnectorInterface;
 use LaravelNats\Core\Client;
 use LaravelNats\Core\Connection\ConnectionConfig;
+use LaravelNats\Core\JetStream\JetStreamConfig;
 
 /**
  * NatsConnector creates NatsQueue instances from configuration.
  *
  * This connector is registered with Laravel's queue manager and is
  * responsible for creating properly configured queue instances.
+ * When delayed jobs are enabled (config queue.delayed.enabled), JetStream
+ * is used and the delay stream/consumer are ensured at connect time.
  */
 class NatsConnector implements ConnectorInterface
 {
@@ -44,13 +47,60 @@ class NatsConnector implements ConnectorInterface
             $dlqSubject = $prefix . $dlqSubject;
         }
 
+        $jetStream = null;
+        $delayedConfig = null;
+
+        $delayed = $config['delayed'] ?? $this->readConfig('nats.queue.delayed', []);
+        $delayedEnabled = is_array($delayed) && ($delayed['enabled'] ?? false);
+
+        if ($delayedEnabled) {
+            $jsConfig = JetStreamConfig::fromArray($this->readConfig('nats.jetstream', []));
+            $jetStream = $client->getJetStream($jsConfig);
+            DelayStreamBootstrap::ensureStreamAndConsumer(
+                $jetStream,
+                $delayed['stream'] ?? 'laravel_delayed',
+                $delayed['subject_prefix'] ?? 'laravel.delayed.',
+                $delayed['consumer'] ?? 'laravel_delayed_worker',
+            );
+            $delayedConfig = [
+                'stream' => $delayed['stream'] ?? 'laravel_delayed',
+                'subject_prefix' => $delayed['subject_prefix'] ?? 'laravel.delayed.',
+                'consumer' => $delayed['consumer'] ?? 'laravel_delayed_worker',
+            ];
+        }
+
         return new NatsQueue(
             client: $client,
             defaultQueue: $config['queue'] ?? 'default',
             retryAfter: $config['retry_after'] ?? 60,
             maxTries: $config['tries'] ?? 3,
             deadLetterQueue: $dlqSubject,
+            jetStream: $jetStream,
+            delayedConfig: $delayedConfig,
         );
+    }
+
+    /**
+     * Read a config value when Laravel config is available (e.g. when queue is resolved from container).
+     *
+     * @param string $key Config key (e.g. "nats.queue.delayed")
+     * @param mixed $default Default when config unavailable
+     *
+     * @return mixed
+     */
+    protected function readConfig(string $key, mixed $default = []): mixed
+    {
+        if (! function_exists('config')) {
+            return $default;
+        }
+
+        try {
+            $value = config($key, $default);
+
+            return $value ?? $default;
+        } catch (\Throwable) {
+            return $default;
+        }
     }
 
     /**

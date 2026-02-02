@@ -25,38 +25,33 @@ final class DelayStreamBootstrap
     }
 
     /**
-     * Ensure the delay stream and consumer exist for the given configuration.
+     * Ensure the delay stream and consumer exist using an existing JetStream client.
      *
-     * Creates the stream and durable consumer if they are missing.
+     * Use this when you already have a JetStreamClient (e.g. from the queue connector).
      * Idempotent: safe to call multiple times.
      *
-     * @param string|null $connectionName NATS connection name (null for default)
+     * @param JetStreamClient $js JetStream client
      * @param string $streamName JetStream stream name
      * @param string $subjectPrefix Subject prefix for delay messages (e.g. "laravel.delayed.")
      * @param string $consumerName Durable consumer name
      *
      * @throws NatsException If JetStream is not available or creation fails
      */
-    public function ensure(
-        ?string $connectionName,
+    public static function ensureStreamAndConsumer(
+        JetStreamClient $js,
         string $streamName,
         string $subjectPrefix,
         string $consumerName,
     ): void {
-        $js = $this->nats->jetstream($connectionName);
-
         if (! $js->isAvailable()) {
             throw new NatsException('JetStream is not available on this server');
         }
 
-        $this->ensureStream($js, $streamName, $subjectPrefix);
-        $this->ensureConsumer($js, $streamName, $subjectPrefix, $consumerName);
+        self::ensureStreamInternal($js, $streamName, $subjectPrefix);
+        self::ensureConsumerInternal($js, $streamName, $subjectPrefix, $consumerName);
     }
 
-    /**
-     * Ensure the delay stream exists.
-     */
-    private function ensureStream(
+    private static function ensureStreamInternal(
         JetStreamClient $js,
         string $streamName,
         string $subjectPrefix,
@@ -81,10 +76,7 @@ final class DelayStreamBootstrap
         $js->createStream($config);
     }
 
-    /**
-     * Ensure the delay consumer exists on the stream.
-     */
-    private function ensureConsumer(
+    private static function ensureConsumerInternal(
         JetStreamClient $js,
         string $streamName,
         string $subjectPrefix,
@@ -108,5 +100,34 @@ final class DelayStreamBootstrap
             ->withAckPolicy(ConsumerConfig::ACK_EXPLICIT);
 
         $js->createConsumer($streamName, $consumerName, $config);
+    }
+
+    /**
+     * Ensure the delay stream and consumer exist for the given configuration.
+     *
+     * Creates the stream and durable consumer if they are missing.
+     * Idempotent: safe to call multiple times.
+     *
+     * @param string|null $connectionName NATS connection name (null for default)
+     * @param string $streamName JetStream stream name
+     * @param string $subjectPrefix Subject prefix for delay messages (e.g. "laravel.delayed.")
+     * @param string $consumerName Durable consumer name
+     *
+     * @throws NatsException If JetStream is not available or creation fails
+     */
+    public function ensure(
+        ?string $connectionName,
+        string $streamName,
+        string $subjectPrefix,
+        string $consumerName,
+    ): void {
+        $js = $this->nats->jetstream($connectionName);
+
+        if (! $js->isAvailable()) {
+            throw new NatsException('JetStream is not available on this server');
+        }
+
+        self::ensureStreamInternal($js, $streamName, $subjectPrefix);
+        self::ensureConsumerInternal($js, $streamName, $subjectPrefix, $consumerName);
     }
 }

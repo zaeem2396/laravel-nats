@@ -10,6 +10,7 @@ use Illuminate\Contracts\Queue\Queue as QueueContract;
 use Illuminate\Queue\Queue;
 use Illuminate\Support\Str;
 use LaravelNats\Core\Client;
+use LaravelNats\Core\JetStream\JetStreamClient;
 
 /**
  * NatsQueue implements Laravel's Queue contract using NATS as the backend.
@@ -50,6 +51,20 @@ class NatsQueue extends Queue implements QueueContract
     protected ?string $deadLetterQueue = null;
 
     /**
+     * JetStream client for delayed jobs (null when delayed jobs disabled).
+     *
+     * @var JetStreamClient|null
+     */
+    protected ?JetStreamClient $jetStream = null;
+
+    /**
+     * Delayed jobs config: stream, subject_prefix, consumer (null when disabled).
+     *
+     * @var array{stream: string, subject_prefix: string, consumer: string}|null
+     */
+    protected ?array $delayedConfig = null;
+
+    /**
      * Create a new NATS queue instance.
      *
      * @param Client $client
@@ -57,6 +72,8 @@ class NatsQueue extends Queue implements QueueContract
      * @param int $retryAfter
      * @param int $maxTries
      * @param string|null $deadLetterQueue
+     * @param JetStreamClient|null $jetStream For delayed jobs (when queue.delayed.enabled)
+     * @param array{stream: string, subject_prefix: string, consumer: string}|null $delayedConfig For delayed jobs
      */
     public function __construct(
         Client $client,
@@ -64,12 +81,16 @@ class NatsQueue extends Queue implements QueueContract
         int $retryAfter = 60,
         int $maxTries = 3,
         ?string $deadLetterQueue = null,
+        ?JetStreamClient $jetStream = null,
+        ?array $delayedConfig = null,
     ) {
         $this->client = $client;
         $this->defaultQueue = $defaultQueue;
         $this->retryAfter = $retryAfter;
         $this->maxTries = $maxTries;
         $this->deadLetterQueue = $deadLetterQueue;
+        $this->jetStream = $jetStream;
+        $this->delayedConfig = $delayedConfig;
     }
 
     /**
