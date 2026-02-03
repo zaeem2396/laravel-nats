@@ -24,8 +24,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 #### JetStream Support (Phase 3 - Milestone 3.5 Artisan Commands)
 - `JetStreamClient::listStreams()` - List streams (paged) via STREAM.LIST API
-- Artisan commands: `nats:stream:list`, `nats:stream:info`, `nats:stream:create`, `nats:stream:delete`
+- Artisan commands: `nats:stream:list`, `nats:stream:info`, `nats:stream:create`, `nats:stream:delete`, `nats:stream:purge`, `nats:stream:update`
 - Artisan commands: `nats:consumer:list`, `nats:consumer:info`, `nats:consumer:create`, `nats:consumer:delete`
+- Artisan command: `nats:jetstream:status` - JetStream account status and usage (table or `--json`)
+- `JetStreamClient::getAccountInfo()` - JetStream account information (memory, storage, streams, consumers, limits) via `$JS.API.INFO`
 - Commands support `--connection=` for non-default NATS connection
 - README Artisan Commands section and roadmap update
 
