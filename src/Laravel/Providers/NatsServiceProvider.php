@@ -16,6 +16,7 @@ use LaravelNats\Laravel\Console\Commands\NatsStreamDeleteCommand;
 use LaravelNats\Laravel\Console\Commands\NatsStreamInfoCommand;
 use LaravelNats\Laravel\Console\Commands\NatsStreamListCommand;
 use LaravelNats\Laravel\Console\Commands\NatsStreamPurgeCommand;
+use LaravelNats\Laravel\Console\Commands\NatsStreamUpdateCommand;
 use LaravelNats\Laravel\NatsManager;
 use LaravelNats\Laravel\Queue\NatsConnector;
 
@@ -77,6 +78,7 @@ class NatsServiceProvider extends ServiceProvider implements DeferrableProvider
             NatsStreamCreateCommand::class,
             NatsStreamDeleteCommand::class,
             NatsStreamPurgeCommand::class,
+            NatsStreamUpdateCommand::class,
             NatsConsumerListCommand::class,
             NatsConsumerInfoCommand::class,
             NatsConsumerCreateCommand::class,
