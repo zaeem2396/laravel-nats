@@ -11,10 +11,13 @@ use LaravelNats\Laravel\Console\Commands\NatsConsumerCreateCommand;
 use LaravelNats\Laravel\Console\Commands\NatsConsumerDeleteCommand;
 use LaravelNats\Laravel\Console\Commands\NatsConsumerInfoCommand;
 use LaravelNats\Laravel\Console\Commands\NatsConsumerListCommand;
+use LaravelNats\Laravel\Console\Commands\NatsJetStreamStatusCommand;
 use LaravelNats\Laravel\Console\Commands\NatsStreamCreateCommand;
 use LaravelNats\Laravel\Console\Commands\NatsStreamDeleteCommand;
 use LaravelNats\Laravel\Console\Commands\NatsStreamInfoCommand;
 use LaravelNats\Laravel\Console\Commands\NatsStreamListCommand;
+use LaravelNats\Laravel\Console\Commands\NatsStreamPurgeCommand;
+use LaravelNats\Laravel\Console\Commands\NatsStreamUpdateCommand;
 use LaravelNats\Laravel\NatsManager;
 use LaravelNats\Laravel\Queue\NatsConnector;
 
@@ -75,10 +78,13 @@ class NatsServiceProvider extends ServiceProvider implements DeferrableProvider
             NatsStreamInfoCommand::class,
             NatsStreamCreateCommand::class,
             NatsStreamDeleteCommand::class,
+            NatsStreamPurgeCommand::class,
+            NatsStreamUpdateCommand::class,
             NatsConsumerListCommand::class,
             NatsConsumerInfoCommand::class,
             NatsConsumerCreateCommand::class,
             NatsConsumerDeleteCommand::class,
+            NatsJetStreamStatusCommand::class,
         ]);
     }
 

@@ -594,6 +594,8 @@ Manage streams and consumers from the CLI:
 php artisan nats:stream:list [--connection=] [--offset=0]
 php artisan nats:stream:info {stream} [--connection=]
 php artisan nats:stream:create {name} {subjects*} [--connection=] [--description=] [--storage=file|memory] [--retention=limits|interest|workqueue]
+php artisan nats:stream:update {stream} [--connection=] [--description=] [--storage=] [--retention=] [--max-messages=] [--max-bytes=] [--max-age=]
+php artisan nats:stream:purge {stream} [--connection=] [--force]
 php artisan nats:stream:delete {stream} [--connection=] [--force]
 
 # Consumers
@@ -601,6 +603,9 @@ php artisan nats:consumer:list {stream} [--connection=] [--offset=0]
 php artisan nats:consumer:info {stream} {consumer} [--connection=]
 php artisan nats:consumer:create {stream} {name} [--connection=] [--filter-subject=] [--deliver-policy=all|last|new] [--ack-policy=none|all|explicit]
 php artisan nats:consumer:delete {stream} {consumer} [--connection=] [--force]
+
+# JetStream account
+php artisan nats:jetstream:status [--connection=] [--json]
 ```
 
 Use `--connection=` to target a non-default NATS connection from `config/nats.php`.
@@ -618,12 +623,12 @@ This package is under active development. Current status:
   - ✅ Milestone 2.4: Failed Jobs & DLQ
   - ✅ Milestone 2.5: Queue Worker Compatibility
   - ✅ Milestone 2.6: Queue Driver Stabilization
-- 🔵 **Phase 3:** JetStream Support (In Progress)
+- ✅ **Phase 3:** JetStream Support (Complete)
   - ✅ Milestone 3.1: JetStream Connection
   - ✅ Milestone 3.2: Stream Management
   - ✅ Milestone 3.3: Consumer Management
   - ✅ Milestone 3.4: Acknowledgement System
-  - ✅ Milestone 3.5: Artisan Commands
+  - ✅ Milestone 3.5: Artisan Commands (stream purge/update, jetstream:status, getAccountInfo)
 - 🔲 **Phase 4:** Worker & Runtime
 - 🔲 **Phase 5:** Observability & Debugging
 - 🔲 **Phase 6:** Reliability & Resilience

@@ -621,6 +621,24 @@ final class JetStreamClient
     }
 
     /**
+     * Get JetStream account information (memory, storage, streams, consumers, limits).
+     *
+     * @param float|null $timeout Request timeout
+     *
+     * @throws NatsException If JetStream is not available
+     * @throws TimeoutException If request times out
+     * @throws ConnectionException If not connected
+     *
+     * @return array<string, mixed> Account info (memory, storage, streams, consumers, domain, limits, etc.)
+     */
+    public function getAccountInfo(?float $timeout = null): array
+    {
+        $timeout ??= $this->config->getTimeout();
+
+        return $this->apiRequest('INFO', [], $timeout);
+    }
+
+    /**
      * Send an ack payload to the ack subject.
      */
     private function sendAck(string $ackSubject, string $payload): void

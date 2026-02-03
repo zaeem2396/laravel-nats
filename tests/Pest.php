@@ -41,7 +41,7 @@ declare(strict_types=1);
 uses(LaravelNats\Tests\TestCase::class)->in('Unit/Connection', 'Unit/Messaging', 'Unit/Protocol', 'Unit/Serialization', 'Unit/Core/JetStream');
 
 // Unit/Laravel tests: Laravel application context with Orchestra Testbench
-uses(LaravelNats\Tests\LaravelTestCase::class)->in('Unit/Laravel/NatsFacadeTest.php', 'Unit/Laravel/NatsManagerTest.php', 'Unit/Laravel/NatsServiceProviderTest.php', 'Unit/Laravel/NatsManagerJetStreamTest.php');
+uses(LaravelNats\Tests\LaravelTestCase::class)->in('Unit/Laravel/Console/JetStreamCommandsTest.php', 'Unit/Laravel/NatsFacadeTest.php', 'Unit/Laravel/NatsManagerTest.php', 'Unit/Laravel/NatsServiceProviderTest.php', 'Unit/Laravel/NatsManagerJetStreamTest.php');
 
 // Unit/Laravel/Queue tests: Queue components (minimal Laravel context)
 uses(LaravelNats\Tests\TestCase::class)->in('Unit/Laravel/Queue');
