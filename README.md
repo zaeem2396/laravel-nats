@@ -453,6 +453,9 @@ $js = Nats::jetstream();
 if ($js->isAvailable()) {
     // Use JetStream features
 }
+
+// Get account information (memory, storage, streams, consumers, limits)
+$accountInfo = $js->getAccountInfo();
 ```
 
 ### Configuration
@@ -492,6 +495,10 @@ $config = new StreamConfig('my-stream', ['events.>'])
     ->withStorage(StreamConfig::STORAGE_FILE);
 
 $info = $js->createStream($config);
+
+// List streams (paged)
+$result = $js->listStreams(offset: 0);
+// $result has: total, offset, limit, streams
 
 // Get stream information
 $info = $js->getStreamInfo('my-stream');
@@ -609,29 +616,6 @@ php artisan nats:jetstream:status [--connection=] [--json]
 ```
 
 Use `--connection=` to target a non-default NATS connection from `config/nats.php`.
-
-## Roadmap
-
-This package is under active development. Current status:
-
-- ✅ **Phase 1:** Core Messaging (Publish, Subscribe, Request/Reply)
-- ✅ **Phase 1:** Laravel Integration (ServiceProvider, Facade, Config)
-- ✅ **Phase 2:** Laravel Queue Driver (Complete)
-  - ✅ Milestone 2.1: Queue Driver Foundation
-  - ✅ Milestone 2.2: Delayed Jobs (JetStream)
-  - ✅ Milestone 2.3: Job Lifecycle & Retry
-  - ✅ Milestone 2.4: Failed Jobs & DLQ
-  - ✅ Milestone 2.5: Queue Worker Compatibility
-  - ✅ Milestone 2.6: Queue Driver Stabilization
-- ✅ **Phase 3:** JetStream Support (Complete)
-  - ✅ Milestone 3.1: JetStream Connection
-  - ✅ Milestone 3.2: Stream Management
-  - ✅ Milestone 3.3: Consumer Management
-  - ✅ Milestone 3.4: Acknowledgement System
-  - ✅ Milestone 3.5: Artisan Commands (stream purge/update, jetstream:status, getAccountInfo)
-- 🔲 **Phase 4:** Worker & Runtime
-- 🔲 **Phase 5:** Observability & Debugging
-- 🔲 **Phase 6:** Reliability & Resilience
 
 ## Contributing
 
