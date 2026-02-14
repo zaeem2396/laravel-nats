@@ -24,7 +24,7 @@ it('can connect via facade', function (): void {
 
 it('publishes orders.created example from FEATURES.md', function (): void {
     $received = null;
-    $subject = 'orders.created';
+    $subject = 'orders.created.' . uniqid();
 
     Nats::subscribe($subject, function (MessageInterface $message) use (&$received): void {
         $received = $message->getDecodedPayload();
