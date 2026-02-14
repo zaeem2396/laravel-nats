@@ -21,4 +21,7 @@ Nats::publish('orders.created', [
     'order_id' => 1001,
     'amount' => 2500,
 ]);
+
+// Publish to a specific connection
+Nats::connection('analytics')->publish('events.tracked', $data);
 ```
