@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+#### Documentation
+- `docs/FEATURES.md` — Comprehensive features overview with examples (Publish Messages, Subscribe, Request/Reply, Queue Driver, JetStream, Delayed Jobs, Multiple Connections, Wildcards, Artisan Commands, Laravel-Native API)
+- README link to Features overview
+
 ### Changed
 
 - **PHP requirements:** Minimum PHP raised from 8.1 to 8.2 (Pest/PHPUnit compatibility). PHP 8.4 added to CI test matrix (Laravel 10, 11, 12).
