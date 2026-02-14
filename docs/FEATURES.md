@@ -47,3 +47,4 @@ Nats::publish('orders.created', $payload, ['X-Trace-Id' => 'abc-123']);
 - Arrays and objects are auto-serialized to JSON
 - Raw strings are published as-is
 - Headers require NATS 2.2+ server
+- NATS default max payload is 1MB; for larger messages, store data externally and pass a reference
