@@ -50,3 +50,13 @@ Nats::publish('orders.created', $payload, ['X-Trace-Id' => 'abc-123']);
 - Raw strings are published as-is
 - Headers require NATS 2.2+ server
 - NATS default max payload is 1MB; for larger messages, store data externally and pass a reference
+
+**Requirements**
+
+- NATS Server 2.x
+- PHP 8.2+
+
+**See also**
+
+- [README — Publishing Messages](../README.md#publishing-messages)
+- [README — Troubleshooting (Message Size)](../README.md#message-size-limits)
