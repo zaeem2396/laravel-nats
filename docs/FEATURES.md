@@ -27,6 +27,8 @@ Send structured payloads easily using a Laravel-friendly facade. Messages are au
 
 **Example**
 
+The `Nats` facade is registered as an alias by the package. Use the full namespace or the `Nats` alias:
+
 ```php
 use LaravelNats\Laravel\Facades\Nats;
 
