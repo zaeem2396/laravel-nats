@@ -24,4 +24,13 @@ Nats::publish('orders.created', [
 
 // Publish to a specific connection
 Nats::connection('analytics')->publish('events.tracked', $data);
+
+// With optional headers (NATS 2.2+)
+Nats::publish('orders.created', $payload, ['X-Trace-Id' => 'abc-123']);
 ```
+
+**Notes**
+
+- Arrays and objects are auto-serialized to JSON
+- Raw strings are published as-is
+- Headers require NATS 2.2+ server
