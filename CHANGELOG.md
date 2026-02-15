@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- (none)
+
+## [1.1.0] - 2026-02-15
+
+### Added
+
 #### Documentation
 - `docs/FEATURES.md` — Comprehensive features overview with examples (Publish Messages, Subscribe, Request/Reply, Queue Driver, JetStream, Delayed Jobs, Multiple Connections, Wildcards, Artisan Commands, Laravel-Native API)
 - Feature 2: Subscribe to Subjects — queue groups, unsubscribe, wildcard notes
@@ -21,12 +27,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Feature 9: Artisan Commands — nats:stream:*, nats:consumer:*, nats:jetstream:status
 - Feature 10: Laravel-Native API Design — dispatch, facade, config, queue worker
 - README link to Features overview
-
-### Changed
-
-- **PHP requirements:** Minimum PHP raised from 8.1 to 8.2 (Pest/PHPUnit compatibility). PHP 8.4 added to CI test matrix (Laravel 10, 11, 12).
-
-### Added
 
 #### Queue Driver - Delayed Jobs (Phase 2 - Milestone 2.2)
 - Delayed jobs support using JetStream: enable via `queue.delayed.enabled` in queue connection or `config/nats.php`
@@ -78,6 +78,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Multi-tenant domain support for JetStream
 - JetStream configuration section in `config/nats.php`
 - Comprehensive unit and integration tests for JetStream connection
+
+### Changed
+
+- **PHP requirements:** Minimum PHP raised from 8.1 to 8.2 (Pest/PHPUnit compatibility). PHP 8.4 added to CI test matrix (Laravel 10, 11, 12).
 
 ## [1.0.0] - 2026-01-24
 
@@ -145,6 +149,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Upgrade Guide
 
+### From 1.0.0 to 1.1.0
+
+- **PHP:** Minimum PHP is now 8.2 (was 8.1). Ensure your environment meets this requirement.
+- **Delayed jobs:** Enable via `queue.delayed.enabled` in your queue connection config or `config/nats.php`.
+- **JetStream:** Use `Nats::jetstream()` for streams, consumers, and acknowledgements. See `docs/FEATURES.md` for examples.
+
+Update `composer.json`:
+
+```json
+{
+    "require": {
+        "zaeem2396/laravel-nats": "^1.1"
+    }
+}
+```
+
+Run `composer update zaeem2396/laravel-nats` to upgrade.
+
 ### From Pre-release to 1.0.0
 
 No breaking changes. Simply update your `composer.json`:
@@ -161,6 +183,7 @@ Run `composer update zaeem2396/laravel-nats` to upgrade.
 
 ---
 
-[Unreleased]: https://github.com/zaeem2396/laravel-nats/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/zaeem2396/laravel-nats/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/zaeem2396/laravel-nats/releases/tag/v1.1.0
 [1.0.0]: https://github.com/zaeem2396/laravel-nats/releases/tag/v1.0.0
 
