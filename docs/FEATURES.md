@@ -10,8 +10,8 @@ laravel-nats is a production-ready, Laravel-native integration for NATS and JetS
 4. [Full Laravel Queue Driver](#-4-full-laravel-queue-driver) _(coming soon)_
 5. [JetStream Support](#-5-jetstream-support) _(coming soon)_
 6. [Delayed Jobs via JetStream](#-6-delayed-jobs-via-jetstream) _(coming soon)_
-7. [Multiple Connections Support](#-7-multiple-connections-support) _(coming soon)_
-8. [Wildcard Subscriptions](#-8-wildcard-subscriptions) _(coming soon)_
+7. [Multiple Connections Support](#-7-multiple-connections-support)
+8. [Wildcard Subscriptions](#-8-wildcard-subscriptions)
 9. [Artisan Commands](#-9-artisan-commands) _(coming soon)_
 10. [Laravel-Native API Design](#-10-laravel-native-api-design) _(coming soon)_
 
@@ -129,5 +129,89 @@ Subscribe on a specific connection: `Nats::connection('analytics')->subscribe(..
 
 ---
 
-_Feature 2 (Subscribe) complete. Remaining features (3–10) documented in subsequent releases._
+## 🔄 7. Multiple Connections Support
+
+Define and use multiple NATS connections in your config.
+
+**Description**
+
+Configure named connections in `config/nats.php` and switch between them for different workloads (e.g. analytics, orders, notifications).
+
+**Example**
+
+```php
+use LaravelNats\Laravel\Facades\Nats;
+
+// Publish to analytics connection
+Nats::connection('analytics')->publish('events.page_viewed', $data);
+
+// Subscribe on a specific connection
+Nats::connection('secondary')->subscribe('orders.*', $callback);
+```
+
+**Configuration**
+
+```php
+// config/nats.php
+'connections' => [
+    'default' => ['host' => 'localhost', 'port' => 4222],
+    'analytics' => ['host' => 'nats-analytics.example.com', 'port' => 4222],
+],
+```
+
+**Requirements**
+
+- NATS Server 2.x
+- PHP 8.2+
+
+**See also**
+
+- [README — Multiple Connections](../README.md#multiple-connections)
+
+---
+
+## 🧵 8. Wildcard Subscriptions
+
+Subscribe using NATS wildcard patterns for flexible subject matching.
+
+**Description**
+
+- `*` matches exactly one token: `orders.*` matches `orders.created`, `orders.updated`
+- `>` matches one or more tokens: `payments.>` matches `payments.created`, `payments.failed`, `payments.refund.initiated`
+
+**Example**
+
+```php
+use LaravelNats\Laravel\Facades\Nats;
+
+// Single-token wildcard
+Nats::subscribe('orders.*', function ($message) {
+    // Handles orders.created, orders.updated, orders.deleted
+});
+
+// Multi-token wildcard
+Nats::subscribe('payments.>', function ($message) {
+    // Handles payments.created, payments.failed, payments.refund.initiated
+});
+
+Nats::process(1.0);
+```
+
+**Notes**
+
+- Wildcards only apply to subscriptions, not publish subjects
+- Use unique subjects per test to avoid cross-test message leakage
+
+**Requirements**
+
+- NATS Server 2.x
+- PHP 8.2+
+
+**See also**
+
+- [README — Wildcards](../README.md#wildcards)
+
+---
+
+_Features 7–8 complete. Remaining features (3–6, 9–10) documented in subsequent releases._
 
