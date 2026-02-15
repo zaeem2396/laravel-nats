@@ -226,3 +226,5 @@ _Features 3–4 complete. Remaining features (5–10) documented in subsequent r
 - **Request/Reply:** `Nats::request($subject, $payload, timeout: 5.0)` — synchronous RPC-style messaging
 - **Queue Driver:** `dispatch($job)->onConnection('nats')`, `php artisan queue:work nats` — full Laravel queue contract
 
+**Microservice use case:** Use Request/Reply for sync RPC; use Queue Driver for async job processing.
+
