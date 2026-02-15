@@ -60,3 +60,5 @@ Nats::publish('orders.created', $payload, ['X-Trace-Id' => 'abc-123']);
 
 - [README — Publishing Messages](../README.md#publishing-messages)
 - [README — Troubleshooting (Message Size)](../README.md#message-size-limits)
+
+---
