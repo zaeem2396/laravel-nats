@@ -129,5 +129,5 @@ Subscribe on a specific connection: `Nats::connection('analytics')->subscribe(..
 
 ---
 
-_Remaining features (3–10) documented in subsequent releases._
+_Feature 2 (Subscribe) complete. Remaining features (3–10) documented in subsequent releases._
 
