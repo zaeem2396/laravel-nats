@@ -84,6 +84,17 @@ Nats::subscribe('orders.*', function ($message) {
 Nats::process(1.0);
 ```
 
+**Queue groups**
+
+Use a queue group to distribute messages across multiple subscribers (load balancing):
+
+```php
+Nats::subscribe('orders.process', function ($message) {
+    // Only one subscriber receives each message
+}, 'order-workers');
+```
+
 ---
 
 _Remaining features (3–10) documented in subsequent releases._
+
