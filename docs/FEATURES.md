@@ -203,6 +203,7 @@ Nats::process(1.0);
 
 - Wildcards only apply to subscriptions, not publish subjects
 - Use unique subjects per test to avoid cross-test message leakage
+- `orders.*` matches one token (e.g. `orders.created`); `orders.created.xyz` does not match
 
 **Requirements**
 
