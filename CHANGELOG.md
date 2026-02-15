@@ -11,7 +11,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 #### Documentation
 - `docs/FEATURES.md` — Comprehensive features overview with examples (Publish Messages, Subscribe, Request/Reply, Queue Driver, JetStream, Delayed Jobs, Multiple Connections, Wildcards, Artisan Commands, Laravel-Native API)
-- Feature 2: Subscribe to Subjects — queue groups, unsubscribe, wildcard notes
 - README link to Features overview
 
 ### Changed

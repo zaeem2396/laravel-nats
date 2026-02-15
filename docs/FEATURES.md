@@ -5,7 +5,7 @@ laravel-nats is a production-ready, Laravel-native integration for NATS and JetS
 ## Table of Contents
 
 1. [Publish Messages](#-1-publish-messages)
-2. [Subscribe to Subjects](#-2-subscribe-to-subjects)
+2. [Subscribe to Subjects](#-2-subscribe-to-subjects) _(coming soon)_
 3. [Request / Reply Pattern](#-3-request--reply-pattern) _(coming soon)_
 4. [Full Laravel Queue Driver](#-4-full-laravel-queue-driver) _(coming soon)_
 5. [JetStream Support](#-5-jetstream-support) _(coming soon)_
@@ -63,71 +63,4 @@ Nats::publish('orders.created', $payload, ['X-Trace-Id' => 'abc-123']);
 
 ---
 
-## 📥 2. Subscribe to Subjects
-
-Subscribe to subjects and process messages using callbacks.
-
-**Description**
-
-Supports standard and wildcard subjects (`*`, `>`). Messages are decoded automatically when using the default JSON serializer. Ideal for event-driven and pub/sub architectures.
-
-**Example**
-
-The callback receives a `MessageInterface`; use `getDecodedPayload()` for JSON-decoded data:
-
-```php
-use LaravelNats\Laravel\Facades\Nats;
-
-Nats::subscribe('orders.*', function ($message) {
-    logger()->info('Order event received', $message->getDecodedPayload());
-});
-
-// Process incoming messages (wait up to 1 second)
-Nats::process(1.0);
-
-// For long-running subscribers, use a loop:
-// while (true) { Nats::process(1.0); }
-```
-
-**Queue groups**
-
-Use a queue group to distribute messages across multiple subscribers (load balancing):
-
-```php
-Nats::subscribe('orders.process', function ($message) {
-    // Only one subscriber receives each message
-}, 'order-workers');
-```
-
-**Notes**
-
-- Callback receives a `MessageInterface` instance; use `getDecodedPayload()` for parsed data or `getPayload()` for raw string
-- `process($timeout)` blocks and dispatches messages to callbacks; use a loop for continuous processing
-- Wildcards: `*` matches one token, `>` matches one or more tokens
-
-**Unsubscribe**
-
-Call `Nats::process()` in a loop for long-running subscribers. Use `unsubscribe()` to stop receiving:
-
-```php
-$sid = Nats::subscribe('orders.*', $callback);
-Nats::process(1.0);
-Nats::unsubscribe($sid);
-```
-
-**Requirements**
-
-- NATS Server 2.x
-- PHP 8.2+
-
-**See also**
-
-- [README — Subscribing to Messages](../README.md#subscribing-to-messages)
-- [README — Queue Groups](../README.md#queue-groups-load-balancing)
-
-Subscribe on a specific connection: `Nats::connection('analytics')->subscribe(...)`.
-
----
-
-_Feature 2 (Subscribe) complete. Remaining features (3–10) documented in subsequent releases._
-
+_Remaining features (2–10) documented in subsequent releases._
