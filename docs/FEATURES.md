@@ -172,7 +172,7 @@ Use NATS as a first-class Laravel queue driver.
 
 **Description**
 
-Supports job retries, backoff strategies, delayed jobs (with JetStream), failed job handling, and Dead Letter Queues (DLQ).
+Supports job retries, backoff strategies, delayed jobs (with JetStream), failed job handling, and Dead Letter Queues (DLQ). Fully compatible with Laravel's `queue:work` command.
 
 **Example**
 
