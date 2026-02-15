@@ -169,6 +169,7 @@ if ($js->isAvailable()) {
 
 - [README — JetStream Support](../README.md#jetstream-support)
 - [README — Stream Management](../README.md#stream-management)
+- [README — Consumer Management](../README.md#consumer-management)
 
 ---
 
