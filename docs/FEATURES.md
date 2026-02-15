@@ -73,6 +73,8 @@ Supports standard and wildcard subjects (`*`, `>`). Messages are decoded automat
 
 **Example**
 
+The callback receives a `MessageInterface`; use `getDecodedPayload()` for JSON-decoded data:
+
 ```php
 use LaravelNats\Laravel\Facades\Nats;
 
