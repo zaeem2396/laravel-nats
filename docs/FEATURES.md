@@ -84,6 +84,9 @@ Nats::subscribe('orders.*', function ($message) {
 
 // Process incoming messages (wait up to 1 second)
 Nats::process(1.0);
+
+// For long-running subscribers, use a loop:
+// while (true) { Nats::process(1.0); }
 ```
 
 **Queue groups**
