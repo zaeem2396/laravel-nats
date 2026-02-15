@@ -143,7 +143,9 @@ Perfect for microservice-style communication where a response is required. The r
 use LaravelNats\Laravel\Facades\Nats;
 
 $response = Nats::request('orders.get', ['order_id' => 1001], timeout: 5.0);
+// Or: Nats::connection('secondary')->request(...)
 $order = $response->getDecodedPayload();
+// Connection-specific: Nats::connection('secondary')->request(...)
 ```
 
 **Notes**
@@ -200,7 +202,7 @@ class ProcessOrder implements ShouldQueue
 
 **Failed jobs and DLQ**
 
-Configure `dead_letter_queue` in queue config to route failed jobs to a separate NATS subject.
+Configure `dead_letter_queue` in queue config to route failed jobs to a separate NATS subject. Jobs also stored in Laravel's `failed_jobs` table.
 
 **Requirements**
 
