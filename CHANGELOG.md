@@ -16,6 +16,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Feature 4: Full Laravel Queue Driver — dispatch, retries, backoff, failed jobs, DLQ
 - Feature 5: JetStream Support — streams, consumers, acks, StreamConfig
 - Feature 6: Delayed Jobs via JetStream — later(), delay(), queue.delayed config
+- Feature 7: Multiple Connections — named connections, Nats::connection('name')
+- Feature 8: Wildcard Subscriptions — * and > patterns, examples
+- Feature 9: Artisan Commands — nats:stream:*, nats:consumer:*, nats:jetstream:status
+- Feature 10: Laravel-Native API Design — dispatch, facade, config, queue worker
 - README link to Features overview
 
 ### Changed
