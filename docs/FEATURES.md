@@ -8,8 +8,8 @@ laravel-nats is a production-ready, Laravel-native integration for NATS and JetS
 2. [Subscribe to Subjects](#-2-subscribe-to-subjects)
 3. [Request / Reply Pattern](#-3-request--reply-pattern) _(coming soon)_
 4. [Full Laravel Queue Driver](#-4-full-laravel-queue-driver) _(coming soon)_
-5. [JetStream Support](#-5-jetstream-support) _(coming soon)_
-6. [Delayed Jobs via JetStream](#-6-delayed-jobs-via-jetstream) _(coming soon)_
+5. [JetStream Support](#-5-jetstream-support)
+6. [Delayed Jobs via JetStream](#-6-delayed-jobs-via-jetstream)
 7. [Multiple Connections Support](#-7-multiple-connections-support) _(coming soon)_
 8. [Wildcard Subscriptions](#-8-wildcard-subscriptions) _(coming soon)_
 9. [Artisan Commands](#-9-artisan-commands) _(coming soon)_
@@ -129,5 +129,78 @@ Subscribe on a specific connection: `Nats::connection('analytics')->subscribe(..
 
 ---
 
-_Feature 2 (Subscribe) complete. Remaining features (3–10) documented in subsequent releases._
+## 🚀 5. JetStream Support
+
+Advanced NATS JetStream integration for persistence and streaming.
+
+**Description**
+
+Stream creation and management, consumer configuration, durable consumers, message acknowledgements. JetStream adds persistence, replay, and exactly-once semantics.
+
+**Example**
+
+```php
+use LaravelNats\Core\JetStream\StreamConfig;
+use LaravelNats\Laravel\Facades\Nats;
+
+$js = Nats::jetstream();
+
+if ($js->isAvailable()) {
+    $config = new StreamConfig('ORDERS', ['orders.*'])
+        ->withMaxMessages(10000)
+        ->withStorage(\LaravelNats\Core\JetStream\StreamConfig::STORAGE_FILE);
+
+    $info = $js->createStream($config);
+}
+```
+
+**Key operations:** `createStream`, `getStreamInfo`, `updateStream`, `deleteStream`, `purgeStream`, `listStreams`, `createConsumer`, `listConsumers`, `fetchNextMessage`, `ack`, `nak`, `term`
+
+**Requirements**
+
+- NATS Server 2.9+ with `--jetstream`
+- PHP 8.2+
+
+**See also**
+
+- [README — JetStream Support](../README.md#jetstream-support)
+- [README — Stream Management](../README.md#stream-management)
+
+---
+
+## ⏳ 6. Delayed Jobs via JetStream
+
+Schedule jobs using JetStream's delayed delivery mechanism.
+
+**Description**
+
+When `queue.delayed.enabled` is true, jobs dispatched with `later()` or `delay()` are stored in a JetStream stream and delivered to the queue when due.
+
+**Example**
+
+```php
+dispatch(new SendReminderEmail($user))
+    ->delay(now()->addMinutes(10))
+    ->onConnection('nats');
+
+// Or with seconds
+Queue::connection('nats')->later(60, new ProcessOrder($order));
+```
+
+**Configuration**
+
+Enable in queue config: `delayed => ['enabled' => true, 'stream' => '...', 'subject_prefix' => '...', 'consumer' => '...']`
+
+**Requirements**
+
+- NATS Server with JetStream enabled
+- `queue.delayed.enabled` in nats queue connection
+
+**See also**
+
+- [README — Delayed Jobs (JetStream)](../README.md#delayed-jobs-jetstream)
+
+---
+
+_Features 5–6 complete. Remaining features (3–4, 7–10) documented in subsequent releases._
 
