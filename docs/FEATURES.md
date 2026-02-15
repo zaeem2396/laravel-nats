@@ -6,10 +6,10 @@ laravel-nats is a production-ready, Laravel-native integration for NATS and JetS
 
 1. [Publish Messages](#-1-publish-messages)
 2. [Subscribe to Subjects](#-2-subscribe-to-subjects)
-3. [Request / Reply Pattern](#-3-request--reply-pattern) _(coming soon)_
-4. [Full Laravel Queue Driver](#-4-full-laravel-queue-driver) _(coming soon)_
-5. [JetStream Support](#-5-jetstream-support)
-6. [Delayed Jobs via JetStream](#-6-delayed-jobs-via-jetstream)
+3. [Request / Reply Pattern](#-3-request--reply-pattern)
+4. [Full Laravel Queue Driver](#-4-full-laravel-queue-driver)
+5. [JetStream Support](#-5-jetstream-support) _(coming soon)_
+6. [Delayed Jobs via JetStream](#-6-delayed-jobs-via-jetstream) _(coming soon)_
 7. [Multiple Connections Support](#-7-multiple-connections-support) _(coming soon)_
 8. [Wildcard Subscriptions](#-8-wildcard-subscriptions) _(coming soon)_
 9. [Artisan Commands](#-9-artisan-commands) _(coming soon)_
@@ -129,87 +129,103 @@ Subscribe on a specific connection: `Nats::connection('analytics')->subscribe(..
 
 ---
 
-## 🚀 5. JetStream Support
+## 🔁 3. Request / Reply Pattern
 
-Advanced NATS JetStream integration for persistence and streaming.
+Built-in support for synchronous request-response communication.
 
 **Description**
 
-Stream creation and management, consumer configuration, durable consumers, message acknowledgements. JetStream adds persistence, replay, and exactly-once semantics.
+Perfect for microservice-style communication where a response is required. The request blocks until a reply is received or the timeout expires. Ideal for RPC-style calls between services.
 
 **Example**
 
 ```php
-use LaravelNats\Core\JetStream\StreamConfig;
 use LaravelNats\Laravel\Facades\Nats;
 
-$js = Nats::jetstream();
+$response = Nats::request('orders.get', ['order_id' => 1001], timeout: 5.0);
+// Or: Nats::connection('secondary')->request(...)
+$order = $response->getDecodedPayload();
+// Connection-specific: Nats::connection('secondary')->request(...)
+```
 
-if ($js->isAvailable()) {
-    $config = new StreamConfig('ORDERS', ['orders.*'])
-        ->withMaxMessages(10000)
-        ->withStorage(\LaravelNats\Core\JetStream\StreamConfig::STORAGE_FILE);
+**Notes**
 
-    $info = $js->createStream($config);
+- Uses `_INBOX.*` for reply routing; no manual reply subject needed
+- Configurable timeout (default 5.0 seconds)
+- Returns `MessageInterface` with `getDecodedPayload()` for parsed response
+- Throws `TimeoutException` if no reply within timeout
+
+**Requirements**
+
+- NATS Server 2.x
+- PHP 8.2+
+
+**See also**
+
+- [README — Request/Reply](../README.md#requestreply)
+
+---
+
+## 🗂 4. Full Laravel Queue Driver
+
+Use NATS as a first-class Laravel queue driver.
+
+**Description**
+
+Supports job retries, backoff strategies, delayed jobs (with JetStream), failed job handling, and Dead Letter Queues (DLQ). Fully compatible with Laravel's `queue:work` command.
+
+**Example**
+
+```php
+dispatch(new ProcessOrder($order))->onConnection('nats');
+```
+
+Run the worker:
+
+```bash
+php artisan queue:work nats
+```
+
+**Worker options:** `--queue`, `--tries`, `--timeout`, `--memory`, `--sleep`, `--once`
+
+**Job retries and backoff**
+
+```php
+class ProcessOrder implements ShouldQueue
+{
+    use InteractsWithQueue;
+
+    public $tries = 5;
+    public $backoff = [10, 30, 60]; // Linear backoff in seconds
 }
 ```
 
-**Consumer and ack:** Use `ConsumerConfig` for pull consumers; `fetchNextMessage()` + `ack()` / `nak()` / `term()` for message handling.
+**Failed jobs and DLQ**
 
-**Key operations:** `createStream`, `getStreamInfo`, `updateStream`, `deleteStream`, `purgeStream`, `listStreams`, `createConsumer`, `listConsumers`, `fetchNextMessage`, `ack`, `nak`, `term`, `getAccountInfo`
+Configure `dead_letter_queue` in queue config to route failed jobs to a separate NATS subject. Jobs also stored in Laravel's `failed_jobs` table.
 
 **Requirements**
 
-- NATS Server 2.9+ with `--jetstream`
+- NATS Server 2.x (JetStream for delayed jobs)
 - PHP 8.2+
-
-**Domain support:** `Nats::jetstream(null, new JetStreamConfig('my-domain'))` for multi-tenancy.
-
-**See also**
-
-- [README — JetStream Support](../README.md#jetstream-support)
-- [README — Stream Management](../README.md#stream-management)
-- [README — Consumer Management](../README.md#consumer-management)
-
----
-
-## ⏳ 6. Delayed Jobs via JetStream
-
-Schedule jobs using JetStream's delayed delivery mechanism.
-
-**Description**
-
-When `queue.delayed.enabled` is true, jobs dispatched with `later()` or `delay()` are stored in a JetStream stream and delivered to the queue when due.
-
-**Example**
-
-```php
-dispatch(new SendReminderEmail($user))
-    ->delay(now()->addMinutes(10))
-    ->onConnection('nats');
-
-// Or with seconds
-Queue::connection('nats')->later(60, new ProcessOrder($order));
-```
-
-**Configuration**
-
-Enable in queue config: `delayed => ['enabled' => true, 'stream' => '...', 'subject_prefix' => '...', 'consumer' => '...']`. Use `NATS_QUEUE_DELAYED_*` env vars.
-
-**Requirements**
-
-- NATS Server with JetStream enabled
-- `queue.delayed.enabled` in nats queue connection
+- Laravel 10.x / 11.x / 12.x
 
 **See also**
 
-- [README — Delayed Jobs (JetStream)](../README.md#delayed-jobs-jetstream)
-
-**DelayStreamBootstrap:** Automatically ensures the delay stream and durable consumer exist when delayed is enabled.
+- [README — Queue Driver](../README.md#queue-driver)
+- [README — Failed Jobs & DLQ](../README.md#dead-letter-queue-dlq)
+- [README — Delayed Jobs](../README.md#delayed-jobs-jetstream)
 
 ---
 
-_Features 5–6 complete. JetStream enables persistence and delayed jobs; use for event sourcing and scheduled job processing._
+_Features 3–4 complete. Remaining features (5–10) documented in subsequent releases._
 
-Remaining features (3–4, 7–10) documented in subsequent releases.
+---
+
+### Feature 3–4 Summary
+
+- **Request/Reply:** `Nats::request($subject, $payload, timeout: 5.0)` — synchronous RPC-style messaging
+- **Queue Driver:** `dispatch($job)->onConnection('nats')`, `php artisan queue:work nats` — full Laravel queue contract
+
+**Microservice use case:** Use Request/Reply for sync RPC; use Queue Driver for async job processing.
 
