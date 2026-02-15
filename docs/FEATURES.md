@@ -6,8 +6,8 @@ laravel-nats is a production-ready, Laravel-native integration for NATS and JetS
 
 1. [Publish Messages](#-1-publish-messages)
 2. [Subscribe to Subjects](#-2-subscribe-to-subjects)
-3. [Request / Reply Pattern](#-3-request--reply-pattern) _(coming soon)_
-4. [Full Laravel Queue Driver](#-4-full-laravel-queue-driver) _(coming soon)_
+3. [Request / Reply Pattern](#-3-request--reply-pattern)
+4. [Full Laravel Queue Driver](#-4-full-laravel-queue-driver)
 5. [JetStream Support](#-5-jetstream-support) _(coming soon)_
 6. [Delayed Jobs via JetStream](#-6-delayed-jobs-via-jetstream) _(coming soon)_
 7. [Multiple Connections Support](#-7-multiple-connections-support) _(coming soon)_
@@ -129,5 +129,88 @@ Subscribe on a specific connection: `Nats::connection('analytics')->subscribe(..
 
 ---
 
-_Feature 2 (Subscribe) complete. Remaining features (3–10) documented in subsequent releases._
+## 🔁 3. Request / Reply Pattern
+
+Built-in support for synchronous request-response communication.
+
+**Description**
+
+Perfect for microservice-style communication where a response is required. The request blocks until a reply is received or the timeout expires.
+
+**Example**
+
+```php
+use LaravelNats\Laravel\Facades\Nats;
+
+$response = Nats::request('orders.get', ['order_id' => 1001], timeout: 5.0);
+$order = $response->getDecodedPayload();
+```
+
+**Notes**
+
+- Uses `_INBOX.*` for reply routing; no manual reply subject needed
+- Configurable timeout (default 5.0 seconds)
+- Returns `MessageInterface` with `getDecodedPayload()` for parsed response
+
+**Requirements**
+
+- NATS Server 2.x
+- PHP 8.2+
+
+**See also**
+
+- [README — Request/Reply](../README.md#requestreply)
+
+---
+
+## 🗂 4. Full Laravel Queue Driver
+
+Use NATS as a first-class Laravel queue driver.
+
+**Description**
+
+Supports job retries, backoff strategies, delayed jobs (with JetStream), failed job handling, and Dead Letter Queues (DLQ).
+
+**Example**
+
+```php
+dispatch(new ProcessOrder($order))->onConnection('nats');
+```
+
+Run the worker:
+
+```bash
+php artisan queue:work nats
+```
+
+**Job retries and backoff**
+
+```php
+class ProcessOrder implements ShouldQueue
+{
+    use InteractsWithQueue;
+
+    public $tries = 5;
+    public $backoff = [10, 30, 60]; // Linear backoff in seconds
+}
+```
+
+**Failed jobs and DLQ**
+
+Configure `dead_letter_queue` in queue config to route failed jobs to a separate NATS subject.
+
+**Requirements**
+
+- NATS Server 2.x (JetStream for delayed jobs)
+- PHP 8.2+
+- Laravel 10.x / 11.x / 12.x
+
+**See also**
+
+- [README — Queue Driver](../README.md#queue-driver)
+- [README — Failed Jobs & DLQ](../README.md#dead-letter-queue-dlq)
+
+---
+
+_Features 3–4 complete. Remaining features (5–10) documented in subsequent releases._
 
