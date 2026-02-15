@@ -69,7 +69,7 @@ Subscribe to subjects and process messages using callbacks.
 
 **Description**
 
-Supports standard and wildcard subjects (`*`, `>`). Messages are decoded automatically when using the default JSON serializer.
+Supports standard and wildcard subjects (`*`, `>`). Messages are decoded automatically when using the default JSON serializer. Ideal for event-driven and pub/sub architectures.
 
 **Example**
 
