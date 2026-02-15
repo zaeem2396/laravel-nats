@@ -161,6 +161,8 @@ if ($js->isAvailable()) {
 - NATS Server 2.9+ with `--jetstream`
 - PHP 8.2+
 
+**Domain support:** `Nats::jetstream(null, new JetStreamConfig('my-domain'))` for multi-tenancy.
+
 **See also**
 
 - [README — JetStream Support](../README.md#jetstream-support)
