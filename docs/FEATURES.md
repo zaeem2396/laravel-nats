@@ -125,6 +125,8 @@ Nats::unsubscribe($sid);
 - [README — Subscribing to Messages](../README.md#subscribing-to-messages)
 - [README — Queue Groups](../README.md#queue-groups-load-balancing)
 
+Subscribe on a specific connection: `Nats::connection('analytics')->subscribe(...)`.
+
 ---
 
 _Remaining features (3–10) documented in subsequent releases._
