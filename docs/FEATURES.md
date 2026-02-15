@@ -151,6 +151,7 @@ $order = $response->getDecodedPayload();
 - Uses `_INBOX.*` for reply routing; no manual reply subject needed
 - Configurable timeout (default 5.0 seconds)
 - Returns `MessageInterface` with `getDecodedPayload()` for parsed response
+- Throws `TimeoutException` if no reply within timeout
 
 **Requirements**
 
