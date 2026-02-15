@@ -154,6 +154,8 @@ if ($js->isAvailable()) {
 }
 ```
 
+**Consumer and ack:** Use `ConsumerConfig` for pull consumers; `fetchNextMessage()` + `ack()` / `nak()` / `term()` for message handling.
+
 **Key operations:** `createStream`, `getStreamInfo`, `updateStream`, `deleteStream`, `purgeStream`, `listStreams`, `createConsumer`, `listConsumers`, `fetchNextMessage`, `ack`, `nak`, `term`, `getAccountInfo`
 
 **Requirements**
