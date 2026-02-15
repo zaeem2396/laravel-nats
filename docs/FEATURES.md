@@ -110,6 +110,16 @@ Nats::process(1.0);
 Nats::unsubscribe($sid);
 ```
 
+**Requirements**
+
+- NATS Server 2.x
+- PHP 8.2+
+
+**See also**
+
+- [README — Subscribing to Messages](../README.md#subscribing-to-messages)
+- [README — Queue Groups](../README.md#queue-groups-load-balancing)
+
 ---
 
 _Remaining features (3–10) documented in subsequent releases._
