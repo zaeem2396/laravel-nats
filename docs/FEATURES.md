@@ -5,7 +5,7 @@ laravel-nats is a production-ready, Laravel-native integration for NATS and JetS
 ## Table of Contents
 
 1. [Publish Messages](#-1-publish-messages)
-2. [Subscribe to Subjects](#-2-subscribe-to-subjects) _(coming soon)_
+2. [Subscribe to Subjects](#-2-subscribe-to-subjects)
 3. [Request / Reply Pattern](#-3-request--reply-pattern) _(coming soon)_
 4. [Full Laravel Queue Driver](#-4-full-laravel-queue-driver) _(coming soon)_
 5. [JetStream Support](#-5-jetstream-support) _(coming soon)_
@@ -63,4 +63,27 @@ Nats::publish('orders.created', $payload, ['X-Trace-Id' => 'abc-123']);
 
 ---
 
-_Remaining features (2–10) documented in subsequent releases._
+## 📥 2. Subscribe to Subjects
+
+Subscribe to subjects and process messages using callbacks.
+
+**Description**
+
+Supports standard and wildcard subjects (`*`, `>`). Messages are decoded automatically when using the default JSON serializer.
+
+**Example**
+
+```php
+use LaravelNats\Laravel\Facades\Nats;
+
+Nats::subscribe('orders.*', function ($message) {
+    logger()->info('Order event received', $message->getDecodedPayload());
+});
+
+// Process incoming messages (wait up to 1 second)
+Nats::process(1.0);
+```
+
+---
+
+_Remaining features (3–10) documented in subsequent releases._
