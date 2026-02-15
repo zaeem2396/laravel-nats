@@ -62,3 +62,5 @@ Nats::publish('orders.created', $payload, ['X-Trace-Id' => 'abc-123']);
 - [README — Troubleshooting (Message Size)](../README.md#message-size-limits)
 
 ---
+
+_Remaining features (2–10) documented in subsequent releases._
