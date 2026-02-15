@@ -94,6 +94,12 @@ Nats::subscribe('orders.process', function ($message) {
 }, 'order-workers');
 ```
 
+**Notes**
+
+- Callback receives a `MessageInterface` instance; use `getDecodedPayload()` for parsed data
+- `process($timeout)` blocks and dispatches messages to callbacks; use a loop for continuous processing
+- Wildcards: `*` matches one token, `>` matches one or more tokens
+
 **Unsubscribe**
 
 Call `Nats::process()` in a loop for long-running subscribers. Use `unsubscribe()` to stop receiving:
