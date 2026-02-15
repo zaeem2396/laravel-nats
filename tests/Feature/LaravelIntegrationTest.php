@@ -75,6 +75,25 @@ it('can publish and subscribe via facade', function (): void {
     Nats::disconnect();
 });
 
+it('request/reply orders.get example from FEATURES.md', function (): void {
+    $subject = 'orders.get.' . uniqid();
+
+    Nats::subscribe($subject, function (MessageInterface $message): void {
+        $replyTo = $message->getReplyTo();
+        if ($replyTo !== null) {
+            $payload = $message->getDecodedPayload();
+            Nats::publish($replyTo, ['order_id' => $payload['order_id'], 'amount' => 2500]);
+        }
+    });
+
+    $response = Nats::request($subject, ['order_id' => 1001], timeout: 5.0);
+    $order = $response->getDecodedPayload();
+
+    expect($order)->toBe(['order_id' => 1001, 'amount' => 2500]);
+
+    Nats::disconnect();
+});
+
 it('can use request/reply via facade', function (): void {
     $subject = 'laravel.echo.' . uniqid();
 
