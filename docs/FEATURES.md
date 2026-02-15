@@ -12,8 +12,8 @@ laravel-nats is a production-ready, Laravel-native integration for NATS and JetS
 6. [Delayed Jobs via JetStream](#-6-delayed-jobs-via-jetstream) _(coming soon)_
 7. [Multiple Connections Support](#-7-multiple-connections-support) _(coming soon)_
 8. [Wildcard Subscriptions](#-8-wildcard-subscriptions) _(coming soon)_
-9. [Artisan Commands](#-9-artisan-commands) _(coming soon)_
-10. [Laravel-Native API Design](#-10-laravel-native-api-design) _(coming soon)_
+9. [Artisan Commands](#-9-artisan-commands)
+10. [Laravel-Native API Design](#-10-laravel-native-api-design)
 
 ---
 
@@ -129,5 +129,64 @@ Subscribe on a specific connection: `Nats::connection('analytics')->subscribe(..
 
 ---
 
-_Feature 2 (Subscribe) complete. Remaining features (3–10) documented in subsequent releases._
+## 🛠 9. Artisan Commands
+
+Manage streams and consumers directly from Laravel.
+
+**Description**
+
+CLI commands for JetStream stream and consumer management. All commands support `--connection=` for non-default NATS connections.
+
+**Example**
+
+```bash
+# Streams
+php artisan nats:stream:list [--connection=]
+php artisan nats:stream:info ORDERS [--connection=]
+php artisan nats:stream:create ORDERS "orders.*" [--description=] [--storage=file|memory]
+php artisan nats:stream:delete ORDERS [--force]
+
+# Consumers
+php artisan nats:consumer:list ORDERS [--connection=]
+php artisan nats:consumer:create ORDERS orders-consumer [--filter-subject=] [--ack-policy=explicit]
+php artisan nats:consumer:delete ORDERS orders-consumer [--force]
+
+# JetStream account
+php artisan nats:jetstream:status [--connection=] [--json]
+```
+
+**Requirements**
+
+- NATS Server with JetStream enabled
+- PHP 8.2+
+
+**See also**
+
+- [README — Artisan Commands (JetStream)](../README.md#artisan-commands-jetstream)
+
+---
+
+## 🧩 10. Laravel-Native API Design
+
+Designed to feel like core Laravel features.
+
+**Description**
+
+- **Familiar dispatch() integration** — Use `dispatch($job)->onConnection('nats')` as with Redis or SQS
+- **Facade-based API** — `Nats::publish()`, `Nats::subscribe()`, `Nats::request()`, `Nats::jetstream()`
+- **Config-driven setup** — `config/nats.php`, `NATS_*` env vars, `queue.connections.nats`
+- **Seamless queue worker support** — `php artisan queue:work nats` with `--tries`, `--timeout`, `--queue`
+
+**Example**
+
+```php
+// Same patterns as Laravel's Redis/Cache/Queue
+Nats::publish('event', $payload);
+dispatch($job)->onConnection('nats');
+$js = Nats::jetstream();
+```
+
+---
+
+_All 10 features documented. See README for full reference._
 
