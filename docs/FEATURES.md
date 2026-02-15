@@ -216,5 +216,7 @@ Nats::process(1.0);
 
 ---
 
-_Features 7–8 complete. Remaining features (3–6, 9–10) documented in subsequent releases._
+_Features 7–8 complete. Multiple connections for workload isolation; wildcards for flexible event routing._
+
+Remaining features (3–6, 9–10) documented in subsequent releases.
 
