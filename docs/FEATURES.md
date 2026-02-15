@@ -194,7 +194,7 @@ Queue::connection('nats')->later(60, new ProcessOrder($order));
 
 **Configuration**
 
-Enable in queue config: `delayed => ['enabled' => true, 'stream' => '...', 'subject_prefix' => '...', 'consumer' => '...']`
+Enable in queue config: `delayed => ['enabled' => true, 'stream' => '...', 'subject_prefix' => '...', 'consumer' => '...']`. Use `NATS_QUEUE_DELAYED_*` env vars.
 
 **Requirements**
 
