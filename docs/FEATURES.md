@@ -8,12 +8,12 @@ laravel-nats is a production-ready, Laravel-native integration for NATS and JetS
 2. [Subscribe to Subjects](#-2-subscribe-to-subjects)
 3. [Request / Reply Pattern](#-3-request--reply-pattern)
 4. [Full Laravel Queue Driver](#-4-full-laravel-queue-driver)
-5. [JetStream Support](#-5-jetstream-support) _(coming soon)_
-6. [Delayed Jobs via JetStream](#-6-delayed-jobs-via-jetstream) _(coming soon)_
+5. [JetStream Support](#-5-jetstream-support)
+6. [Delayed Jobs via JetStream](#-6-delayed-jobs-via-jetstream)
 7. [Multiple Connections Support](#-7-multiple-connections-support)
 8. [Wildcard Subscriptions](#-8-wildcard-subscriptions)
-9. [Artisan Commands](#-9-artisan-commands) _(coming soon)_
-10. [Laravel-Native API Design](#-10-laravel-native-api-design) _(coming soon)_
+9. [Artisan Commands](#-9-artisan-commands)
+10. [Laravel-Native API Design](#-10-laravel-native-api-design)
 
 ---
 
@@ -143,7 +143,6 @@ Perfect for microservice-style communication where a response is required. The r
 use LaravelNats\Laravel\Facades\Nats;
 
 $response = Nats::request('orders.get', ['order_id' => 1001], timeout: 5.0);
-// Or: Nats::connection('secondary')->request(...)
 $order = $response->getDecodedPayload();
 // Connection-specific: Nats::connection('secondary')->request(...)
 ```
@@ -218,14 +217,231 @@ Configure `dead_letter_queue` in queue config to route failed jobs to a separate
 
 ---
 
-_Features 3–4 complete. Remaining features (5–10) documented in subsequent releases._
+## 🚀 5. JetStream Support
+
+Advanced NATS JetStream integration for persistence and streaming.
+
+**Description**
+
+Stream creation and management, consumer configuration, durable consumers, message acknowledgements. JetStream adds persistence, replay, and exactly-once semantics.
+
+**Example**
+
+```php
+use LaravelNats\Core\JetStream\StreamConfig;
+use LaravelNats\Laravel\Facades\Nats;
+
+$js = Nats::jetstream();
+
+if ($js->isAvailable()) {
+    $config = new StreamConfig('ORDERS', ['orders.*'])
+        ->withMaxMessages(10000)
+        ->withStorage(\LaravelNats\Core\JetStream\StreamConfig::STORAGE_FILE);
+
+    $info = $js->createStream($config);
+}
+```
+
+**Consumer and ack:** Use `ConsumerConfig` for pull consumers; `fetchNextMessage()` + `ack()` / `nak()` / `term()` for message handling.
+
+**Key operations:** `createStream`, `getStreamInfo`, `updateStream`, `deleteStream`, `purgeStream`, `listStreams`, `createConsumer`, `listConsumers`, `fetchNextMessage`, `ack`, `nak`, `term`, `getAccountInfo`
+
+**Requirements**
+
+- NATS Server 2.9+ with `--jetstream`
+- PHP 8.2+
+
+**Domain support:** `Nats::jetstream(null, new JetStreamConfig('my-domain'))` for multi-tenancy.
+
+**See also**
+
+- [README — JetStream Support](../README.md#jetstream-support)
+- [README — Stream Management](../README.md#stream-management)
+- [README — Consumer Management](../README.md#consumer-management)
 
 ---
 
-### Feature 3–4 Summary
+## ⏳ 6. Delayed Jobs via JetStream
 
-- **Request/Reply:** `Nats::request($subject, $payload, timeout: 5.0)` — synchronous RPC-style messaging
-- **Queue Driver:** `dispatch($job)->onConnection('nats')`, `php artisan queue:work nats` — full Laravel queue contract
+Schedule jobs using JetStream's delayed delivery mechanism.
 
-**Microservice use case:** Use Request/Reply for sync RPC; use Queue Driver for async job processing.
+**Description**
+
+When `queue.delayed.enabled` is true, jobs dispatched with `later()` or `delay()` are stored in a JetStream stream and delivered to the queue when due.
+
+**Example**
+
+```php
+dispatch(new SendReminderEmail($user))
+    ->delay(now()->addMinutes(10))
+    ->onConnection('nats');
+
+// Or with seconds
+Queue::connection('nats')->later(60, new ProcessOrder($order));
+```
+
+**Configuration**
+
+Enable in queue config: `delayed => ['enabled' => true, 'stream' => '...', 'subject_prefix' => '...', 'consumer' => '...']`. Use `NATS_QUEUE_DELAYED_*` env vars.
+
+**Requirements**
+
+- NATS Server with JetStream enabled
+- `queue.delayed.enabled` in nats queue connection
+
+**See also**
+
+- [README — Delayed Jobs (JetStream)](../README.md#delayed-jobs-jetstream)
+
+**DelayStreamBootstrap:** Automatically ensures the delay stream and durable consumer exist when delayed is enabled.
+
+---
+
+## 🔄 7. Multiple Connections Support
+
+Define and use multiple NATS connections in your config.
+
+**Description**
+
+Configure named connections in `config/nats.php` and switch between them for different workloads (e.g. analytics, orders, notifications).
+
+**Example**
+
+```php
+use LaravelNats\Laravel\Facades\Nats;
+
+// Publish to analytics connection
+Nats::connection('analytics')->publish('events.page_viewed', $data);
+
+// Subscribe on a specific connection
+Nats::connection('secondary')->subscribe('orders.*', $callback);
+```
+
+**Default connection:** Use `NATS_CONNECTION` env var or omit `connection()` for default.
+
+**Configuration**
+
+```php
+// config/nats.php
+'connections' => [
+    'default' => ['host' => 'localhost', 'port' => 4222],
+    'analytics' => ['host' => 'nats-analytics.example.com', 'port' => 4222],
+],
+```
+
+**Requirements**
+
+- NATS Server 2.x
+- PHP 8.2+
+
+**See also**
+
+- [README — Multiple Connections](../README.md#multiple-connections)
+
+---
+
+## 🧵 8. Wildcard Subscriptions
+
+Subscribe using NATS wildcard patterns for flexible subject matching.
+
+**Description**
+
+- `*` matches exactly one token: `orders.*` matches `orders.created`, `orders.updated`
+- `>` matches one or more tokens: `payments.>` matches `payments.created`, `payments.failed`, `payments.refund.initiated`
+
+**Example**
+
+```php
+use LaravelNats\Laravel\Facades\Nats;
+
+// Single-token wildcard
+Nats::subscribe('orders.*', function ($message) {
+    // Handles orders.created, orders.updated, orders.deleted
+});
+
+// Multi-token wildcard
+Nats::subscribe('payments.>', function ($message) {
+    // Handles payments.created, payments.failed, payments.refund.initiated
+});
+
+Nats::process(1.0);
+```
+
+**Notes**
+
+- Wildcards only apply to subscriptions, not publish subjects
+- Use unique subjects per test to avoid cross-test message leakage
+- `orders.*` matches one token (e.g. `orders.created`); `orders.created.xyz` does not match
+
+**Requirements**
+
+- NATS Server 2.x
+- PHP 8.2+
+
+**See also**
+
+- [README — Wildcards](../README.md#wildcards)
+
+---
+
+## 🛠 9. Artisan Commands
+
+Manage streams and consumers directly from Laravel.
+
+**Description**
+
+CLI commands for JetStream stream and consumer management. All commands support `--connection=` for non-default NATS connections.
+
+**Example**
+
+```bash
+# Streams
+php artisan nats:stream:list [--connection=]
+php artisan nats:stream:info ORDERS [--connection=]
+php artisan nats:stream:create ORDERS "orders.*" [--description=] [--storage=file|memory]
+php artisan nats:stream:delete ORDERS [--force]
+
+# Consumers
+php artisan nats:consumer:list ORDERS [--connection=]
+php artisan nats:consumer:create ORDERS orders-consumer [--filter-subject=] [--ack-policy=explicit]
+php artisan nats:consumer:delete ORDERS orders-consumer [--force]
+
+# JetStream account
+php artisan nats:jetstream:status [--connection=] [--json]
+```
+
+**Requirements**
+
+- NATS Server with JetStream enabled
+- PHP 8.2+
+
+**See also**
+
+- [README — Artisan Commands (JetStream)](../README.md#artisan-commands-jetstream)
+
+---
+
+## 🧩 10. Laravel-Native API Design
+
+Designed to feel like core Laravel features.
+
+**Description**
+
+- **Familiar dispatch() integration** — Use `dispatch($job)->onConnection('nats')` as with Redis or SQS
+- **Facade-based API** — `Nats::publish()`, `Nats::subscribe()`, `Nats::request()`, `Nats::jetstream()`
+- **Config-driven setup** — `config/nats.php`, `NATS_*` env vars, `queue.connections.nats`
+- **Seamless queue worker support** — `php artisan queue:work nats` with `--tries`, `--timeout`, `--queue`
+
+**Example**
+
+```php
+// Same patterns as Laravel's Redis/Cache/Queue
+Nats::publish('event', $payload);
+dispatch($job)->onConnection('nats');
+$js = Nats::jetstream();
+```
+
+---
+
+_All 10 features documented. See README for full reference._
 
