@@ -202,6 +202,8 @@ Enable in queue config: `delayed => ['enabled' => true, 'stream' => '...', 'subj
 
 - [README — Delayed Jobs (JetStream)](../README.md#delayed-jobs-jetstream)
 
+**DelayStreamBootstrap:** Automatically ensures the delay stream and durable consumer exist when delayed is enabled.
+
 ---
 
 _Features 5–6 complete. Remaining features (3–4, 7–10) documented in subsequent releases._
