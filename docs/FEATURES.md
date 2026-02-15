@@ -214,6 +214,7 @@ Configure `dead_letter_queue` in queue config to route failed jobs to a separate
 
 - [README — Queue Driver](../README.md#queue-driver)
 - [README — Failed Jobs & DLQ](../README.md#dead-letter-queue-dlq)
+- [README — Delayed Jobs](../README.md#delayed-jobs-jetstream)
 
 ---
 
