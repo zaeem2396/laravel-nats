@@ -149,6 +149,8 @@ Nats::connection('analytics')->publish('events.page_viewed', $data);
 Nats::connection('secondary')->subscribe('orders.*', $callback);
 ```
 
+**Default connection:** Use `NATS_CONNECTION` env var or omit `connection()` for default.
+
 **Configuration**
 
 ```php
