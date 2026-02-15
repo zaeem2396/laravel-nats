@@ -44,7 +44,8 @@ it('publishes orders.created example from FEATURES.md', function (): void {
 
 it('subscribes orders.* example from FEATURES.md', function (): void {
     $received = null;
-    $subject = 'orders.created.' . uniqid(); // orders.* matches orders.created.xyz
+    // orders.* matches exactly one token after "orders." (e.g. orders.created, orders.xyz)
+    $subject = 'orders.' . uniqid('test');
 
     Nats::subscribe('orders.*', function (MessageInterface $message) use (&$received): void {
         $received = $message->getDecodedPayload();
