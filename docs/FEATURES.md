@@ -94,6 +94,16 @@ Nats::subscribe('orders.process', function ($message) {
 }, 'order-workers');
 ```
 
+**Unsubscribe**
+
+Call `Nats::process()` in a loop for long-running subscribers. Use `unsubscribe()` to stop receiving:
+
+```php
+$sid = Nats::subscribe('orders.*', $callback);
+Nats::process(1.0);
+Nats::unsubscribe($sid);
+```
+
 ---
 
 _Remaining features (3–10) documented in subsequent releases._
