@@ -184,6 +184,8 @@ Run the worker:
 php artisan queue:work nats
 ```
 
+**Worker options:** `--queue`, `--tries`, `--timeout`, `--memory`, `--sleep`, `--once`
+
 **Job retries and backoff**
 
 ```php
