@@ -12,8 +12,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 #### Documentation
 - `docs/FEATURES.md` — Comprehensive features overview with examples (Publish Messages, Subscribe, Request/Reply, Queue Driver, JetStream, Delayed Jobs, Multiple Connections, Wildcards, Artisan Commands, Laravel-Native API)
 - Feature 2: Subscribe to Subjects — queue groups, unsubscribe, wildcard notes
-- Feature 9: Artisan Commands — nats:stream:*, nats:consumer:*, nats:jetstream:status
-- Feature 10: Laravel-Native API Design — dispatch, facade, config, queue worker
+- Feature 3: Request/Reply Pattern — synchronous request-response, timeout
+- Feature 4: Full Laravel Queue Driver — dispatch, retries, backoff, failed jobs, DLQ
+- Feature 5: JetStream Support — streams, consumers, acks, StreamConfig
+- Feature 6: Delayed Jobs via JetStream — later(), delay(), queue.delayed config
 - README link to Features overview
 
 ### Changed

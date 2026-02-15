@@ -6,14 +6,14 @@ laravel-nats is a production-ready, Laravel-native integration for NATS and JetS
 
 1. [Publish Messages](#-1-publish-messages)
 2. [Subscribe to Subjects](#-2-subscribe-to-subjects)
-3. [Request / Reply Pattern](#-3-request--reply-pattern) _(coming soon)_
-4. [Full Laravel Queue Driver](#-4-full-laravel-queue-driver) _(coming soon)_
+3. [Request / Reply Pattern](#-3-request--reply-pattern)
+4. [Full Laravel Queue Driver](#-4-full-laravel-queue-driver)
 5. [JetStream Support](#-5-jetstream-support) _(coming soon)_
 6. [Delayed Jobs via JetStream](#-6-delayed-jobs-via-jetstream) _(coming soon)_
-7. [Multiple Connections Support](#-7-multiple-connections-support) _(coming soon)_
-8. [Wildcard Subscriptions](#-8-wildcard-subscriptions) _(coming soon)_
-9. [Artisan Commands](#-9-artisan-commands)
-10. [Laravel-Native API Design](#-10-laravel-native-api-design)
+7. [Multiple Connections Support](#-7-multiple-connections-support)
+8. [Wildcard Subscriptions](#-8-wildcard-subscriptions)
+9. [Artisan Commands](#-9-artisan-commands) _(coming soon)_
+10. [Laravel-Native API Design](#-10-laravel-native-api-design) _(coming soon)_
 
 ---
 
@@ -129,66 +129,103 @@ Subscribe on a specific connection: `Nats::connection('analytics')->subscribe(..
 
 ---
 
-## 🛠 9. Artisan Commands
+## 🔁 3. Request / Reply Pattern
 
-Manage streams and consumers directly from Laravel.
-
-**Description**
-
-CLI commands for JetStream stream and consumer management. All commands support `--connection=` for non-default NATS connections.
-
-**Example**
-
-```bash
-# Streams
-php artisan nats:stream:list [--connection=]
-php artisan nats:stream:info ORDERS [--connection=]
-php artisan nats:stream:create ORDERS "orders.*" [--description=] [--storage=file|memory]
-php artisan nats:stream:delete ORDERS [--force]
-
-# Consumers
-php artisan nats:consumer:list ORDERS [--connection=]
-php artisan nats:consumer:create ORDERS orders-consumer [--filter-subject=] [--ack-policy=explicit]
-php artisan nats:consumer:delete ORDERS orders-consumer [--force]
-
-# JetStream account
-php artisan nats:jetstream:status [--connection=] [--json]
-```
-
-**Requirements**
-
-- NATS Server with JetStream enabled
-- PHP 8.2+
-
-**See also**
-
-- [README — Artisan Commands (JetStream)](../README.md#artisan-commands-jetstream)
-
----
-
-## 🧩 10. Laravel-Native API Design
-
-Designed to feel like core Laravel features.
+Built-in support for synchronous request-response communication.
 
 **Description**
 
-- **Familiar dispatch() integration** — Use `dispatch($job)->onConnection('nats')` as with Redis or SQS
-- **Facade-based API** — `Nats::publish()`, `Nats::subscribe()`, `Nats::request()`, `Nats::jetstream()`
-- **Config-driven setup** — `config/nats.php`, `NATS_*` env vars, `queue.connections.nats`
-- **Seamless queue worker support** — `php artisan queue:work nats` with `--tries`, `--timeout`, `--queue`
+Perfect for microservice-style communication where a response is required. The request blocks until a reply is received or the timeout expires. Ideal for RPC-style calls between services.
 
 **Example**
 
 ```php
-// Same patterns as Laravel's Redis/Cache/Queue
-Nats::publish('event', $payload);
-dispatch($job)->onConnection('nats');
-$js = Nats::jetstream();
+use LaravelNats\Laravel\Facades\Nats;
+
+$response = Nats::request('orders.get', ['order_id' => 1001], timeout: 5.0);
+// Or: Nats::connection('secondary')->request(...)
+$order = $response->getDecodedPayload();
+// Connection-specific: Nats::connection('secondary')->request(...)
 ```
+
+**Notes**
+
+- Uses `_INBOX.*` for reply routing; no manual reply subject needed
+- Configurable timeout (default 5.0 seconds)
+- Returns `MessageInterface` with `getDecodedPayload()` for parsed response
+- Throws `TimeoutException` if no reply within timeout
+
+**Requirements**
+
+- NATS Server 2.x
+- PHP 8.2+
+
+**See also**
+
+- [README — Request/Reply](../README.md#requestreply)
 
 ---
 
-_All 10 features documented. See README for full reference._
+## 🗂 4. Full Laravel Queue Driver
 
-**FEATURES.md complete** — Comprehensive overview of laravel-nats capabilities.
+Use NATS as a first-class Laravel queue driver.
+
+**Description**
+
+Supports job retries, backoff strategies, delayed jobs (with JetStream), failed job handling, and Dead Letter Queues (DLQ). Fully compatible with Laravel's `queue:work` command.
+
+**Example**
+
+```php
+dispatch(new ProcessOrder($order))->onConnection('nats');
+```
+
+Run the worker:
+
+```bash
+php artisan queue:work nats
+```
+
+**Worker options:** `--queue`, `--tries`, `--timeout`, `--memory`, `--sleep`, `--once`
+
+**Job retries and backoff**
+
+```php
+class ProcessOrder implements ShouldQueue
+{
+    use InteractsWithQueue;
+
+    public $tries = 5;
+    public $backoff = [10, 30, 60]; // Linear backoff in seconds
+}
+```
+
+**Failed jobs and DLQ**
+
+Configure `dead_letter_queue` in queue config to route failed jobs to a separate NATS subject. Jobs also stored in Laravel's `failed_jobs` table.
+
+**Requirements**
+
+- NATS Server 2.x (JetStream for delayed jobs)
+- PHP 8.2+
+- Laravel 10.x / 11.x / 12.x
+
+**See also**
+
+- [README — Queue Driver](../README.md#queue-driver)
+- [README — Failed Jobs & DLQ](../README.md#dead-letter-queue-dlq)
+- [README — Delayed Jobs](../README.md#delayed-jobs-jetstream)
+
+---
+
+_Features 3–4 complete. Remaining features (5–10) documented in subsequent releases._
+
+---
+
+### Feature 3–4 Summary
+
+- **Request/Reply:** `Nats::request($subject, $payload, timeout: 5.0)` — synchronous RPC-style messaging
+- **Queue Driver:** `dispatch($job)->onConnection('nats')`, `php artisan queue:work nats` — full Laravel queue contract
+
+**Microservice use case:** Use Request/Reply for sync RPC; use Queue Driver for async job processing.
 
