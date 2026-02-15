@@ -42,6 +42,22 @@ it('publishes orders.created example from FEATURES.md', function (): void {
     Nats::disconnect();
 });
 
+it('subscribes orders.* example from FEATURES.md', function (): void {
+    $received = null;
+    $subject = 'orders.created.' . uniqid(); // orders.* matches orders.created.xyz
+
+    Nats::subscribe('orders.*', function (MessageInterface $message) use (&$received): void {
+        $received = $message->getDecodedPayload();
+    });
+
+    Nats::publish($subject, ['order_id' => 1001, 'event' => 'created']);
+    Nats::process(0.5);
+
+    expect($received)->toBe(['order_id' => 1001, 'event' => 'created']);
+
+    Nats::disconnect();
+});
+
 it('can publish and subscribe via facade', function (): void {
     $received = null;
     $subject = 'laravel.test.' . uniqid();
