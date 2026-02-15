@@ -190,3 +190,5 @@ $js = Nats::jetstream();
 
 _All 10 features documented. See README for full reference._
 
+**FEATURES.md complete** — Comprehensive overview of laravel-nats capabilities.
+
