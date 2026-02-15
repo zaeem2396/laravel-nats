@@ -209,5 +209,7 @@ Enable in queue config: `delayed => ['enabled' => true, 'stream' => '...', 'subj
 
 ---
 
-_Features 5–6 complete. Remaining features (3–4, 7–10) documented in subsequent releases._
+_Features 5–6 complete. JetStream enables persistence and delayed jobs; use for event sourcing and scheduled job processing._
+
+Remaining features (3–4, 7–10) documented in subsequent releases.
 
