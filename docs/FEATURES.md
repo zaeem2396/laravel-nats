@@ -98,7 +98,7 @@ Nats::subscribe('orders.process', function ($message) {
 
 **Notes**
 
-- Callback receives a `MessageInterface` instance; use `getDecodedPayload()` for parsed data
+- Callback receives a `MessageInterface` instance; use `getDecodedPayload()` for parsed data or `getPayload()` for raw string
 - `process($timeout)` blocks and dispatches messages to callbacks; use a loop for continuous processing
 - Wildcards: `*` matches one token, `>` matches one or more tokens
 
