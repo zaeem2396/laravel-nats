@@ -8,6 +8,8 @@
 
 A native NATS integration for Laravel that feels like home. Publish, subscribe, and request/reply with a familiar, expressive API.
 
+> 📋 **[Features Overview](docs/FEATURES.md)** — Full feature list with examples.
+
 ## Requirements
 
 - PHP 8.2+

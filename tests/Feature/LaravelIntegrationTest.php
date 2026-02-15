@@ -22,6 +22,26 @@ it('can connect via facade', function (): void {
     Nats::disconnect();
 });
 
+it('publishes orders.created example from FEATURES.md', function (): void {
+    $received = null;
+    $subject = 'orders.created.' . uniqid();
+
+    Nats::subscribe($subject, function (MessageInterface $message) use (&$received): void {
+        $received = $message->getDecodedPayload();
+    });
+
+    // Example from docs/FEATURES.md - Publish Messages
+    Nats::publish($subject, [
+        'order_id' => 1001,
+        'amount' => 2500,
+    ]);
+    Nats::process(0.5);
+
+    expect($received)->toBe(['order_id' => 1001, 'amount' => 2500]);
+
+    Nats::disconnect();
+});
+
 it('can publish and subscribe via facade', function (): void {
     $received = null;
     $subject = 'laravel.test.' . uniqid();
