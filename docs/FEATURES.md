@@ -154,7 +154,7 @@ if ($js->isAvailable()) {
 }
 ```
 
-**Key operations:** `createStream`, `getStreamInfo`, `updateStream`, `deleteStream`, `purgeStream`, `listStreams`, `createConsumer`, `listConsumers`, `fetchNextMessage`, `ack`, `nak`, `term`
+**Key operations:** `createStream`, `getStreamInfo`, `updateStream`, `deleteStream`, `purgeStream`, `listStreams`, `createConsumer`, `listConsumers`, `fetchNextMessage`, `ack`, `nak`, `term`, `getAccountInfo`
 
 **Requirements**
 
