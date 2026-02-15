@@ -219,3 +219,10 @@ Configure `dead_letter_queue` in queue config to route failed jobs to a separate
 
 _Features 3–4 complete. Remaining features (5–10) documented in subsequent releases._
 
+---
+
+### Feature 3–4 Summary
+
+- **Request/Reply:** `Nats::request($subject, $payload, timeout: 5.0)` — synchronous RPC-style messaging
+- **Queue Driver:** `dispatch($job)->onConnection('nats')`, `php artisan queue:work nats` — full Laravel queue contract
+
