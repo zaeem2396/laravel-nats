@@ -135,7 +135,7 @@ Built-in support for synchronous request-response communication.
 
 **Description**
 
-Perfect for microservice-style communication where a response is required. The request blocks until a reply is received or the timeout expires.
+Perfect for microservice-style communication where a response is required. The request blocks until a reply is received or the timeout expires. Ideal for RPC-style calls between services.
 
 **Example**
 
