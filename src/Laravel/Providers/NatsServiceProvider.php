@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace LaravelNats\Laravel\Providers;
 
 use Illuminate\Contracts\Support\DeferrableProvider;
+use Illuminate\Queue\Worker;
 use Illuminate\Support\ServiceProvider;
 use LaravelNats\Core\Client;
 use LaravelNats\Laravel\Console\Commands\NatsConsumerCreateCommand;
@@ -13,6 +14,7 @@ use LaravelNats\Laravel\Console\Commands\NatsConsumerInfoCommand;
 use LaravelNats\Laravel\Console\Commands\NatsConsumerListCommand;
 use LaravelNats\Laravel\Console\Commands\NatsJetStreamStatusCommand;
 use LaravelNats\Laravel\Console\Commands\NatsStreamCreateCommand;
+use LaravelNats\Laravel\Console\Commands\NatsWorkCommand;
 use LaravelNats\Laravel\Console\Commands\NatsStreamDeleteCommand;
 use LaravelNats\Laravel\Console\Commands\NatsStreamInfoCommand;
 use LaravelNats\Laravel\Console\Commands\NatsStreamListCommand;
@@ -73,7 +75,15 @@ class NatsServiceProvider extends ServiceProvider implements DeferrableProvider
             return;
         }
 
+        if ($this->app->bound('queue')) {
+            $this->app->make('queue');
+        }
+        if ($this->app->bound('queue.worker')) {
+            $this->app->alias('queue.worker', Worker::class);
+        }
+
         $this->commands([
+            NatsWorkCommand::class,
             NatsStreamListCommand::class,
             NatsStreamInfoCommand::class,
             NatsStreamCreateCommand::class,
