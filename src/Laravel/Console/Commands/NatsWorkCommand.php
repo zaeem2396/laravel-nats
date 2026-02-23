@@ -90,7 +90,7 @@ class NatsWorkCommand extends Command
 
         $this->removePidFile();
 
-        return is_int($exitCode) ? $exitCode : 0;
+        return is_int($exitCode) ? $exitCode : 0; // Worker::EXIT_SUCCESS, EXIT_MEMORY_LIMIT, etc.
     }
 
     /**
@@ -135,7 +135,8 @@ class NatsWorkCommand extends Command
     }
 
     /**
-     * Remove PID file (called on shutdown).
+     * Remove PID file (called on shutdown or before exit).
+     * Safe to call when pidFile is null or file already removed.
      */
     public function removePidFile(): void
     {
