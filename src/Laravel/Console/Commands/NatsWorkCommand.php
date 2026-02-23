@@ -36,7 +36,8 @@ class NatsWorkCommand extends Command
                             {--once : Process only the next job}
                             {--max-jobs=0 : Stop after N jobs}
                             {--max-time=0 : Stop after N seconds}
-                            {--rest=0 : Rest between jobs}';
+                            {--rest=0 : Rest between jobs}
+                            {--stop-when-empty : Stop when queue is empty}';
 
     /**
      * The console command description.
@@ -104,7 +105,7 @@ class NatsWorkCommand extends Command
             (int) $this->option('sleep'),
             (int) $this->option('tries'),
             (bool) $this->option('force'),
-            false,
+            (bool) $this->option('stop-when-empty'),
             (int) $this->option('max-jobs'),
             (int) $this->option('max-time'),
             (int) $this->option('rest'),
