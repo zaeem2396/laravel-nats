@@ -324,7 +324,7 @@ php artisan queue:work nats --memory=128
 - `--memory` - Memory limit in megabytes
 - `--sleep` - Seconds to sleep when no job available
 - `--once` - Process a single job and exit
-- **nats:work only:** `--connection`, `--name`, `--pidfile`, `--stop-when-empty`
+- **nats:work only:** `--connection`, `--name`, `--pidfile`, `--stop-when-empty`. Graceful shutdown via SIGTERM/SIGINT (Laravel Worker).
 
 ### Current Limitations
 
