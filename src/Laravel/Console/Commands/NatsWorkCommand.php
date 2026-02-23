@@ -68,17 +68,18 @@ class NatsWorkCommand extends Command
      */
     public function handle(): int
     {
-        $connection = (string) $this->option('connection');
-        $queue = (string) $this->option('queue');
+        $connection = is_string($this->option('connection')) ? $this->option('connection') : 'nats';
+        $queue = is_string($this->option('queue')) ? $this->option('queue') : 'default';
         $pidfile = $this->option('pidfile');
 
-        if ($pidfile !== null && $pidfile !== '') {
+        if (is_string($pidfile) && $pidfile !== '') {
             $this->pidFile = $pidfile;
             $this->writePidFile();
             register_shutdown_function([$this, 'removePidFile']);
         }
 
-        $this->worker->setName((string) $this->option('name'));
+        $name = is_string($this->option('name')) ? $this->option('name') : 'nats-worker';
+        $this->worker->setName($name);
         $this->worker->setCache($this->cache);
 
         $options = $this->gatherWorkerOptions();
@@ -94,14 +95,28 @@ class NatsWorkCommand extends Command
     }
 
     /**
+     * Remove PID file (called on shutdown or before exit).
+     * Safe to call when pidFile is null or file already removed.
+     */
+    public function removePidFile(): void
+    {
+        if ($this->pidFile !== null && is_file($this->pidFile)) {
+            @unlink($this->pidFile);
+            $this->pidFile = null;
+        }
+    }
+
+    /**
      * Gather worker options from command options.
      *
      * @return WorkerOptions
      */
     protected function gatherWorkerOptions(): WorkerOptions
     {
+        $name = is_string($this->option('name')) ? $this->option('name') : 'nats-worker';
+
         return new WorkerOptions(
-            (string) $this->option('name'),
+            $name,
             (int) $this->option('backoff'),
             (int) $this->option('memory'),
             (int) $this->option('timeout'),
@@ -131,18 +146,6 @@ class NatsWorkCommand extends Command
             $this->error('Could not write PID file: ' . $this->pidFile);
 
             exit(1);
-        }
-    }
-
-    /**
-     * Remove PID file (called on shutdown or before exit).
-     * Safe to call when pidFile is null or file already removed.
-     */
-    public function removePidFile(): void
-    {
-        if ($this->pidFile !== null && is_file($this->pidFile)) {
-            @unlink($this->pidFile);
-            $this->pidFile = null;
         }
     }
 }
