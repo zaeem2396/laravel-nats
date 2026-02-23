@@ -187,7 +187,7 @@ php artisan queue:work nats
 php artisan nats:work --pidfile=/var/run/nats-worker.pid
 ```
 
-**Worker options:** `--queue`, `--tries`, `--timeout`, `--memory`, `--sleep`, `--once`. For `nats:work`: also `--connection`, `--name`, `--pidfile`.
+**Worker options:** `--queue`, `--tries`, `--timeout`, `--memory`, `--sleep`, `--once`. For `nats:work`: also `--connection`, `--name`, `--pidfile`, `--stop-when-empty`.
 
 **Job retries and backoff**
 

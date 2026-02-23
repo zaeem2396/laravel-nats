@@ -116,7 +116,7 @@ class NatsWorkCommand extends Command
     }
 
     /**
-     * Write current process PID to pidfile.
+     * Write current process PID to pidfile (used by process managers).
      */
     protected function writePidFile(): void
     {
