@@ -285,7 +285,20 @@ When delayed is enabled, the connector automatically ensures the JetStream delay
 
 ### Running Queue Workers
 
-Use Laravel's standard queue worker commands:
+You can use either Laravel's standard `queue:work` or the package's dedicated **`nats:work`** command (Phase 4.1), which defaults to the NATS connection and supports a PID file for process management:
+
+```bash
+# Dedicated NATS worker (Phase 4) — defaults to connection "nats", queue "default"
+php artisan nats:work
+
+# With PID file for process managers (Supervisor, systemd)
+php artisan nats:work --pidfile=/var/run/nats-worker.pid
+
+# Process one job and exit
+php artisan nats:work --once
+```
+
+Or use Laravel's standard queue worker:
 
 ```bash
 # Start a queue worker
