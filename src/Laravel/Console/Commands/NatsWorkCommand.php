@@ -10,10 +10,11 @@ use Illuminate\Queue\Worker;
 use Illuminate\Queue\WorkerOptions;
 
 /**
- * NATS-specific queue worker command (Phase 4.1).
+ * NATS-specific queue worker command (Phase 4.1 — Basic NATS Worker).
  *
  * Runs the same worker logic as queue:work but defaults to NATS connection,
- * supports PID file and worker name for process management.
+ * supports PID file and worker name for process management. Signal handling
+ * (SIGTERM, SIGINT, etc.) is provided by Laravel's Worker.
  */
 class NatsWorkCommand extends Command
 {
@@ -47,7 +48,9 @@ class NatsWorkCommand extends Command
     protected $description = 'Run NATS queue worker (Phase 4: dedicated worker with PID file and signals)';
 
     /**
-     * Path to PID file when used.
+     * Path to PID file when --pidfile is set (removed on shutdown).
+     *
+     * @var string|null
      */
     protected ?string $pidFile = null;
 
