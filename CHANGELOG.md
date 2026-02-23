@@ -10,9 +10,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 #### Phase 4: Worker & Runtime (Milestone 4.1)
-- `nats:work` Artisan command — dedicated NATS queue worker with `--connection`, `--queue`, `--name`, `--pidfile`
-- PID file support for process managers (Supervisor, systemd)
-- Delegates to Laravel's Queue Worker (same job processing as `queue:work nats`) with graceful shutdown and signal handling
+- `nats:work` Artisan command — dedicated NATS queue worker with `--connection`, `--queue`, `--name`, `--pidfile`, `--stop-when-empty`
+- PID file support for process managers (Supervisor, systemd); file is removed on shutdown
+- Delegates to Laravel's Queue Worker (same job processing as `queue:work nats`) with graceful shutdown and signal handling (SIGTERM, SIGINT, etc.)
 
 ## [1.1.0] - 2026-02-15
 
