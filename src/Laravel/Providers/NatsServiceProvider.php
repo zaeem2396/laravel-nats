@@ -67,7 +67,7 @@ class NatsServiceProvider extends ServiceProvider implements DeferrableProvider
     }
 
     /**
-     * Register JetStream Artisan commands.
+     * Register Artisan commands (nats:work and JetStream stream/consumer commands).
      */
     protected function registerJetStreamCommands(): void
     {

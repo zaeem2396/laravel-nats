@@ -5,7 +5,7 @@ declare(strict_types=1);
 use Illuminate\Support\Facades\Artisan;
 use LaravelNats\Laravel\Console\Commands\NatsWorkCommand;
 
-describe('JetStream Artisan commands', function (): void {
+describe('NATS Artisan commands (JetStream + nats:work)', function (): void {
     it('defines nats:work command (Phase 4.1)', function (): void {
         $refl = new \ReflectionClass(NatsWorkCommand::class);
         $defaults = $refl->getDefaultProperties();
