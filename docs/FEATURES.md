@@ -179,13 +179,15 @@ Supports job retries, backoff strategies, delayed jobs (with JetStream), failed 
 dispatch(new ProcessOrder($order))->onConnection('nats');
 ```
 
-Run the worker:
+Run the worker (either command):
 
 ```bash
 php artisan queue:work nats
+# Or use the dedicated NATS worker (Phase 4.1) with PID file support:
+php artisan nats:work --pidfile=/var/run/nats-worker.pid
 ```
 
-**Worker options:** `--queue`, `--tries`, `--timeout`, `--memory`, `--sleep`, `--once`
+**Worker options:** `--queue`, `--tries`, `--timeout`, `--memory`, `--sleep`, `--once`. For `nats:work`: also `--connection`, `--name`, `--pidfile`.
 
 **Job retries and backoff**
 
