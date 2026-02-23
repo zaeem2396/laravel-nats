@@ -183,7 +183,7 @@ Run the worker (either command):
 
 ```bash
 php artisan queue:work nats
-# Or use the dedicated NATS worker (Phase 4.1) with PID file support:
+# Or use the dedicated NATS worker (Phase 4.1) with PID file for Supervisor/systemd:
 php artisan nats:work --pidfile=/var/run/nats-worker.pid
 ```
 

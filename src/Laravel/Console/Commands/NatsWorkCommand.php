@@ -45,7 +45,7 @@ class NatsWorkCommand extends Command
      *
      * @var string
      */
-    protected $description = 'Run NATS queue worker (Phase 4: dedicated worker with PID file and signals)';
+    protected $description = 'Run NATS queue worker (Phase 4.1: dedicated worker with PID file and graceful shutdown)';
 
     /**
      * Path to PID file when --pidfile is set (removed on shutdown).
