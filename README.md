@@ -317,13 +317,14 @@ php artisan queue:work nats --timeout=60
 php artisan queue:work nats --memory=128
 ```
 
-**Supported Worker Options:**
+**Supported Worker Options (queue:work and nats:work):**
 - `--queue` - Specify which queues to process
 - `--tries` - Maximum number of attempts for a job
 - `--timeout` - Seconds a child process can run
 - `--memory` - Memory limit in megabytes
 - `--sleep` - Seconds to sleep when no job available
 - `--once` - Process a single job and exit
+- **nats:work only:** `--connection`, `--name`, `--pidfile`, `--stop-when-empty`
 
 ### Current Limitations
 
