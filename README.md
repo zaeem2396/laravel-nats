@@ -344,7 +344,7 @@ php artisan nats:consume "notifications.email" --handler=App\\Handlers\\EmailNot
 php artisan nats:consume "alerts" --subjects="alerts.critical,alerts.info"
 ```
 
-**Options:** `--connection=`, `--queue=`, `--handler=`, `--subjects=`. Supports wildcards `*` (single token) and `>` (one or more tokens). Use Ctrl+C for graceful shutdown.
+**nats:consume options:** `--connection=` (NATS connection name), `--queue=` (queue group for load balancing), `--handler=` (class implementing `MessageHandlerInterface`), `--subjects=` (comma-separated additional subjects). Supports wildcards `*` (single token) and `>` (one or more tokens). Use Ctrl+C for graceful shutdown.
 
 ### Current Limitations
 

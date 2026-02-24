@@ -19,7 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Wildcard subject support (`*` and `>`); multiple subjects via `--subjects=`
 - `--queue=` for queue group (load-balanced consumption); `--handler=` for class implementing `MessageHandlerInterface`
 - `MessageHandlerInterface` — contract for message handlers with `handle(MessageInterface $message): void`; handlers resolved from container (DI)
-- Graceful shutdown via SIGTERM/SIGINT when pcntl available
+- Graceful shutdown via SIGTERM/SIGINT when pcntl is available
 
 ## [1.1.0] - 2026-02-15
 
