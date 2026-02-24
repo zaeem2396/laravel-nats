@@ -344,6 +344,8 @@ php artisan nats:consume "notifications.email" --handler=App\\Handlers\\EmailNot
 php artisan nats:consume "alerts" --subjects="alerts.critical,alerts.info"
 ```
 
+Implement a handler by creating a class that implements `LaravelNats\Contracts\Messaging\MessageHandlerInterface` (define `handle(MessageInterface $message): void`) and pass it with `--handler=YourClass`.
+
 **nats:consume options:** `--connection=` (NATS connection name), `--queue=` (queue group for load balancing), `--handler=` (class implementing `MessageHandlerInterface`), `--subjects=` (comma-separated additional subjects). Supports wildcards `*` (single token) and `>` (one or more tokens). Use Ctrl+C for graceful shutdown.
 
 ### Current Limitations

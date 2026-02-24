@@ -151,7 +151,8 @@ class NatsConsumeCommand extends Command
     }
 
     /**
-     * Register signal handlers for graceful shutdown.
+     * Register signal handlers for graceful shutdown (SIGTERM, SIGINT).
+     * No-op when pcntl extension is not available.
      */
     protected function registerSignalHandlers(): void
     {
