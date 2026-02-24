@@ -189,7 +189,7 @@ php artisan nats:work --pidfile=/var/run/nats-worker.pid
 
 **Worker options:** `--queue`, `--tries`, `--timeout`, `--memory`, `--sleep`, `--once`. For `nats:work`: also `--connection`, `--name`, `--pidfile`, `--stop-when-empty`.
 
-**Subject-based consumer (Phase 4.2):** Use `nats:consume {subject}` to subscribe to subject(s) with optional queue group and handler class. Handlers implement `LaravelNats\Contracts\Messaging\MessageHandlerInterface` and receive each message via `handle(MessageInterface $message)`. Options: `--connection=`, `--queue=`, `--handler=`, `--subjects=` (comma-separated). Supports wildcards `*` and `>`.
+**Subject-based consumer (Phase 4.2 — Subject-Based Consumer):** Use `nats:consume {subject}` to subscribe to subject(s) with optional queue group and handler class. Handlers implement `LaravelNats\Contracts\Messaging\MessageHandlerInterface` and receive each message via `handle(MessageInterface $message)`. Options: `--connection=`, `--queue=`, `--handler=`, `--subjects=` (comma-separated). Supports wildcards `*` and `>`.
 
 Example handler:
 
