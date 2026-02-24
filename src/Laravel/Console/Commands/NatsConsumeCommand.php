@@ -65,7 +65,7 @@ class NatsConsumeCommand extends Command
         }
 
         $connectionName = $this->option('connection');
-        $connName = is_string($connectionName) ? $connectionName : null;
+        $connName = is_string($connectionName) && $connectionName !== '' ? $connectionName : null;
         $queue = $this->option('queue');
         $queueGroup = is_string($queue) && $queue !== '' ? $queue : null;
         $handlerClass = $this->option('handler');
