@@ -9,7 +9,8 @@ namespace LaravelNats\Contracts\Messaging;
  *
  * Handlers are invoked by the nats:consume command for each message received
  * on the subscribed subject(s). The handler is resolved from the container
- * so it can use dependency injection.
+ * so it can use dependency injection. Use --handler=YourHandlerClass when
+ * running nats:consume.
  */
 interface MessageHandlerInterface
 {

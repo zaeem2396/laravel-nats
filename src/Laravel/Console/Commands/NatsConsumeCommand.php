@@ -10,10 +10,11 @@ use LaravelNats\Contracts\Messaging\MessageInterface;
 use LaravelNats\Laravel\NatsManager;
 
 /**
- * Subject-based NATS consumer command (Phase 4.2).
+ * Subject-based NATS consumer command (Phase 4.2 — Subject-Based Consumer).
  *
  * Subscribes to one or more subjects (with optional queue group) and
- * dispatches each message to a handler class. Supports wildcards (* and >).
+ * dispatches each message to a handler class or prints to console.
+ * Supports wildcards: * (single token) and > (one or more tokens).
  */
 class NatsConsumeCommand extends Command
 {
