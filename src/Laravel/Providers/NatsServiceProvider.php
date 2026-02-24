@@ -8,6 +8,7 @@ use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Queue\Worker;
 use Illuminate\Support\ServiceProvider;
 use LaravelNats\Core\Client;
+use LaravelNats\Laravel\Console\Commands\NatsConsumeCommand;
 use LaravelNats\Laravel\Console\Commands\NatsConsumerCreateCommand;
 use LaravelNats\Laravel\Console\Commands\NatsConsumerDeleteCommand;
 use LaravelNats\Laravel\Console\Commands\NatsConsumerInfoCommand;
@@ -84,6 +85,7 @@ class NatsServiceProvider extends ServiceProvider implements DeferrableProvider
 
         $this->commands([
             NatsWorkCommand::class,
+            NatsConsumeCommand::class,
             NatsStreamListCommand::class,
             NatsStreamInfoCommand::class,
             NatsStreamCreateCommand::class,
