@@ -54,19 +54,15 @@ class NatsWorkCommand extends Command
      */
     protected ?string $pidFile = null;
 
-    public function __construct(
-        protected Worker $worker,
-        protected Cache $cache,
-    ) {
-        parent::__construct();
-    }
-
     /**
      * Execute the console command.
      *
+     * Worker and Cache are injected via handle() so they are only resolved when
+     * the command runs, avoiding resolution failures during command registration.
+     *
      * @return int
      */
-    public function handle(): int
+    public function handle(Worker $worker, Cache $cache): int
     {
         $connection = is_string($this->option('connection')) ? $this->option('connection') : 'nats';
         $queue = is_string($this->option('queue')) ? $this->option('queue') : 'default';
@@ -79,15 +75,15 @@ class NatsWorkCommand extends Command
         }
 
         $name = is_string($this->option('name')) ? $this->option('name') : 'nats-worker';
-        $this->worker->setName($name);
-        $this->worker->setCache($this->cache);
+        $worker->setName($name);
+        $worker->setCache($cache);
 
         $options = $this->gatherWorkerOptions();
 
         $this->info(sprintf('NATS worker [%s] processing queue "%s" on connection "%s".', $options->name, $queue, $connection));
 
         $method = $this->option('once') ? 'runNextJob' : 'daemon';
-        $exitCode = $this->worker->{$method}($connection, $queue, $options);
+        $exitCode = $worker->{$method}($connection, $queue, $options);
 
         $this->removePidFile();
 
