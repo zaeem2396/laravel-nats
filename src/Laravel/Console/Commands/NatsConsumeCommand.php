@@ -57,7 +57,7 @@ class NatsConsumeCommand extends Command
      */
     public function handle(): int
     {
-        $subject = is_string($this->argument('subject')) ? $this->argument('subject') : '';
+        $subject = is_string($this->argument('subject')) ? trim($this->argument('subject')) : '';
         if ($subject === '') {
             $this->error('Subject is required.');
 
