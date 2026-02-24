@@ -206,7 +206,7 @@ class MyHandler implements MessageHandlerInterface
 }
 ```
 
-Run: `php artisan nats:consume "events.>" --handler=MyHandler`. See README "Subject-based consumer" for full options.
+Run: `php artisan nats:consume "events.>" --handler=MyHandler`. See README "Subject-based consumer (Phase 4.2)" for full options and queue groups.
 
 **Job retries and backoff**
 
