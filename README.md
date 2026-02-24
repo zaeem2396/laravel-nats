@@ -663,7 +663,7 @@ php artisan nats:consumer:delete {stream} {consumer} [--connection=] [--force]
 php artisan nats:jetstream:status [--connection=] [--json]
 ```
 
-Use `--connection=` to target a non-default NATS connection from `config/nats.php`.
+Use `--connection=` to target a non-default NATS connection from `config/nats.php`. For subject-based consumption (Phase 4.2), see [Subject-based consumer](#subject-based-consumer-phase-42).
 
 ## Contributing
 
