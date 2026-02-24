@@ -634,7 +634,7 @@ if ($msg instanceof JetStreamConsumedMessage) {
 
 ### Artisan Commands (JetStream and Worker)
 
-**Subject-based consumer (Phase 4.2):**
+**Subject-based consumer (Phase 4.2 — Subject-Based Consumer):**
 
 ```bash
 php artisan nats:consume {subject} [--connection=] [--queue=] [--handler=] [--subjects=]

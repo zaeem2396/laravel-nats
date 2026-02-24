@@ -28,7 +28,7 @@ class NatsConsumeCommand extends Command
                             {--connection= : NATS connection name}
                             {--queue= : Queue group name for load-balanced consumption}
                             {--handler= : Handler class implementing MessageHandlerInterface}
-                            {--subjects= : Comma-separated additional subjects}';
+                            {--subjects= : Comma-separated additional subjects to consume}';
 
     /**
      * The console command description.
