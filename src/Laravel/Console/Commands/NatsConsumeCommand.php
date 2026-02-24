@@ -137,9 +137,9 @@ class NatsConsumeCommand extends Command
      *
      * @param string $class Handler class name (must implement MessageHandlerInterface)
      *
-     * @return MessageHandlerInterface
-     *
      * @throws \InvalidArgumentException If the class does not implement the interface
+     *
+     * @return MessageHandlerInterface
      */
     protected function resolveHandler(string $class): MessageHandlerInterface
     {
