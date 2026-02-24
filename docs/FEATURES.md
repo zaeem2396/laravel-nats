@@ -191,6 +191,23 @@ php artisan nats:work --pidfile=/var/run/nats-worker.pid
 
 **Subject-based consumer (Phase 4.2):** Use `nats:consume {subject}` to subscribe to subject(s) with optional queue group and handler class. Handlers implement `LaravelNats\Contracts\Messaging\MessageHandlerInterface` and receive each message via `handle(MessageInterface $message)`. Options: `--connection=`, `--queue=`, `--handler=`, `--subjects=` (comma-separated). Supports wildcards `*` and `>`.
 
+Example handler:
+
+```php
+use LaravelNats\Contracts\Messaging\MessageHandlerInterface;
+use LaravelNats\Contracts\Messaging\MessageInterface;
+
+class MyHandler implements MessageHandlerInterface
+{
+    public function handle(MessageInterface $message): void
+    {
+        // Process $message->getSubject(), $message->getPayload(), etc.
+    }
+}
+```
+
+Run: `php artisan nats:consume "events.>" --handler=MyHandler`
+
 **Job retries and backoff**
 
 ```php
