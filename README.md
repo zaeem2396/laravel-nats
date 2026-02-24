@@ -326,6 +326,26 @@ php artisan queue:work nats --memory=128
 - `--once` - Process a single job and exit
 - **nats:work only:** `--connection`, `--name`, `--pidfile`, `--stop-when-empty`. Graceful shutdown via SIGTERM/SIGINT (Laravel Worker).
 
+### Subject-based consumer (Phase 4.2)
+
+Consume messages from NATS subjects (with optional queue group and handler class):
+
+```bash
+# Consume a subject (messages printed to console)
+php artisan nats:consume "orders.*"
+
+# With queue group for load balancing
+php artisan nats:consume "events.>" --queue=workers
+
+# Dispatch each message to a handler class (must implement MessageHandlerInterface)
+php artisan nats:consume "notifications.email" --handler=App\\Handlers\\EmailNotificationHandler
+
+# Multiple subjects (comma-separated in --subjects=)
+php artisan nats:consume "alerts" --subjects="alerts.critical,alerts.info"
+```
+
+**Options:** `--connection=`, `--queue=`, `--handler=`, `--subjects=`. Supports wildcards `*` (single token) and `>` (one or more tokens). Use Ctrl+C for graceful shutdown.
+
 ### Current Limitations
 
 - **Delayed jobs:** Require JetStream; enable via `queue.delayed.enabled` (see [Delayed Jobs (JetStream)](#delayed-jobs-jetstream)).
