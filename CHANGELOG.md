@@ -14,6 +14,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - PID file support for process managers (Supervisor, systemd); file is removed on shutdown
 - Delegates to Laravel's Queue Worker (same job processing as `queue:work nats`) with graceful shutdown and signal handling (SIGTERM, SIGINT, etc.).
 
+#### Phase 4: Worker & Runtime (Milestone 4.2 — Subject-Based Consumer)
+- `nats:consume {subject}` Artisan command — subscribe to subject(s) with optional queue group and handler class
+- Wildcard subject support (`*` and `>`); multiple subjects via `--subjects=`
+- `--queue=` for queue group (load-balanced consumption); `--handler=` for class implementing `MessageHandlerInterface`
+- `MessageHandlerInterface` — contract for message handlers with `handle(MessageInterface $message): void`; handlers resolved from container (DI)
+- Graceful shutdown via SIGTERM/SIGINT when pcntl available
+
 ## [1.1.0] - 2026-02-15
 
 ### Added
