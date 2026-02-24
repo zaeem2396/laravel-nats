@@ -451,7 +451,8 @@ Designed to feel like core Laravel features.
 - **Familiar dispatch() integration** — Use `dispatch($job)->onConnection('nats')` as with Redis or SQS
 - **Facade-based API** — `Nats::publish()`, `Nats::subscribe()`, `Nats::request()`, `Nats::jetstream()`
 - **Config-driven setup** — `config/nats.php`, `NATS_*` env vars, `queue.connections.nats`
-- **Seamless queue worker support** — `php artisan queue:work nats` with `--tries`, `--timeout`, `--queue`
+- **Seamless queue worker support** — `php artisan queue:work nats` or `nats:work` with `--tries`, `--timeout`, `--queue`
+- **Subject-based consumer (Phase 4.2)** — `nats:consume {subject}` with queue groups and handler classes
 
 **Example**
 

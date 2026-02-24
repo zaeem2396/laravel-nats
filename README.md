@@ -665,6 +665,13 @@ php artisan nats:jetstream:status [--connection=] [--json]
 
 Use `--connection=` to target a non-default NATS connection from `config/nats.php`. For subject-based consumption (Phase 4.2), see [Subject-based consumer](#subject-based-consumer-phase-42).
 
+## Summary of Phase 4 Commands
+
+| Command | Phase | Purpose |
+|---------|-------|---------|
+| `nats:work` | 4.1 | NATS queue worker (PID file, signals) |
+| `nats:consume {subject}` | 4.2 | Subject-based consumer (handler, queue group, wildcards) |
+
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
