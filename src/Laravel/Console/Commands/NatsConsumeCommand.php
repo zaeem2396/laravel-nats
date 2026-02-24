@@ -133,11 +133,13 @@ class NatsConsumeCommand extends Command
     }
 
     /**
-     * Resolve handler from container.
+     * Resolve handler from container (supports dependency injection).
      *
      * @param string $class Handler class name (must implement MessageHandlerInterface)
      *
      * @return MessageHandlerInterface
+     *
+     * @throws \InvalidArgumentException If the class does not implement the interface
      */
     protected function resolveHandler(string $class): MessageHandlerInterface
     {
