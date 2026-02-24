@@ -630,7 +630,15 @@ if ($msg instanceof JetStreamConsumedMessage) {
 }
 ```
 
-### Artisan Commands (JetStream)
+### Artisan Commands (JetStream and Worker)
+
+**Subject-based consumer (Phase 4.2):**
+
+```bash
+php artisan nats:consume {subject} [--connection=] [--queue=] [--handler=] [--subjects=]
+```
+
+**Queue worker (Phase 4.1):** `php artisan nats:work [--connection=nats] [--queue=default] [--pidfile=] ...`
 
 Manage streams and consumers from the CLI:
 
