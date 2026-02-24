@@ -16,7 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 #### Phase 4: Worker & Runtime (Milestone 4.2 — Subject-Based Consumer)
 - `nats:consume {subject}` Artisan command — subscribe to subject(s) with optional queue group and handler class
-- Wildcard subject support (`*` and `>`); multiple subjects via `--subjects=`
+- Wildcard subject support (`*` and `>`); multiple subjects via argument and `--subjects=` (comma-separated)
 - `--queue=` for queue group (load-balanced consumption); `--handler=` for class implementing `MessageHandlerInterface`. Without `--handler`, messages are printed to console
 - `MessageHandlerInterface` — contract for message handlers with `handle(MessageInterface $message): void`; handlers resolved from container (DI)
 - Graceful shutdown via SIGTERM/SIGINT when pcntl is available. Unsubscribes before exit.
