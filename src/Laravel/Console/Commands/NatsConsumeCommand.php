@@ -35,7 +35,7 @@ class NatsConsumeCommand extends Command
      *
      * @var string
      */
-    protected $description = 'Consume messages from NATS subject(s) with optional handler and queue group (Phase 4.2)';
+    protected $description = 'Consume messages from NATS subject(s) with optional handler and queue group (Phase 4.2 — Subject-Based Consumer)';
 
     /**
      * Whether the consumer should stop (e.g. on SIGTERM).
