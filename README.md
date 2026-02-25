@@ -326,6 +326,28 @@ php artisan queue:work nats --memory=128
 - `--once` - Process a single job and exit
 - **nats:work only:** `--connection`, `--name`, `--pidfile`, `--stop-when-empty`. Graceful shutdown via SIGTERM/SIGINT (Laravel Worker).
 
+### Subject-based consumer (Phase 4.2)
+
+Consume messages from NATS subjects (with optional queue group and handler class):
+
+```bash
+# Consume a subject (messages printed to console)
+php artisan nats:consume "orders.*"
+
+# With queue group for load balancing
+php artisan nats:consume "events.>" --queue=workers
+
+# Dispatch each message to a handler class (must implement MessageHandlerInterface)
+php artisan nats:consume "notifications.email" --handler=App\\Handlers\\EmailNotificationHandler
+
+# Multiple subjects (comma-separated in --subjects=)
+php artisan nats:consume "alerts" --subjects="alerts.critical,alerts.info"
+```
+
+Implement a handler by creating a class that implements `LaravelNats\Contracts\Messaging\MessageHandlerInterface` (define `handle(MessageInterface $message): void`) and pass it with `--handler=YourClass`. The handler is resolved from the Laravel container (dependency injection supported).
+
+**nats:consume options:** `--connection=` (NATS connection name), `--queue=` (queue group for load balancing), `--handler=` (class implementing `MessageHandlerInterface`), `--subjects=` (comma-separated additional subjects). Supports wildcards `*` (single token) and `>` (one or more tokens). Use Ctrl+C for graceful shutdown.
+
 ### Current Limitations
 
 - **Delayed jobs:** Require JetStream; enable via `queue.delayed.enabled` (see [Delayed Jobs (JetStream)](#delayed-jobs-jetstream)).
@@ -610,7 +632,15 @@ if ($msg instanceof JetStreamConsumedMessage) {
 }
 ```
 
-### Artisan Commands (JetStream)
+### Artisan Commands (JetStream and Worker)
+
+**Subject-based consumer (Phase 4.2 — Subject-Based Consumer):**
+
+```bash
+php artisan nats:consume {subject} [--connection=] [--queue=] [--handler=] [--subjects=]
+```
+
+**Queue worker (Phase 4.1):** `php artisan nats:work [--connection=nats] [--queue=default] [--pidfile=] ...`
 
 Manage streams and consumers from the CLI:
 
@@ -633,7 +663,14 @@ php artisan nats:consumer:delete {stream} {consumer} [--connection=] [--force]
 php artisan nats:jetstream:status [--connection=] [--json]
 ```
 
-Use `--connection=` to target a non-default NATS connection from `config/nats.php`.
+Use `--connection=` to target a non-default NATS connection from `config/nats.php`. For subject-based consumption (Phase 4.2), see [Subject-based consumer](#subject-based-consumer-phase-42).
+
+## Summary of Phase 4 Commands
+
+| Command | Phase | Purpose |
+|---------|-------|---------|
+| `nats:work` | 4.1 | NATS queue worker (PID file, signals) |
+| `nats:consume {subject}` | 4.2 | Subject-based consumer (handler, queue group, wildcards) |
 
 ## Contributing
 

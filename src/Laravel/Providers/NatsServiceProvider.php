@@ -8,6 +8,7 @@ use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Queue\Worker;
 use Illuminate\Support\ServiceProvider;
 use LaravelNats\Core\Client;
+use LaravelNats\Laravel\Console\Commands\NatsConsumeCommand;
 use LaravelNats\Laravel\Console\Commands\NatsConsumerCreateCommand;
 use LaravelNats\Laravel\Console\Commands\NatsConsumerDeleteCommand;
 use LaravelNats\Laravel\Console\Commands\NatsConsumerInfoCommand;
@@ -75,15 +76,13 @@ class NatsServiceProvider extends ServiceProvider implements DeferrableProvider
             return;
         }
 
-        if ($this->app->bound('queue')) {
-            $this->app->make('queue');
-        }
-        if ($this->app->bound('queue.worker')) {
-            $this->app->alias('queue.worker', Worker::class);
-        }
+        // Alias Worker::class to queue.worker so NatsWorkCommand::handle(Worker $worker, ...) can
+        // resolve. QueueServiceProvider (deferred) binds queue.worker when it is first resolved.
+        $this->app->alias('queue.worker', Worker::class);
 
         $this->commands([
             NatsWorkCommand::class,
+            NatsConsumeCommand::class,
             NatsStreamListCommand::class,
             NatsStreamInfoCommand::class,
             NatsStreamCreateCommand::class,
