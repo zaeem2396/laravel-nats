@@ -26,6 +26,8 @@ abstract class LaravelTestCase extends OrchestraTestCase
     protected function getPackageProviders($app): array
     {
         return [
+            \Illuminate\Queue\QueueServiceProvider::class,
+            \Illuminate\Cache\CacheServiceProvider::class,
             NatsServiceProvider::class,
         ];
     }

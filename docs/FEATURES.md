@@ -179,13 +179,34 @@ Supports job retries, backoff strategies, delayed jobs (with JetStream), failed 
 dispatch(new ProcessOrder($order))->onConnection('nats');
 ```
 
-Run the worker:
+Run the worker (either command):
 
 ```bash
 php artisan queue:work nats
+# Or use the dedicated NATS worker (Phase 4.1) with PID file for Supervisor/systemd:
+php artisan nats:work --pidfile=/var/run/nats-worker.pid
 ```
 
-**Worker options:** `--queue`, `--tries`, `--timeout`, `--memory`, `--sleep`, `--once`
+**Worker options:** `--queue`, `--tries`, `--timeout`, `--memory`, `--sleep`, `--once`. For `nats:work`: also `--connection`, `--name`, `--pidfile`, `--stop-when-empty`.
+
+**Subject-based consumer (Phase 4.2 — Subject-Based Consumer):** Use `nats:consume {subject}` to subscribe to subject(s) with optional queue group and handler class. Handlers implement `LaravelNats\Contracts\Messaging\MessageHandlerInterface` and receive each message via `handle(MessageInterface $message)`. Options: `--connection=`, `--queue=`, `--handler=`, `--subjects=` (comma-separated). Supports wildcards `*` and `>`.
+
+Example handler:
+
+```php
+use LaravelNats\Contracts\Messaging\MessageHandlerInterface;
+use LaravelNats\Contracts\Messaging\MessageInterface;
+
+class MyHandler implements MessageHandlerInterface
+{
+    public function handle(MessageInterface $message): void
+    {
+        // Process $message->getSubject(), $message->getPayload(), etc.
+    }
+}
+```
+
+Run: `php artisan nats:consume "events.>" --handler=MyHandler`. See README "Subject-based consumer (Phase 4.2)" for full options and queue groups.
 
 **Job retries and backoff**
 
@@ -430,7 +451,8 @@ Designed to feel like core Laravel features.
 - **Familiar dispatch() integration** — Use `dispatch($job)->onConnection('nats')` as with Redis or SQS
 - **Facade-based API** — `Nats::publish()`, `Nats::subscribe()`, `Nats::request()`, `Nats::jetstream()`
 - **Config-driven setup** — `config/nats.php`, `NATS_*` env vars, `queue.connections.nats`
-- **Seamless queue worker support** — `php artisan queue:work nats` with `--tries`, `--timeout`, `--queue`
+- **Seamless queue worker support** — `php artisan queue:work nats` or `nats:work` with `--tries`, `--timeout`, `--queue`
+- **Subject-based consumer (Phase 4.2)** — `nats:consume {subject}` with queue groups and handler classes
 
 **Example**
 

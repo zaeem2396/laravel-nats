@@ -3,8 +3,22 @@
 declare(strict_types=1);
 
 use Illuminate\Support\Facades\Artisan;
+use LaravelNats\Laravel\Console\Commands\NatsConsumeCommand;
+use LaravelNats\Laravel\Console\Commands\NatsWorkCommand;
 
-describe('JetStream Artisan commands', function (): void {
+describe('NATS Artisan commands (JetStream + nats:work + nats:consume)', function (): void {
+    it('defines nats:consume command (Phase 4.2 — Subject-Based Consumer)', function (): void {
+        $refl = new \ReflectionClass(NatsConsumeCommand::class);
+        $defaults = $refl->getDefaultProperties();
+        expect(isset($defaults['signature']) && str_contains((string) $defaults['signature'], 'nats:consume'))->toBeTrue();
+    });
+
+    it('defines nats:work command (Phase 4.1)', function (): void {
+        $refl = new \ReflectionClass(NatsWorkCommand::class);
+        $defaults = $refl->getDefaultProperties();
+        expect(isset($defaults['signature']) && str_contains((string) $defaults['signature'], 'nats:work'))->toBeTrue();
+    });
+
     it('registers nats:stream:purge command', function (): void {
         $commands = Artisan::all();
 
