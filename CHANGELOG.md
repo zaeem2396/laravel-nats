@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- (none)
+
+## [1.1.1] - 2026-01-27
+
+### Added
+
 #### Phase 4: Worker & Runtime (Milestone 4.1)
 - `nats:work` Artisan command — dedicated NATS queue worker with `--connection`, `--queue`, `--name`, `--pidfile`, `--stop-when-empty`
 - PID file support for process managers (Supervisor, systemd); file is removed on shutdown
