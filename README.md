@@ -22,7 +22,7 @@ A native NATS integration for Laravel that feels like home. Publish, subscribe, 
 composer require zaeem2396/laravel-nats
 ```
 
-The service provider will be auto-discovered. To publish the configuration file:
+Requires **v1.1.1** or later for Phase 4 commands (`nats:work`, `nats:consume`). The service provider will be auto-discovered. To publish the configuration file:
 
 ```bash
 php artisan vendor:publish --tag=nats-config
