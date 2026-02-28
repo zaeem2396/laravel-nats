@@ -19,6 +19,18 @@ describe('NATS Artisan commands (JetStream + nats:work + nats:consume)', functio
         expect(isset($defaults['signature']) && str_contains((string) $defaults['signature'], 'nats:work'))->toBeTrue();
     });
 
+    it('registers nats:work command (Phase 4.1 — v1.1.1)', function (): void {
+        $commands = Artisan::all();
+
+        expect(array_key_exists('nats:work', $commands))->toBeTrue();
+    });
+
+    it('registers nats:consume command (Phase 4.2 — v1.1.1)', function (): void {
+        $commands = Artisan::all();
+
+        expect(array_key_exists('nats:consume', $commands))->toBeTrue();
+    });
+
     it('registers nats:stream:purge command', function (): void {
         $commands = Artisan::all();
 
