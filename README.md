@@ -672,6 +672,8 @@ Use `--connection=` to target a non-default NATS connection from `config/nats.ph
 | `nats:work` | 4.1 | NATS queue worker (PID file, signals) |
 | `nats:consume {subject}` | 4.2 | Subject-based consumer (handler, queue group, wildcards) |
 
+For release notes and version history, see [CHANGELOG.md](CHANGELOG.md).
+
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
