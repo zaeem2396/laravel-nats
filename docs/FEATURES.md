@@ -2,6 +2,8 @@
 
 laravel-nats is a production-ready, Laravel-native integration for NATS and JetStream with full queue driver support.
 
+**v1.1.1** adds Phase 4: dedicated NATS queue worker (`nats:work`) and subject-based consumer (`nats:consume`) with handler support. See [Full Laravel Queue Driver](#-4-full-laravel-queue-driver) and [Laravel-Native API Design](#-10-laravel-native-api-design).
+
 ## Table of Contents
 
 1. [Publish Messages](#-1-publish-messages)
