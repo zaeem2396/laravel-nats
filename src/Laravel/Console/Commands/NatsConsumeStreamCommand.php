@@ -95,7 +95,7 @@ class NatsConsumeStreamCommand extends Command
         while (! $this->shouldQuit) {
             $fetched = 0;
             for ($i = 0; $i < $batch && ! $this->shouldQuit; $i++) {
-                $message = $js->fetchNextMessage($stream, $consumerName, $timeout, $noWait || $i > 0, $batch);
+                $message = $js->fetchNextMessage($stream, $consumerName, $timeout, $noWait || $i > 0, 1);
                 if ($message === null) {
                     break;
                 }
@@ -121,7 +121,12 @@ class NatsConsumeStreamCommand extends Command
             $js->ack($message);
         } catch (\Throwable $e) {
             $this->error(sprintf('Handler error: %s', $e->getMessage()));
-            $js->nak($message);
+
+            try {
+                $js->nak($message);
+            } catch (\Throwable $nakException) {
+                $this->error(sprintf('Failed to NAK message: %s', $nakException->getMessage()));
+            }
         }
     }
 
