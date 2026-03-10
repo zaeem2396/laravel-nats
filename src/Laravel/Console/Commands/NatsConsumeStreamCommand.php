@@ -103,7 +103,7 @@ class NatsConsumeStreamCommand extends Command
                 $fetched++;
             }
             if ($fetched === 0 && $noWait) {
-                usleep(500_000); // 0.5s when no-wait to avoid busy loop
+                usleep(500_000); // 0.5s when no-wait to avoid busy loop (Phase 4.3)
             }
         }
 
