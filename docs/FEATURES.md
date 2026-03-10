@@ -227,7 +227,7 @@ class OrderStreamHandler implements JetStreamMessageHandlerInterface
 }
 ```
 
-Run: `php artisan nats:consume:stream ORDERS --consumer=workers --handler=OrderStreamHandler`. See README "JetStream stream consumer (Phase 4.3)".
+Run: `php artisan nats:consume:stream ORDERS --consumer=workers --handler=OrderStreamHandler`. See README “JetStream stream consumer (Phase 4.3)” for all options.
 
 **Job retries and backoff**
 
