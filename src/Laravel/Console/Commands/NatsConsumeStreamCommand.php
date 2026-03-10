@@ -15,7 +15,8 @@ use LaravelNats\Laravel\NatsManager;
  * JetStream pull consumer worker command (Phase 4.3 — JetStream Consumer Worker).
  *
  * Consumes messages from a JetStream stream via a durable pull consumer.
- * Supports optional handler class, batch size, timeout, no-wait, and auto-create consumer.
+ * Supports optional handler class (JetStreamMessageHandlerInterface), batch size, timeout,
+ * no-wait, and --auto-create to create a durable consumer if missing.
  */
 class NatsConsumeStreamCommand extends Command
 {
