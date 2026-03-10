@@ -75,7 +75,7 @@ final class Client implements PublisherInterface, SubscriberInterface
     /**
      * Pending requests waiting for replies.
      *
-     * @var array<string, array{deadline: float, message: MessageInterface|null}>
+     * @var array<string, array{deadline: float, message?: MessageInterface|null, max?: int, messages?: list<MessageInterface>}>
      */
     private array $pendingRequests = [];
 
@@ -287,6 +287,68 @@ final class Client implements PublisherInterface, SubscriberInterface
         unset($this->pendingRequests[$replyTo]);
 
         throw TimeoutException::requestTimeout($subject, $timeout);
+    }
+
+    /**
+     * Publish a message and wait for up to maxMessages replies (batch request/reply).
+     *
+     * Used by JetStream pull consumer to fetch multiple messages in one round-trip.
+     *
+     * @param string $subject The subject to publish to
+     * @param mixed $payload The message payload (will be serialized)
+     * @param float $timeout Maximum seconds to wait
+     * @param int $maxMessages Maximum number of reply messages to collect (minimum 1)
+     * @param array<string, string> $headers Optional message headers
+     *
+     * @return list<MessageInterface> Collected reply messages (may be fewer than maxMessages if timeout or no more data)
+     */
+    public function requestBatch(string $subject, mixed $payload, float $timeout = 5.0, int $maxMessages = 1, array $headers = []): array
+    {
+        $this->ensureConnected();
+        $this->validateSubject($subject, false);
+
+        $maxMessages = $maxMessages < 1 ? 1 : $maxMessages;
+        $this->ensureInboxSubscription();
+
+        $replyTo = $this->inboxPrefix . '.' . bin2hex(random_bytes(4));
+        $deadline = microtime(true) + $timeout;
+        $this->pendingRequests[$replyTo] = [
+            'deadline' => $deadline,
+            'max' => $maxMessages,
+            'messages' => [],
+        ];
+
+        $serializedPayload = $this->serializer->serialize($payload);
+        if ($headers !== []) {
+            $command = $this->connection->getCommandBuilder()->publishWithHeaders(
+                $subject,
+                $serializedPayload,
+                $headers,
+                $replyTo,
+            );
+        } else {
+            $command = $this->connection->getCommandBuilder()->publish(
+                $subject,
+                $serializedPayload,
+                $replyTo,
+            );
+        }
+        $this->connection->write($command);
+
+        while (microtime(true) < $deadline) {
+            $this->process(0.1);
+            $pending = $this->pendingRequests[$replyTo];
+            /** @var list<MessageInterface> $collected */
+            $collected = $pending['messages'];
+            if (count($collected) >= $maxMessages) {
+                break;
+            }
+        }
+
+        $messages = $this->pendingRequests[$replyTo]['messages'];
+        unset($this->pendingRequests[$replyTo]);
+
+        return $messages;
     }
 
     /**
@@ -505,7 +567,11 @@ final class Client implements PublisherInterface, SubscriberInterface
         if (str_starts_with($message->getSubject(), $this->inboxPrefix . '.')) {
             $replySubject = $message->getSubject();
             if (isset($this->pendingRequests[$replySubject])) {
-                $this->pendingRequests[$replySubject]['message'] = $message;
+                if (isset($this->pendingRequests[$replySubject]['max'])) {
+                    $this->pendingRequests[$replySubject]['messages'][] = $message;
+                } else {
+                    $this->pendingRequests[$replySubject]['message'] = $message;
+                }
 
                 return 1;
             }

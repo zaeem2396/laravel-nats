@@ -15,6 +15,7 @@ use LaravelNats\Laravel\NatsManager;
  * JetStream pull consumer worker command (Phase 4.3 — JetStream Consumer Worker).
  *
  * Consumes messages from a JetStream stream via a durable pull consumer.
+ * Uses one CONSUMER.MSG.NEXT request per cycle with batch=N for efficient server-side batching.
  * Supports optional handler class (JetStreamMessageHandlerInterface), batch size, timeout,
  * no-wait, and --auto-create to create a durable consumer if missing.
  */
@@ -25,7 +26,7 @@ class NatsConsumeStreamCommand extends Command
                             {--connection= : NATS connection name}
                             {--consumer= : Durable consumer name (required unless --auto-create)}
                             {--handler= : Handler class implementing JetStreamMessageHandlerInterface}
-                            {--batch=1 : Max messages to fetch per cycle (batch size)}
+                            {--batch=1 : Max messages to fetch per request (batch size)}
                             {--timeout=5 : Fetch timeout in seconds}
                             {--no-wait : Do not wait when no message available}
                             {--auto-create : Create durable consumer if it does not exist}';
@@ -93,16 +94,14 @@ class NatsConsumeStreamCommand extends Command
         ));
 
         while (! $this->shouldQuit) {
-            $fetched = 0;
-            for ($i = 0; $i < $batch && ! $this->shouldQuit; $i++) {
-                $message = $js->fetchNextMessage($stream, $consumerName, $timeout, $noWait || $i > 0, $batch);
-                if ($message === null) {
+            $messages = $js->fetchNextMessages($stream, $consumerName, $timeout, $noWait, $batch);
+            foreach ($messages as $message) {
+                if ($this->shouldQuit) {
                     break;
                 }
                 $this->processMessage($message, $handler, $js);
-                $fetched++;
             }
-            if ($fetched === 0 && $noWait) {
+            if ($messages === [] && $noWait) {
                 usleep(500_000); // 0.5s when no-wait to avoid busy loop (Phase 4.3)
             }
         }
@@ -121,7 +120,12 @@ class NatsConsumeStreamCommand extends Command
             $js->ack($message);
         } catch (\Throwable $e) {
             $this->error(sprintf('Handler error: %s', $e->getMessage()));
-            $js->nak($message);
+
+            try {
+                $js->nak($message);
+            } catch (\Throwable $nakException) {
+                $this->error(sprintf('Failed to NAK message: %s', $nakException->getMessage()));
+            }
         }
     }
 
