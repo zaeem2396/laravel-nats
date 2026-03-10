@@ -210,7 +210,7 @@ class MyHandler implements MessageHandlerInterface
 
 Run: `php artisan nats:consume "events.>" --handler=MyHandler`. See README "Subject-based consumer (Phase 4.2)" for full options and queue groups.
 
-**JetStream stream consumer (Phase 4.3 — JetStream Consumer Worker):** Use `nats:consume:stream {stream}` to consume from a JetStream stream via a pull consumer. Options: `--consumer=` (durable consumer name), `--connection=`, `--handler=` (class implementing `LaravelNats\Contracts\JetStream\JetStreamMessageHandlerInterface`), `--batch=1`, `--timeout=5`, `--no-wait`, `--auto-create`. The command acks after successful handle, naks on exception.
+**JetStream stream consumer (Phase 4.3 — JetStream Consumer Worker):** Use `nats:consume:stream {stream}` to consume from a JetStream stream via a pull consumer. Options: `--consumer=` (durable consumer name), `--connection=`, `--handler=` (class implementing `JetStreamMessageHandlerInterface`), `--batch=1`, `--timeout=5`, `--no-wait`, `--auto-create`. The command acks after successful handle, naks on exception. Graceful shutdown via Ctrl+C.
 
 Example JetStream handler:
 
