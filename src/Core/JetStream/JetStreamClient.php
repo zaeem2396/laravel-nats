@@ -474,6 +474,7 @@ final class JetStreamClient
      * @param string $consumerName Consumer name
      * @param float|null $timeout Request timeout in seconds
      * @param bool $noWait If true, return null when no message available instead of waiting
+     * @param int $batch Batch size (number of messages to request; default 1)
      *
      * @throws NatsException If JetStream is not available or consumer not found
      * @throws TimeoutException If request times out (when no_wait is false and no message)
@@ -486,6 +487,7 @@ final class JetStreamClient
         string $consumerName,
         ?float $timeout = null,
         bool $noWait = false,
+        int $batch = 1,
     ): ?JetStreamConsumedMessage {
         $timeout ??= $this->config->getTimeout();
         $subject = 'CONSUMER.MSG.NEXT.' . $streamName . '.' . $consumerName;
@@ -495,7 +497,8 @@ final class JetStreamClient
             throw new NatsException('JetStream is not available on this server');
         }
 
-        $payload = ['batch' => 1];
+        $batch = $batch < 1 ? 1 : $batch;
+        $payload = ['batch' => $batch];
         if ($noWait) {
             $payload['no_wait'] = true;
         }
