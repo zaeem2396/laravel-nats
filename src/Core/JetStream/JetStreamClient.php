@@ -474,7 +474,7 @@ final class JetStreamClient
      * @param string $consumerName Consumer name
      * @param float|null $timeout Request timeout in seconds
      * @param bool $noWait If true, return null when no message available instead of waiting
-     * @param int $batch Batch size (number of messages to request; default 1)
+     * @param int $batch Batch size (number of messages to request; default 1). Minimum 1.
      *
      * @throws NatsException If JetStream is not available or consumer not found
      * @throws TimeoutException If request times out (when no_wait is false and no message)
