@@ -11,19 +11,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - (none)
 
-## [1.2.0] - 2026-03-15
-
-Minor release: Phase 4.3 JetStream Consumer Worker (`nats:consume:stream`).
-
-### Added
-
-#### Phase 4: Worker & Runtime (Milestone 4.3 — JetStream Consumer Worker)
-- `nats:consume:stream {stream}` Artisan command — consume from a JetStream stream via pull consumer
-- Options: `--consumer=` (durable consumer name), `--connection=`, `--handler=` (class implementing `JetStreamMessageHandlerInterface`), `--batch=1`, `--timeout=5`, `--no-wait`, `--auto-create` (create durable consumer if missing). Graceful shutdown via SIGTERM/SIGINT.
-- `JetStreamMessageHandlerInterface` — contract for JetStream message handlers with `handle(JetStreamConsumedMessage $message): void`; command acks after successful handle, naks on exception
-- Pull consumer loop with configurable batch size and fetch timeout. Graceful shutdown via SIGTERM/SIGINT when pcntl available.
-- `JetStreamClient::fetchNextMessage()` — optional `$batch` parameter (default 1) for batch size
-
 ## [1.1.1] - 2026-02-27
 
 Patch release: Phase 4 Worker & Runtime (nats:work, nats:consume).
