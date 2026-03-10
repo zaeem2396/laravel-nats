@@ -695,7 +695,7 @@ Use `--connection=` to target a non-default NATS connection from `config/nats.ph
 | `nats:consume {subject}` | 4.2 | Subject-based consumer (handler, queue group, wildcards) |
 | `nats:consume:stream {stream}` | 4.3 | JetStream pull consumer (handler, batch, auto-create) |
 
-For release notes and version history, see [CHANGELOG.md](CHANGELOG.md).
+For release notes and version history (including v1.2.0 Phase 4.3), see [CHANGELOG.md](CHANGELOG.md).
 
 ## Contributing
 
