@@ -11,7 +11,7 @@ use LaravelNats\Core\JetStream\JetStreamConsumedMessage;
  *
  * Handlers are invoked by the nats:consume:stream command for each message fetched from a JetStream
  * pull consumer. The handler is resolved from the container (DI). The command acks the message
- * after the handler returns successfully; on exception it can nak or leave for redelivery.
+ * after the handler returns successfully; on exception it naks for redelivery.
  */
 interface JetStreamMessageHandlerInterface
 {
