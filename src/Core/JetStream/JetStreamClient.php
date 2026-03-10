@@ -465,7 +465,7 @@ final class JetStreamClient
     }
 
     /**
-     * Fetch the next message(s) from a pull consumer (batch size 1).
+     * Fetch the next message from a pull consumer (single message).
      *
      * Sends a request to CONSUMER.MSG.NEXT and returns the consumed message, or null when
      * no_wait is true and no message is available (server responds with Status 404).
@@ -474,6 +474,7 @@ final class JetStreamClient
      * @param string $consumerName Consumer name
      * @param float|null $timeout Request timeout in seconds
      * @param bool $noWait If true, return null when no message available instead of waiting
+     * @param int $batch Batch size (number of messages to request; default 1). Minimum 1.
      *
      * @throws NatsException If JetStream is not available or consumer not found
      * @throws TimeoutException If request times out (when no_wait is false and no message)
@@ -486,7 +487,39 @@ final class JetStreamClient
         string $consumerName,
         ?float $timeout = null,
         bool $noWait = false,
+        int $batch = 1,
     ): ?JetStreamConsumedMessage {
+        $messages = $this->fetchNextMessages($streamName, $consumerName, $timeout, $noWait, $batch < 1 ? 1 : $batch);
+
+        return $messages === [] ? null : $messages[0];
+    }
+
+    /**
+     * Fetch up to batch messages from a pull consumer in one round-trip.
+     *
+     * Sends one request to CONSUMER.MSG.NEXT with batch=N and collects up to N messages.
+     * Server may return fewer if fewer are available. With no_wait, returns immediately
+     * with zero or more messages (no blocking).
+     *
+     * @param string $streamName Stream name
+     * @param string $consumerName Consumer name
+     * @param float|null $timeout Request timeout in seconds
+     * @param bool $noWait If true, return immediately when no message available (server may send 404)
+     * @param int $batch Max messages to request (default 1). Minimum 1.
+     *
+     * @throws NatsException If JetStream is not available or consumer not found
+     * @throws TimeoutException If no message received within timeout when no_wait is false
+     * @throws ConnectionException If not connected
+     *
+     * @return list<JetStreamConsumedMessage> Consumed messages (empty when no_wait and none available)
+     */
+    public function fetchNextMessages(
+        string $streamName,
+        string $consumerName,
+        ?float $timeout = null,
+        bool $noWait = false,
+        int $batch = 1,
+    ): array {
         $timeout ??= $this->config->getTimeout();
         $subject = 'CONSUMER.MSG.NEXT.' . $streamName . '.' . $consumerName;
         $fullSubject = $this->buildApiSubject($subject);
@@ -495,31 +528,29 @@ final class JetStreamClient
             throw new NatsException('JetStream is not available on this server');
         }
 
-        $payload = ['batch' => 1];
+        $batch = $batch < 1 ? 1 : $batch;
+        $payload = ['batch' => $batch];
         if ($noWait) {
             $payload['no_wait'] = true;
         }
 
-        try {
-            $response = $this->client->request($fullSubject, $payload, $timeout);
-        } catch (TimeoutException $e) {
-            if ($noWait) {
-                return null;
-            }
+        $responses = $this->client->requestBatch($fullSubject, $payload, $timeout, $batch);
 
+        $result = [];
+        foreach ($responses as $response) {
+            if ($this->isNoMessageResponse($response) || $response->getReplyTo() === null || $response->getReplyTo() === '') {
+                continue;
+            }
+            $result[] = JetStreamConsumedMessage::fromNatsMessage($response);
+        }
+
+        if ($result === [] && ! $noWait) {
             throw new TimeoutException(
                 "JetStream fetch next message timed out after {$timeout} seconds",
-                0,
-                $e,
             );
         }
 
-        // Server may respond with Status 404 or no reply-to when no messages (no_wait)
-        if ($this->isNoMessageResponse($response) || $response->getReplyTo() === null || $response->getReplyTo() === '') {
-            return null;
-        }
-
-        return JetStreamConsumedMessage::fromNatsMessage($response);
+        return $result;
     }
 
     /**
