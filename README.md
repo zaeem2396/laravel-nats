@@ -366,7 +366,7 @@ php artisan nats:consume:stream ORDERS --auto-create
 php artisan nats:consume:stream ORDERS --consumer=workers --batch=5 --no-wait --timeout=2
 ```
 
-Implement a handler by creating a class that implements `LaravelNats\Contracts\JetStream\JetStreamMessageHandlerInterface` (define `handle(JetStreamConsumedMessage $message): void`). The command acks the message after a successful handle; on exception it naks for redelivery. Use `--connection=` for a non-default NATS connection. Ctrl+C for graceful shutdown.
+Implement a handler by creating a class that implements `LaravelNats\Contracts\JetStream\JetStreamMessageHandlerInterface` (define `handle(JetStreamConsumedMessage $message): void`). The command acks the message after a successful handle; on exception it naks for redelivery. Use `--connection=` for a non-default NATS connection. Use Ctrl+C for graceful shutdown.
 
 ### Current Limitations
 
