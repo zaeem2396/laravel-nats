@@ -662,7 +662,7 @@ php artisan nats:consume {subject} [--connection=] [--queue=] [--handler=] [--su
 
 **Queue worker (Phase 4.1):** `php artisan nats:work [--connection=nats] [--queue=default] [--pidfile=] ...`
 
-**JetStream stream consumer (Phase 4.3):** `php artisan nats:consume:stream {stream} [--consumer=] [--connection=] [--handler=] [--batch=1] [--timeout=5] [--no-wait] [--auto-create]` — pull consumer; use `--handler=` with a class implementing `LaravelNats\Contracts\JetStream\JetStreamMessageHandlerInterface`. Use `--auto-create` to create a durable consumer if it does not exist.
+**JetStream stream consumer (Phase 4.3):** `php artisan nats:consume:stream {stream} [--consumer=] [--connection=] [--handler=] [--batch=1] [--timeout=5] [--no-wait] [--auto-create]` — pull consumer. Use `--handler=` with a class implementing `JetStreamMessageHandlerInterface`. Use `--auto-create` to create a durable consumer if it does not exist.
 
 Manage streams and consumers from the CLI:
 
