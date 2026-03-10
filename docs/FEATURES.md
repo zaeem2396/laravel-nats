@@ -2,7 +2,7 @@
 
 laravel-nats is a production-ready, Laravel-native integration for NATS and JetStream with full queue driver support.
 
-**v1.1.1** adds Phase 4: dedicated NATS queue worker (`nats:work`) and subject-based consumer (`nats:consume`) with handler support. See [Full Laravel Queue Driver](#-4-full-laravel-queue-driver) and [Laravel-Native API Design](#-10-laravel-native-api-design).
+**v1.1.1** adds Phase 4.1–4.2: dedicated NATS queue worker (`nats:work`) and subject-based consumer (`nats:consume`). **v1.2.0** adds Phase 4.3: JetStream stream consumer (`nats:consume:stream`) with pull consumer and `JetStreamMessageHandlerInterface`. See [Full Laravel Queue Driver](#-4-full-laravel-queue-driver) and [Laravel-Native API Design](#-10-laravel-native-api-design).
 
 ## Table of Contents
 
@@ -209,6 +209,25 @@ class MyHandler implements MessageHandlerInterface
 ```
 
 Run: `php artisan nats:consume "events.>" --handler=MyHandler`. See README "Subject-based consumer (Phase 4.2)" for full options and queue groups.
+
+**JetStream stream consumer (Phase 4.3 — JetStream Consumer Worker):** Use `nats:consume:stream {stream}` to consume from a JetStream stream via a pull consumer. Options: `--consumer=` (durable consumer name), `--connection=`, `--handler=` (class implementing `JetStreamMessageHandlerInterface`), `--batch=1`, `--timeout=5`, `--no-wait`, `--auto-create`. The command acks after successful handle, naks on exception. Graceful shutdown via Ctrl+C.
+
+Example JetStream handler:
+
+```php
+use LaravelNats\Contracts\JetStream\JetStreamMessageHandlerInterface;
+use LaravelNats\Core\JetStream\JetStreamConsumedMessage;
+
+class OrderStreamHandler implements JetStreamMessageHandlerInterface
+{
+    public function handle(JetStreamConsumedMessage $message): void
+    {
+        // Process $message->getPayload(), $message->getStreamName(), getConsumerName(), etc.
+    }
+}
+```
+
+Run: `php artisan nats:consume:stream ORDERS --consumer=workers --handler=OrderStreamHandler`. See README “JetStream stream consumer (Phase 4.3)” for all options.
 
 **Job retries and backoff**
 
@@ -455,6 +474,7 @@ Designed to feel like core Laravel features.
 - **Config-driven setup** — `config/nats.php`, `NATS_*` env vars, `queue.connections.nats`
 - **Seamless queue worker support** — `php artisan queue:work nats` or `nats:work` with `--tries`, `--timeout`, `--queue`
 - **Subject-based consumer (Phase 4.2)** — `nats:consume {subject}` with queue groups and handler classes
+- **JetStream stream consumer (Phase 4.3)** — `nats:consume:stream {stream}` with pull consumer and JetStream handler
 
 **Example**
 

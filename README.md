@@ -22,7 +22,7 @@ A native NATS integration for Laravel that feels like home. Publish, subscribe, 
 composer require zaeem2396/laravel-nats
 ```
 
-Requires **v1.1.1** or later for Phase 4 commands (`nats:work`, `nats:consume`). The service provider will be auto-discovered. To publish the configuration file:
+Requires **v1.1.1** or later for Phase 4.1–4.2 (`nats:work`, `nats:consume`); **v1.2.0** for Phase 4.3 (`nats:consume:stream`). The service provider will be auto-discovered. To publish the configuration file:
 
 ```bash
 php artisan vendor:publish --tag=nats-config
@@ -348,6 +348,26 @@ Implement a handler by creating a class that implements `LaravelNats\Contracts\M
 
 **nats:consume options:** `--connection=` (NATS connection name), `--queue=` (queue group for load balancing), `--handler=` (class implementing `MessageHandlerInterface`), `--subjects=` (comma-separated additional subjects). Supports wildcards `*` (single token) and `>` (one or more tokens). Use Ctrl+C for graceful shutdown.
 
+### JetStream stream consumer (Phase 4.3)
+
+Consume messages from a JetStream stream using a pull consumer:
+
+```bash
+# Consume from stream "ORDERS" with durable consumer "workers" (messages printed to console)
+php artisan nats:consume:stream ORDERS --consumer=workers
+
+# With handler class (must implement JetStreamMessageHandlerInterface)
+php artisan nats:consume:stream ORDERS --consumer=workers --handler=App\\Handlers\\OrderMessageHandler
+
+# Create durable consumer if it does not exist
+php artisan nats:consume:stream ORDERS --auto-create
+
+# Batch size and no-wait (return immediately when no message)
+php artisan nats:consume:stream ORDERS --consumer=workers --batch=5 --no-wait --timeout=2
+```
+
+Implement a handler by creating a class that implements `LaravelNats\Contracts\JetStream\JetStreamMessageHandlerInterface` (define `handle(JetStreamConsumedMessage $message): void`). The command acks the message after a successful handle; on exception it naks for redelivery. Use `--connection=` for a non-default NATS connection. Use Ctrl+C for graceful shutdown.
+
 ### Current Limitations
 
 - **Delayed jobs:** Require JetStream; enable via `queue.delayed.enabled` (see [Delayed Jobs (JetStream)](#delayed-jobs-jetstream)).
@@ -642,6 +662,8 @@ php artisan nats:consume {subject} [--connection=] [--queue=] [--handler=] [--su
 
 **Queue worker (Phase 4.1):** `php artisan nats:work [--connection=nats] [--queue=default] [--pidfile=] ...`
 
+**JetStream stream consumer (Phase 4.3):** `php artisan nats:consume:stream {stream} [--consumer=] [--connection=] [--handler=] [--batch=1] [--timeout=5] [--no-wait] [--auto-create]` — pull consumer. Use `--handler=` with a class implementing `JetStreamMessageHandlerInterface`. Use `--auto-create` to create a durable consumer if it does not exist.
+
 Manage streams and consumers from the CLI:
 
 ```bash
@@ -663,7 +685,7 @@ php artisan nats:consumer:delete {stream} {consumer} [--connection=] [--force]
 php artisan nats:jetstream:status [--connection=] [--json]
 ```
 
-Use `--connection=` to target a non-default NATS connection from `config/nats.php`. For subject-based consumption (Phase 4.2), see [Subject-based consumer](#subject-based-consumer-phase-42).
+Use `--connection=` to target a non-default NATS connection from `config/nats.php`. For subject-based consumption (Phase 4.2), see [Subject-based consumer](#subject-based-consumer-phase-42). For JetStream stream consumption (Phase 4.3), see `nats:consume:stream` above.
 
 ## Summary of Phase 4 Commands
 
@@ -671,8 +693,9 @@ Use `--connection=` to target a non-default NATS connection from `config/nats.ph
 |---------|-------|---------|
 | `nats:work` | 4.1 | NATS queue worker (PID file, signals) |
 | `nats:consume {subject}` | 4.2 | Subject-based consumer (handler, queue group, wildcards) |
+| `nats:consume:stream {stream}` | 4.3 | JetStream pull consumer (handler, batch, auto-create) |
 
-For release notes and version history, see [CHANGELOG.md](CHANGELOG.md).
+For release notes and version history (including v1.2.0 Phase 4.3), see [CHANGELOG.md](CHANGELOG.md).
 
 ## Contributing
 
