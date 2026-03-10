@@ -13,7 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.2.0] - 2026-03-15
 
-Minor release: Phase 4.3 JetStream Consumer Worker.
+Minor release: Phase 4.3 JetStream Consumer Worker (`nats:consume:stream`).
 
 ### Added
 
