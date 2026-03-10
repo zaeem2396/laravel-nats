@@ -13,6 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.2.0] - 2026-03-15
 
+Minor release: Phase 4.3 JetStream Consumer Worker.
+
 ### Added
 
 #### Phase 4: Worker & Runtime (Milestone 4.3 — JetStream Consumer Worker)
