@@ -10,7 +10,10 @@ use Illuminate\Contracts\Config\Repository;
 use InvalidArgumentException;
 
 /**
- * Manages named Basis\Nats\Client instances from Laravel config (nats_basis).
+ * Manages named Basis\Nats\Client instances from Laravel config (`nats_basis`).
+ *
+ * @see \Basis\Nats\Client
+ * @see \LaravelNats\Laravel\Facades\NatsV2
  */
 final class ConnectionManager
 {

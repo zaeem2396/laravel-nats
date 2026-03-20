@@ -6,6 +6,8 @@ namespace LaravelNats\Publisher\Contracts;
 
 /**
  * Contract for publishing messages through the v2 NATS stack (basis-company/nats).
+ *
+ * @see \LaravelNats\Publisher\NatsPublisher
  */
 interface NatsPublisherContract
 {

@@ -6,7 +6,6 @@ namespace LaravelNats\Laravel\Facades;
 
 use Basis\Nats\Client;
 use Illuminate\Support\Facades\Facade;
-use LaravelNats\Laravel\NatsV2Gateway;
 
 /**
  * Facade for the v2 NATS stack (basis-company/nats).
@@ -16,7 +15,7 @@ use LaravelNats\Laravel\NatsV2Gateway;
  * @method static void disconnect(string|null $name = null)
  * @method static void disconnectAll()
  *
- * @see NatsV2Gateway
+ * @see \LaravelNats\Laravel\NatsV2Gateway
  */
 class NatsV2 extends Facade
 {

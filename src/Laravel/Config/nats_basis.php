@@ -6,6 +6,7 @@ declare(strict_types=1);
  * NATS configuration for the v2 stack (basis-company/nats client).
  *
  * @see docs/ROADMAP_V2_NATSPHP.md
+ * @see docs/v2/GUIDE.md
  */
 return [
 

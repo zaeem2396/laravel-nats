@@ -16,6 +16,8 @@ use LogicException;
 
 /**
  * Publishes JSON envelopes via basis-company/nats (HPUB when headers are present).
+ *
+ * @see \Basis\Nats\Message\Publish
  */
 final class NatsPublisher implements NatsPublisherContract
 {
