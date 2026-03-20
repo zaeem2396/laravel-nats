@@ -8,11 +8,12 @@
 
 A native NATS integration for Laravel that feels like home. Publish, subscribe, and request/reply with a familiar, expressive API.
 
+> **v2 docs:** [GUIDE](docs/v2/GUIDE.md) · [FAQ](docs/v2/FAQ.md)  
 > 📋 **Roadmap (v2):** [docs/ROADMAP_V2_NATSPHP.md](docs/ROADMAP_V2_NATSPHP.md) — rebuild plan on [basis-company/nats](https://github.com/basis-company/nats.php). Usage for the current package API is in this README.
 
 ## Requirements
 
-- PHP 8.2+
+- PHP 8.2+ (required for package and basis-company/nats)
 - Laravel 10.x, 11.x, or 12.x
 - NATS Server 2.x
 
@@ -22,7 +23,7 @@ A native NATS integration for Laravel that feels like home. Publish, subscribe, 
 composer require zaeem2396/laravel-nats
 ```
 
-Requires **v1.1.1** or later for Phase 4 commands (`nats:work`, `nats:consume`). The service provider will be auto-discovered. To publish the configuration file:
+Requires **v1.1.1** or later for Phase 4 commands (`nats:work`, `nats:consume`). The service provider will be auto-discovered. To publish the configuration file (includes `nats_basis` for v2):
 
 ```bash
 php artisan vendor:publish --tag=nats-config
@@ -41,6 +42,8 @@ NATS_TOKEN=
 ```
 
 ### NATS v2.0 foundation ([basis-company/nats](https://github.com/basis-company/nats.php))
+
+Full write-up: [docs/v2/GUIDE.md](docs/v2/GUIDE.md), [FAQ](docs/v2/FAQ.md).
 
 The package is adopting **basis-company/nats** for wire protocol handling. v2.0 adds a parallel stack configured via `config/nats_basis.php` (merged automatically; publish with `nats-config` to get the file on disk).
 
@@ -383,6 +386,9 @@ NATS_TOKEN=my-secret-token
 ```
 
 ## Testing
+
+v2 testing details: [docs/v2/GUIDE.md](docs/v2/GUIDE.md).
+
 
 This package uses [Pest PHP](https://pestphp.com/) for testing.
 

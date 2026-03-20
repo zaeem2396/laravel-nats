@@ -9,11 +9,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- **v2.0 foundation (basis-company/nats):** `ConnectionManager`, `NatsPublisher` with JSON envelope `{ id, type, version, data }`, `NatsV2` facade, `config/nats_basis.php` — see [docs/ROADMAP_V2_NATSPHP.md](docs/ROADMAP_V2_NATSPHP.md). Does not replace the legacy `Nats` facade or queue driver yet.
+- (none)
 
 ### Removed
 
-- Legacy planning/docs: `ROADMAP.md`, `PROGRESS.md`, `CODE_EXPLANATIONS.md`, and `docs/FEATURES.md` — superseded by [docs/ROADMAP_V2_NATSPHP.md](docs/ROADMAP_V2_NATSPHP.md) and README.
+- (none)
+
+## [2.0.0] - 2026-01-27
+
+### Added
+
+- **v2.0 foundation** ([basis-company/nats](https://github.com/basis-company/nats.php)): `ConnectionManager`, `NatsPublisher`, envelope `{ id, type, version, data }`, `NatsV2`, `config/nats_basis.php`.
+- **Docs:** [docs/v2/GUIDE.md](docs/v2/GUIDE.md), [MIGRATION.md](docs/v2/MIGRATION.md), [FAQ.md](docs/v2/FAQ.md), [README](docs/v2/README.md); [roadmap](docs/ROADMAP_V2_NATSPHP.md).
+
+### Deprecated
+
+- **Soft deprecation (2.0.0):** `Nats` facade, `NatsManager`, and `LaravelNats\Core\Client` for **new** integrations — use `NatsV2` for publish; legacy stack remains for subscribe, queue, and JetStream until v2.2+ parity ([docs/v2/MIGRATION.md](docs/v2/MIGRATION.md)). No removals in v2.x minors without notice.
+
+### Removed
+
+- Legacy planning/docs (`ROADMAP.md`, `PROGRESS.md`, `CODE_EXPLANATIONS.md`, `docs/FEATURES.md`).
 
 ## [1.1.1] - 2026-02-27
 
@@ -205,7 +220,8 @@ Run `composer update zaeem2396/laravel-nats` to upgrade.
 
 ---
 
-[Unreleased]: https://github.com/zaeem2396/laravel-nats/compare/v1.1.0...HEAD
+[Unreleased]: https://github.com/zaeem2396/laravel-nats/compare/v2.0.0...HEAD
+[2.0.0]: https://github.com/zaeem2396/laravel-nats/releases/tag/v2.0.0
 [1.1.0]: https://github.com/zaeem2396/laravel-nats/releases/tag/v1.1.0
 [1.0.0]: https://github.com/zaeem2396/laravel-nats/releases/tag/v1.0.0
 

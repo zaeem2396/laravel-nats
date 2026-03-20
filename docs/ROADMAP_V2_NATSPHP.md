@@ -211,3 +211,11 @@ This roadmap refactors **laravel-nats** to sit on **[basis-company/nats](https:/
 ---
 
 *Document version: 1.1 — JetStream before queue, DLQ with queue, DX / sensible defaults / migration strategy modules added.*
+
+**v2 docs:** [index](v2/README.md)
+
+*v2.0 publisher stack: implemented; subscriber/JetStream-on-basis: see roadmap sections.*
+
+**Next milestone:** v2.1 subscriber system (see roadmap body).
+
+*Module 1 (migration strategy): dual-stack policy documented in [docs/v2/MIGRATION.md](v2/MIGRATION.md); `Nats`, `NatsManager`, and `Core\Client` carry `@deprecated` for new integrations as of 2.0.0.*
