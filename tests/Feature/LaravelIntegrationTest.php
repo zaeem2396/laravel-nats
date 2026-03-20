@@ -22,7 +22,7 @@ it('can connect via facade', function (): void {
     Nats::disconnect();
 });
 
-it('publishes orders.created example from FEATURES.md', function (): void {
+it('publishes orders.created payload to NATS', function (): void {
     $received = null;
     $subject = 'orders.created.' . uniqid();
 
@@ -30,7 +30,7 @@ it('publishes orders.created example from FEATURES.md', function (): void {
         $received = $message->getDecodedPayload();
     });
 
-    // Example from docs/FEATURES.md - Publish Messages
+    // Publish Messages example pattern
     Nats::publish($subject, [
         'order_id' => 1001,
         'amount' => 2500,
@@ -42,7 +42,7 @@ it('publishes orders.created example from FEATURES.md', function (): void {
     Nats::disconnect();
 });
 
-it('subscribes orders.* example from FEATURES.md', function (): void {
+it('subscribes to orders.* wildcard subject', function (): void {
     $received = null;
     // orders.* matches exactly one token after "orders." (e.g. orders.created, orders.xyz)
     $subject = 'orders.' . uniqid('test');
@@ -75,7 +75,7 @@ it('can publish and subscribe via facade', function (): void {
     Nats::disconnect();
 });
 
-it('request/reply orders.get example from FEATURES.md', function (): void {
+it('request/reply orders.get pattern', function (): void {
     $subject = 'orders.get.' . uniqid();
 
     Nats::subscribe($subject, function (MessageInterface $message): void {

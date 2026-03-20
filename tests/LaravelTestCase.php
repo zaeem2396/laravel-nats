@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace LaravelNats\Tests;
 
 use LaravelNats\Laravel\Facades\Nats;
+use LaravelNats\Laravel\Facades\NatsV2;
 use LaravelNats\Laravel\Providers\NatsServiceProvider;
 use Orchestra\Testbench\TestCase as OrchestraTestCase;
 
@@ -43,6 +44,7 @@ abstract class LaravelTestCase extends OrchestraTestCase
     {
         return [
             'Nats' => Nats::class,
+            'NatsV2' => NatsV2::class,
         ];
     }
 

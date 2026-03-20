@@ -14,9 +14,14 @@ name: Tests
 
 on:
   push:
-    branches: [main, develop, 'feature/**', 'feat/**']
+    branches: ['**']
   pull_request:
     branches: [main, develop]
+  workflow_dispatch:
+
+concurrency:
+  group: tests-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   test:
