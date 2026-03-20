@@ -10,9 +10,14 @@ name: Static Analysis
 
 on:
   push:
-    branches: [main, develop, 'feature/**']
+    branches: ['**']
   pull_request:
     branches: [main, develop]
+  workflow_dispatch:
+
+concurrency:
+  group: phpstan-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   phpstan:
