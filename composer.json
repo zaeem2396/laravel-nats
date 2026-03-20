@@ -1,6 +1,6 @@
 {
     "name": "zaeem2396/laravel-nats",
-    "description": "A production-ready, native Laravel NATS integration with Queue driver, JetStream support, and Artisan commands",
+    "description": "Laravel NATS — v2 basis stack (basis-company/nats), queue driver, JetStream support, and Artisan commands",
     "keywords": [
         "laravel",
         "nats",
@@ -8,7 +8,8 @@
         "messaging",
         "jetstream",
         "pub-sub",
-        "microservices"
+        "microservices",
+        "basis-nats"
     ],
     "license": "MIT",
     "type": "library",
