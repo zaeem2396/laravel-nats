@@ -8,7 +8,7 @@
 
 A native NATS integration for Laravel that feels like home. Publish, subscribe, and request/reply with a familiar, expressive API.
 
-> 📋 **[Features Overview](docs/FEATURES.md)** — Full feature list with examples.
+> 📋 **Roadmap (v2):** [docs/ROADMAP_V2_NATSPHP.md](docs/ROADMAP_V2_NATSPHP.md) — rebuild plan on [basis-company/nats](https://github.com/basis-company/nats.php). Usage for the current package API is in this README.
 
 ## Requirements
 
@@ -38,6 +38,19 @@ NATS_PORT=4222
 NATS_USER=
 NATS_PASSWORD=
 NATS_TOKEN=
+```
+
+### NATS v2.0 foundation ([basis-company/nats](https://github.com/basis-company/nats.php))
+
+The package is adopting **basis-company/nats** for wire protocol handling. v2.0 adds a parallel stack configured via `config/nats_basis.php` (merged automatically; publish with `nats-config` to get the file on disk).
+
+**Envelope** (JSON body): `{ "id": "<uuid>", "type": "<subject>", "version": "v1", "data": { ... } }`
+
+```php
+use LaravelNats\Laravel\Facades\NatsV2;
+
+NatsV2::publish('orders.created', ['order_id' => 123], ['X-Request-Id' => 'abc']);
+// Underlying: Basis\Nats\Client — use NatsV2::connection() for advanced APIs.
 ```
 
 ### Multiple Connections

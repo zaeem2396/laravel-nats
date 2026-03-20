@@ -9,7 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- (none)
+- **v2.0 foundation (basis-company/nats):** `ConnectionManager`, `NatsPublisher` with JSON envelope `{ id, type, version, data }`, `NatsV2` facade, `config/nats_basis.php` — see [docs/ROADMAP_V2_NATSPHP.md](docs/ROADMAP_V2_NATSPHP.md). Does not replace the legacy `Nats` facade or queue driver yet.
+
+### Removed
+
+- Legacy planning/docs: `ROADMAP.md`, `PROGRESS.md`, `CODE_EXPLANATIONS.md`, and `docs/FEATURES.md` — superseded by [docs/ROADMAP_V2_NATSPHP.md](docs/ROADMAP_V2_NATSPHP.md) and README.
 
 ## [1.1.1] - 2026-02-27
 
@@ -34,7 +38,7 @@ Patch release: Phase 4 Worker & Runtime (nats:work, nats:consume).
 ### Added
 
 #### Documentation
-- `docs/FEATURES.md` — Comprehensive features overview with examples (Publish Messages, Subscribe, Request/Reply, Queue Driver, JetStream, Delayed Jobs, Multiple Connections, Wildcards, Artisan Commands, Laravel-Native API)
+- Features overview document (publish, subscribe, queue, JetStream, etc.) — removed in later releases in favor of README + v2 roadmap
 - Feature 2: Subscribe to Subjects — queue groups, unsubscribe, wildcard notes
 - Feature 3: Request/Reply Pattern — synchronous request-response, timeout
 - Feature 4: Full Laravel Queue Driver — dispatch, retries, backoff, failed jobs, DLQ
@@ -44,7 +48,7 @@ Patch release: Phase 4 Worker & Runtime (nats:work, nats:consume).
 - Feature 8: Wildcard Subscriptions — * and > patterns, examples
 - Feature 9: Artisan Commands — nats:stream:*, nats:consumer:*, nats:jetstream:status
 - Feature 10: Laravel-Native API Design — dispatch, facade, config, queue worker
-- README link to Features overview
+- README link to features overview (historical)
 
 #### Queue Driver - Delayed Jobs (Phase 2 - Milestone 2.2)
 - Delayed jobs support using JetStream: enable via `queue.delayed.enabled` in queue connection or `config/nats.php`
@@ -171,7 +175,7 @@ Patch release: Phase 4 Worker & Runtime (nats:work, nats:consume).
 
 - **PHP:** Minimum PHP is now 8.2 (was 8.1). Ensure your environment meets this requirement.
 - **Delayed jobs:** Enable via `queue.delayed.enabled` in your queue connection config or `config/nats.php`.
-- **JetStream:** Use `Nats::jetstream()` for streams, consumers, and acknowledgements. See `docs/FEATURES.md` for examples.
+- **JetStream:** Use `Nats::jetstream()` for streams, consumers, and acknowledgements. See this package README for examples.
 
 Update `composer.json`:
 
