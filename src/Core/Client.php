@@ -47,6 +47,10 @@ use LaravelNats\Exceptions\TimeoutException;
  *
  *     // Request/Reply
  *     $response = $client->request('api.users.get', ['id' => 1]);
+ *
+ * @deprecated 2.0.0 Legacy wire-stack client behind {@see \LaravelNats\Laravel\Facades\Nats}. For new code prefer
+ *             {@see \Basis\Nats\Client} via {@see \LaravelNats\Connection\ConnectionManager} / {@see \LaravelNats\Laravel\Facades\NatsV2}.
+ *             Internal package use continues until the v2 migration completes (target v2.2+ for feature parity). See docs/v2/MIGRATION.md.
  */
 final class Client implements PublisherInterface, SubscriberInterface
 {
