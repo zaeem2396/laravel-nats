@@ -5,8 +5,8 @@ declare(strict_types=1);
 /**
  * NATS configuration for the v2 stack (basis-company/nats client).
  *
- * @see docs/ROADMAP_V2_NATSPHP.md
  * @see docs/v2/GUIDE.md
+ * @see docs/v2/MIGRATION.md
  */
 return [
 
@@ -27,6 +27,21 @@ return [
     |
     */
     'envelope_version' => env('NATS_ENVELOPE_VERSION', 'v1'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Logging (basis-company/nats client)
+    |--------------------------------------------------------------------------
+    |
+    | When enabled, the PSR-3 logger is passed to Basis\Nats\Client (wire-level
+    | debug from the dependency). Uses a Laravel log channel name.
+    |
+    */
+
+    'logging' => [
+        'enabled' => filter_var(env('NATS_BASIS_LOGGING', false), FILTER_VALIDATE_BOOL),
+        'channel' => env('NATS_BASIS_LOG_CHANNEL', 'stack'),
+    ],
 
     /*
     |--------------------------------------------------------------------------

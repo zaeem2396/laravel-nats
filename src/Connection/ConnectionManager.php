@@ -8,6 +8,7 @@ use Basis\Nats\Client;
 use Basis\Nats\Configuration as BasisConfiguration;
 use Illuminate\Contracts\Config\Repository;
 use InvalidArgumentException;
+use Psr\Log\LoggerInterface;
 
 /**
  * Manages named Basis\Nats\Client instances from Laravel config (`nats_basis`).
@@ -24,6 +25,7 @@ final class ConnectionManager
 
     public function __construct(
         private readonly Repository $config,
+        private readonly ?LoggerInterface $logger = null,
     ) {
     }
 
@@ -119,7 +121,7 @@ final class ConnectionManager
 
         return new Client(
             configuration: $configuration,
-            logger: null,
+            logger: $this->logger,
             connection: null,
         );
     }

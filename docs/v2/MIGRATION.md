@@ -2,7 +2,7 @@
 
 ## Dual stack (backward compatibility)
 
-Legacy **`Nats`** facade, **`NatsManager`**, **`LaravelNats\Core\Client`**, the **queue driver**, and **JetStream** stay fully usable alongside **`NatsV2`** until documented cutover points in the roadmap. You can migrate **per subject** or **per service**.
+Legacy **`Nats`** facade, **`NatsManager`**, **`LaravelNats\Core\Client`**, the **queue driver**, and **JetStream** stay fully usable alongside **`NatsV2`** while you migrate. You can move **per subject** or **per service** on your own schedule.
 
 ## Deprecation policy (2.0+)
 
@@ -28,8 +28,9 @@ Both are merged when the package boots; run `php artisan vendor:publish --tag=na
 | Ping | `ping_interval` (float) | `pingInterval` (int, seconds) |
 | TLS | `tls.enabled` + `tls.options` | File paths: `tlsKeyFile`, `tlsCertFile`, `tlsCaFile` + `NATS_TLS_KEY`, `NATS_TLS_CERT`, `NATS_TLS_CA` |
 | Envelope schema | — | `envelope_version` / `NATS_ENVELOPE_VERSION` (default `v1`) |
+| Debug logging (basis client) | — | `nats_basis.logging` / `NATS_BASIS_LOGGING`, `NATS_BASIS_LOG_CHANNEL` |
 
-**Future unified config:** the roadmap may merge these into one file; until then, if you use **both** stacks, keep **both** configs consistent for shared connection names.
+**Future unified config:** a later release may merge these into one file; until then, if you use **both** stacks, keep **both** configs consistent for shared connection names.
 
 ## Facade and client usage
 
@@ -73,6 +74,5 @@ Consumers should read application data from **`data`**. Roll back publishers to 
 
 ## See also
 
-- [GUIDE](GUIDE.md) — day-to-day v2 usage  
-- [FAQ](FAQ.md)  
-- [Roadmap](../ROADMAP_V2_NATSPHP.md)
+- [GUIDE](GUIDE.md) — day-to-day v2 usage (wrapper on **basis-company/nats**)  
+- [FAQ](FAQ.md)

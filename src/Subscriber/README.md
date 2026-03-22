@@ -1,9 +1,7 @@
-# Subscriber (v2.1)
+# Subscriber (v2)
 
-The v2 subscriber API will wrap `Basis\Nats\Client::subscribe` / `subscribeQueue` with Laravel-friendly lifecycle management.
+The v2 subscriber API will wrap `Basis\Nats\Client::subscribe` / `subscribeQueue` through this package’s **Laravel wrapper** (same pattern as the v2 publisher: config + lifecycle, [basis-company/nats](https://packagist.org/packages/basis-company/nats) for the wire protocol).
 
-See **docs/ROADMAP_V2_NATSPHP.md** — Version v2.1.
+## Next: subscriber module
 
-## Roadmap v2.1
-
-`Basis\Nats\Client::subscribe` wrapper — see [docs/ROADMAP_V2_NATSPHP.md](../../docs/ROADMAP_V2_NATSPHP.md).
+`Basis\Nats\Client::subscribe` integration is planned as the next major v2 feature area in this repository.

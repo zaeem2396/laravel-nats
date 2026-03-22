@@ -1,6 +1,6 @@
 # Laravel NATS v2.0 — Developer guide
 
-Stack uses [basis-company/nats](https://packagist.org/packages/basis-company/nats) for the wire protocol.
+The v2 stack is a **Laravel wrapper** around [basis-company/nats](https://packagist.org/packages/basis-company/nats): configuration, facades, and a JSON envelope are provided here; the wire protocol is handled by that client.
 
 **Legacy:** `Nats` + `Core\Client`. **v2:** `NatsV2` + `ConnectionManager` + `Basis\Nats\Client`.
 
@@ -24,6 +24,8 @@ Stack uses [basis-company/nats](https://packagist.org/packages/basis-company/nat
 | `NATS_USER` / `NATS_PASS` | User auth |
 | `NATS_TOKEN` | Token |
 | `NATS_ENVELOPE_VERSION` | Envelope `version` field |
+| `NATS_BASIS_LOGGING` | When `true`, pass Laravel’s log channel to `Basis\Nats\Client` (wire-level traces from the dependency) |
+| `NATS_BASIS_LOG_CHANNEL` | Laravel channel name (default `stack`) when logging is enabled |
 
 TLS file paths: `NATS_TLS_KEY`, `NATS_TLS_CERT`, `NATS_TLS_CA`.
 
@@ -75,7 +77,7 @@ Unit tests for envelope and provider; CI uses Docker NATS.
 
 ## See also
 
-[Roadmap](../ROADMAP_V2_NATSPHP.md) · [Migration](MIGRATION.md)
+[Migration](MIGRATION.md)
 
 ### Security
 

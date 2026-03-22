@@ -8,8 +8,7 @@
 
 A native NATS integration for Laravel that feels like home. Publish, subscribe, and request/reply with a familiar, expressive API.
 
-> **v2 docs:** [GUIDE](docs/v2/GUIDE.md) · [FAQ](docs/v2/FAQ.md)  
-> 📋 **Roadmap (v2):** [docs/ROADMAP_V2_NATSPHP.md](docs/ROADMAP_V2_NATSPHP.md) — rebuild plan on [basis-company/nats](https://github.com/basis-company/nats.php). Usage for the current package API is in this README.
+> **v2:** Built as a Laravel **wrapper** on [basis-company/nats](https://github.com/basis-company/nats.php) (`NatsV2`, envelope publish). **Docs:** [Guide](docs/v2/GUIDE.md) · [FAQ](docs/v2/FAQ.md) · [Migration](docs/v2/MIGRATION.md). The **legacy** `Nats` facade API for subscribe, queue, and JetStream is documented in this README.
 
 ## Requirements
 
@@ -45,7 +44,7 @@ NATS_TOKEN=
 
 Full write-up: [docs/v2/GUIDE.md](docs/v2/GUIDE.md), [FAQ](docs/v2/FAQ.md).
 
-The package is adopting **basis-company/nats** for wire protocol handling. v2.0 adds a parallel stack configured via `config/nats_basis.php` (merged automatically; publish with `nats-config` to get the file on disk).
+v2.0 adds a **Laravel wrapper** on **basis-company/nats**: configuration, `NatsV2`, and the JSON envelope live in this package; the dependency handles the wire protocol. Settings go in `config/nats_basis.php` (merged automatically; publish with `nats-config` to get the file on disk).
 
 **Envelope** (JSON body): `{ "id": "<uuid>", "type": "<subject>", "version": "v1", "data": { ... } }`
 

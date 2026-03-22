@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace LaravelNats\Laravel\Providers;
 
 use Illuminate\Contracts\Support\DeferrableProvider;
+use Illuminate\Log\LogManager;
 use Illuminate\Queue\Worker;
 use Illuminate\Support\ServiceProvider;
 use LaravelNats\Connection\ConnectionManager;
@@ -132,7 +133,17 @@ class NatsServiceProvider extends ServiceProvider implements DeferrableProvider
     protected function registerBasisNatsV2(): void
     {
         $this->app->singleton(ConnectionManager::class, function ($app) {
-            return new ConnectionManager($app->make('config'));
+            $config = $app->make('config');
+            $logger = null;
+            if ($config->get('nats_basis.logging.enabled', false) === true) {
+                $channel = $config->get('nats_basis.logging.channel', 'stack');
+                $channel = is_string($channel) && $channel !== '' ? $channel : 'stack';
+                /** @var LogManager $log */
+                $log = $app->make('log');
+                $logger = $log->channel($channel);
+            }
+
+            return new ConnectionManager($config, $logger);
         });
 
         $this->app->singleton(NatsPublisher::class, function ($app) {

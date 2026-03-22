@@ -20,7 +20,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - **v2.0 foundation** ([basis-company/nats](https://github.com/basis-company/nats.php)): `ConnectionManager`, `NatsPublisher`, envelope `{ id, type, version, data }`, `NatsV2`, `config/nats_basis.php`.
-- **Docs:** [docs/v2/GUIDE.md](docs/v2/GUIDE.md), [MIGRATION.md](docs/v2/MIGRATION.md), [FAQ.md](docs/v2/FAQ.md), [README](docs/v2/README.md); [roadmap](docs/ROADMAP_V2_NATSPHP.md).
+- **Optional PSR-3 logging** for the basis client: `nats_basis.logging` + `NATS_BASIS_LOGGING` / `NATS_BASIS_LOG_CHANNEL` (Laravel log channel).
+- **Docs:** [docs/v2/GUIDE.md](docs/v2/GUIDE.md), [MIGRATION.md](docs/v2/MIGRATION.md), [FAQ.md](docs/v2/FAQ.md), [README](docs/v2/README.md) (Laravel wrapper on basis-company/nats).
 
 ### Deprecated
 
@@ -53,7 +54,7 @@ Patch release: Phase 4 Worker & Runtime (nats:work, nats:consume).
 ### Added
 
 #### Documentation
-- Features overview document (publish, subscribe, queue, JetStream, etc.) — removed in later releases in favor of README + v2 roadmap
+- Features overview document (publish, subscribe, queue, JetStream, etc.) — removed in later releases in favor of README and v2 docs
 - Feature 2: Subscribe to Subjects — queue groups, unsubscribe, wildcard notes
 - Feature 3: Request/Reply Pattern — synchronous request-response, timeout
 - Feature 4: Full Laravel Queue Driver — dispatch, retries, backoff, failed jobs, DLQ
@@ -72,7 +73,7 @@ Patch release: Phase 4 Worker & Runtime (nats:work, nats:consume).
 - `DelayStreamBootstrap::ensureStreamAndConsumer()` for use with an existing JetStream client
 - NatsConnector: when delayed enabled, bootstraps delay stream/consumer and passes JetStream + delayed config to NatsQueue
 - NatsQueue: optional `jetStream` and `delayedConfig` constructor params for `later()` (JetStream path)
-- README: Delayed Jobs (JetStream) section and roadmap update
+- README: Delayed Jobs (JetStream) section and documentation update
 
 #### JetStream Support (Phase 3 - Milestone 3.5 Artisan Commands)
 - `JetStreamClient::listStreams()` - List streams (paged) via STREAM.LIST API
@@ -81,7 +82,7 @@ Patch release: Phase 4 Worker & Runtime (nats:work, nats:consume).
 - Artisan command: `nats:jetstream:status` - JetStream account status and usage (table or `--json`)
 - `JetStreamClient::getAccountInfo()` - JetStream account information (memory, storage, streams, consumers, limits) via `$JS.API.INFO`
 - Commands support `--connection=` for non-default NATS connection
-- README Artisan Commands section and roadmap update
+- README Artisan Commands section and documentation update
 
 #### JetStream Support (Phase 3 - Milestone 3.4 Acknowledgement System)
 - `JetStreamConsumedMessage` - Value object for consumed pull messages (ack subject, stream/consumer name, sequences, payload)
