@@ -23,12 +23,16 @@ use LaravelNats\Laravel\Console\Commands\NatsStreamInfoCommand;
 use LaravelNats\Laravel\Console\Commands\NatsStreamListCommand;
 use LaravelNats\Laravel\Console\Commands\NatsStreamPurgeCommand;
 use LaravelNats\Laravel\Console\Commands\NatsStreamUpdateCommand;
+use LaravelNats\Laravel\Console\Commands\NatsV2ListenCommand;
 use LaravelNats\Laravel\Console\Commands\NatsWorkCommand;
 use LaravelNats\Laravel\NatsManager;
 use LaravelNats\Laravel\NatsV2Gateway;
 use LaravelNats\Laravel\Queue\NatsConnector;
 use LaravelNats\Publisher\Contracts\NatsPublisherContract;
 use LaravelNats\Publisher\NatsPublisher;
+use LaravelNats\Subscriber\Contracts\NatsSubscriberContract;
+use LaravelNats\Subscriber\NatsBasisSubscriber;
+use LaravelNats\Subscriber\SubjectValidator;
 
 /**
  * NatsServiceProvider registers NATS services with the Laravel container.
@@ -80,6 +84,9 @@ class NatsServiceProvider extends ServiceProvider implements DeferrableProvider
             ConnectionManager::class,
             NatsPublisher::class,
             NatsPublisherContract::class,
+            NatsSubscriberContract::class,
+            NatsBasisSubscriber::class,
+            SubjectValidator::class,
             Client::class,
         ];
     }
@@ -99,6 +106,7 @@ class NatsServiceProvider extends ServiceProvider implements DeferrableProvider
 
         $this->commands([
             NatsWorkCommand::class,
+            NatsV2ListenCommand::class,
             NatsConsumeCommand::class,
             NatsConsumeStreamCommand::class,
             NatsStreamListCommand::class,
@@ -155,10 +163,27 @@ class NatsServiceProvider extends ServiceProvider implements DeferrableProvider
 
         $this->app->bind(NatsPublisherContract::class, NatsPublisher::class);
 
+        $this->app->singleton(SubjectValidator::class, function ($app) {
+            return new SubjectValidator($app->make('config'));
+        });
+
+        $this->app->singleton(NatsBasisSubscriber::class, function ($app) {
+            return new NatsBasisSubscriber(
+                $app->make(ConnectionManager::class),
+                $app->make('config'),
+                $app->make(SubjectValidator::class),
+                $app,
+                $app->bound('events') ? $app->make('events') : null,
+            );
+        });
+
+        $this->app->bind(NatsSubscriberContract::class, NatsBasisSubscriber::class);
+
         $this->app->singleton('nats.v2', function ($app) {
             return new NatsV2Gateway(
                 $app->make(ConnectionManager::class),
                 $app->make(NatsPublisherContract::class),
+                $app->make(NatsSubscriberContract::class),
             );
         });
 
