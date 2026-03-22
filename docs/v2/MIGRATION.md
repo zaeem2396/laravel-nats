@@ -4,6 +4,10 @@
 
 Legacy **`Nats`** facade, **`NatsManager`**, **`LaravelNats\Core\Client`**, the **queue driver**, and **JetStream** stay fully usable alongside **`NatsV2`** while you migrate. You can move **per subject** or **per service** on your own schedule.
 
+### v2.1 subscriber (`NatsV2::subscribe`)
+
+New code can use **`NatsV2::subscribe`** (basis client) with **`InboundMessage`** instead of legacy `Nats::subscribe` + `MessageInterface`. You still run a **`process()`** loop (or `nats:v2:listen`). See [SUBSCRIBER.md](SUBSCRIBER.md).
+
 ## Deprecation policy (2.0+)
 
 | Rule | Detail |
