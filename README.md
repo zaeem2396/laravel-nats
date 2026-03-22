@@ -8,7 +8,7 @@
 
 A native NATS integration for Laravel that feels like home. Publish, subscribe, and request/reply with a familiar, expressive API.
 
-> **v2:** Built as a Laravel **wrapper** on [basis-company/nats](https://github.com/basis-company/nats.php) (`NatsV2`, envelope publish). **Docs:** [Guide](docs/v2/GUIDE.md) · [FAQ](docs/v2/FAQ.md) · [Migration](docs/v2/MIGRATION.md). The **legacy** `Nats` facade API for subscribe, queue, and JetStream is documented in this README.
+> **v2:** Built as a Laravel **wrapper** on [basis-company/nats](https://github.com/basis-company/nats.php) (`NatsV2`, publish + subscribe). **Docs:** [Guide](docs/v2/GUIDE.md) · [Subscriber v2.1](docs/v2/SUBSCRIBER.md) · [FAQ](docs/v2/FAQ.md) · [Migration](docs/v2/MIGRATION.md). The **legacy** `Nats` facade API for subscribe, queue, and JetStream is also documented in this README.
 
 ## Requirements
 
