@@ -36,24 +36,24 @@
 
 ---
 
-## Version v2.1 — Subscriber system
+## Version v2.1 - Subscriber system
 
 **Goals:** First-class subscriptions and inbound handling; Laravel-friendly hooks without a heavy framework inside the package.
 
 | Area | Deliverable | Status |
 |------|-------------|--------|
-| **M1** Subscriber API | `SubscriberContract` + impl wrapping `Basis\Nats\Client::subscribe` / `subscribeQueue` | Planned |
-| **M1** Subscriber API | Subject validation, queue groups, graceful unsubscribe | Planned |
-| **M2** Runtime | Long-running `process()` for workers; optional `nats:listen`-style command | Planned |
-| **M2** Runtime | Signal handling (pcntl) notes for Supervisor/systemd | Planned |
-| **M3** Inbound | DTO for consumed messages decoupled from basis `Msg` | Planned |
-| **M3** Inbound | Optional v2 envelope decode on consume | Planned |
-| **M4** DX | Opt-in Laravel events on inbound; config subject → event mapping | Planned |
-| **M4** DX | Inbound middleware stack (logging, decode, exceptions) | Planned |
-| **M5** Defaults | Subject conventions + optional validation warn-only | Planned |
-| **M6** Observability | Structured log channel on connect/subscribe/error | Planned |
+| **M1** Subscriber API | `NatsSubscriberContract` + `NatsBasisSubscriber` wrapping `Basis\Nats\Client::subscribe` / `subscribeQueue` | Completed |
+| **M1** Subscriber API | Subject validation, queue groups, unsubscribe by id / `unsubscribeAll` | Completed |
+| **M2** Runtime | Long-running `process()`; `nats:v2:listen` Artisan command | Completed |
+| **M2** Runtime | Signal handling (pcntl) in `nats:v2:listen` + docs | Completed |
+| **M3** Inbound | `InboundMessage` DTO decoupled from basis `Msg` | Completed |
+| **M3** Inbound | Optional v2 envelope decode via `InboundMessage::envelopePayload()` | Completed |
+| **M4** DX | Opt-in `NatsInboundMessageReceived` event; middleware class list in config | Completed |
+| **M4** DX | Inbound middleware pipeline (`InboundMiddleware`, `LogInboundMiddleware`) | Completed |
+| **M5** Defaults | Subject max length; optional warn flag (reserved) | Completed |
+| **M6** Observability | Optional `LogInboundMiddleware` for debug traces | Completed |
 | **M6** Observability | Request-ID / correlation header convention | Planned |
-| **M7** Migration | Doc: map v1 consumers to v2.1 subscriber API | Planned |
+| **M7** Migration | Docs: [MIGRATION.md](v2/MIGRATION.md), [SUBSCRIBER.md](v2/SUBSCRIBER.md) | Completed |
 
 ---
 
@@ -141,7 +141,7 @@
 | Version | Focus | Status |
 |---------|--------|--------|
 | v2.0 | Foundation, wrapper on basis client, publisher, envelope, `NatsV2`, migration docs | Completed |
-| v2.1 | Subscribers, runtime, inbound DTOs, DX, defaults, baseline logging | Planned |
+| v2.1 | Subscribers, `InboundMessage`, `nats:v2:listen`, middleware, events | Completed |
 | v2.2 | JetStream on basis client | Planned |
 | v2.3 | Queue driver + DLQ + retry/backoff | Planned |
 | v2.4 | Idempotency | Planned |
@@ -151,6 +151,6 @@
 
 ---
 
-*Document version: 1.2 — tabular status; wrapper framing.*
+*Document version: 1.3 - tabular status; v2.1 subscriber completed.*
 
-**User docs:** [docs/v2/README.md](v2/README.md) · [GUIDE](v2/GUIDE.md) · [MIGRATION](v2/MIGRATION.md)
+**User docs:** [docs/v2/README.md](v2/README.md) · [GUIDE](v2/GUIDE.md) · [SUBSCRIBER](v2/SUBSCRIBER.md) · [MIGRATION](v2/MIGRATION.md)
