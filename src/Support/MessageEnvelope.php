@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace LaravelNats\Support;
 
 /**
- * Standard outbound message envelope for v2 publisher (see `docs/v2/GUIDE.md`).
+ * Standard outbound message envelope for v2 publisher (see `docs/v2/GUIDE.md`). Pairs with subscriber `InboundMessage::envelopePayload()` on consume.
  *
  * @phpstan-type EnvelopeArray array{id: string, type: string, version: string, data: array<string, mixed>}
  */
