@@ -2,7 +2,9 @@
 
 **Is this a separate NATS client?** No. v2 is a **Laravel wrapper** on [basis-company/nats](https://packagist.org/packages/basis-company/nats): this package adds config, facades, and the envelope; the dependency owns the protocol.
 
-**Why @deprecated on `Nats`?** Soft deprecation only: new **publish** code should use `NatsV2`. Subscribe, queue, and JetStream remain on `Nats` until parity on the basis stack. Details in [MIGRATION](MIGRATION.md).
+**v2.1 subscribe?** Use `NatsV2::subscribe` with `InboundMessage` and a `process()` loop, or `php artisan nats:v2:listen`. See [SUBSCRIBER](SUBSCRIBER.md). Legacy `Nats::subscribe` remains available.
+
+**Why @deprecated on `Nats`?** Soft deprecation only: new **publish** code should use `NatsV2`. For **new** subscribe code on the basis stack, prefer `NatsV2::subscribe`. Queue and JetStream on legacy remain until parity. Details in [MIGRATION](MIGRATION.md).
 
 **Mix facades?** Yes, per subject or service boundary.
 
