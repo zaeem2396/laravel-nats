@@ -9,6 +9,9 @@ use LaravelNats\Laravel\NatsV2Gateway;
 use LaravelNats\Laravel\Providers\NatsServiceProvider;
 use LaravelNats\Publisher\Contracts\NatsPublisherContract;
 use LaravelNats\Publisher\NatsPublisher;
+use LaravelNats\Subscriber\Contracts\NatsSubscriberContract;
+use LaravelNats\Subscriber\NatsBasisSubscriber;
+use LaravelNats\Subscriber\SubjectValidator;
 
 it('registers the nats binding', function (): void {
     expect($this->app->bound('nats'))->toBeTrue();
@@ -34,6 +37,9 @@ it('provides deferred services', function (): void {
         ->and($provides)->toContain(ConnectionManager::class)
         ->and($provides)->toContain(NatsPublisher::class)
         ->and($provides)->toContain(NatsPublisherContract::class)
+        ->and($provides)->toContain(NatsSubscriberContract::class)
+        ->and($provides)->toContain(NatsBasisSubscriber::class)
+        ->and($provides)->toContain(SubjectValidator::class)
         ->and($provides)->toContain(Client::class);
 });
 
