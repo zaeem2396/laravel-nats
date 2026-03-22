@@ -15,6 +15,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - (none)
 
+## [2.1.0] - 2026-01-27
+
+### Added
+
+- **v2.1 subscriber stack:** `NatsSubscriberContract`, `NatsBasisSubscriber` wrapping `Basis\Nats\Client::subscribe` / `subscribeQueue`; `InboundMessage` DTO; subject validation; optional inbound middleware pipeline and `NatsInboundMessageReceived` event; `nats_basis.subscriber` config.
+- **Artisan** `nats:v2:listen` for long-running console consumers.
+- **Docs:** [docs/v2/SUBSCRIBER.md](docs/v2/SUBSCRIBER.md); guide and FAQ updates.
+
 ## [2.0.0] - 2026-01-27
 
 ### Added
@@ -221,7 +229,8 @@ Run `composer update zaeem2396/laravel-nats` to upgrade.
 
 ---
 
-[Unreleased]: https://github.com/zaeem2396/laravel-nats/compare/v2.0.0...HEAD
+[Unreleased]: https://github.com/zaeem2396/laravel-nats/compare/v2.1.0...HEAD
+[2.1.0]: https://github.com/zaeem2396/laravel-nats/releases/tag/v2.1.0
 [2.0.0]: https://github.com/zaeem2396/laravel-nats/releases/tag/v2.0.0
 [1.1.0]: https://github.com/zaeem2396/laravel-nats/releases/tag/v1.1.0
 [1.0.0]: https://github.com/zaeem2396/laravel-nats/releases/tag/v1.0.0
