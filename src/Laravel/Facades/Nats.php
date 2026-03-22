@@ -13,6 +13,11 @@ use LaravelNats\Core\JetStream\JetStreamConfig;
 /**
  * Nats Facade provides static access to NATS messaging.
  *
+ * @deprecated 2.0.0 Soft-deprecated for **new** integrations: use {@see \LaravelNats\Laravel\Facades\NatsV2}
+ *             for publish (envelope + basis-company/nats). This facade remains fully supported for subscribe,
+ *             request/reply, the queue driver, and JetStream until v2.2+ documents parity on the basis client.
+ *             No silent removals in v2.x minors. See [docs/v2/MIGRATION.md](../../../docs/v2/MIGRATION.md).
+ *
  * Usage:
  *   Nats::publish('orders.created', ['order_id' => 123]);
  *   Nats::subscribe('orders.*', fn($msg) => logger($msg->getPayload()));

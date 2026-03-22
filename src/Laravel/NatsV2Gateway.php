@@ -10,6 +10,8 @@ use LaravelNats\Publisher\Contracts\NatsPublisherContract;
 
 /**
  * Facade root for the v2 NATS stack (basis-company/nats + envelope publisher).
+ *
+ * @see \LaravelNats\Laravel\Facades\NatsV2
  */
 final class NatsV2Gateway
 {

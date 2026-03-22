@@ -8,11 +8,11 @@
 
 A native NATS integration for Laravel that feels like home. Publish, subscribe, and request/reply with a familiar, expressive API.
 
-> 📋 **Roadmap (v2):** [docs/ROADMAP_V2_NATSPHP.md](docs/ROADMAP_V2_NATSPHP.md) — rebuild plan on [basis-company/nats](https://github.com/basis-company/nats.php). Usage for the current package API is in this README.
+> **v2:** Built as a Laravel **wrapper** on [basis-company/nats](https://github.com/basis-company/nats.php) (`NatsV2`, envelope publish). **Docs:** [Guide](docs/v2/GUIDE.md) · [FAQ](docs/v2/FAQ.md) · [Migration](docs/v2/MIGRATION.md). The **legacy** `Nats` facade API for subscribe, queue, and JetStream is documented in this README.
 
 ## Requirements
 
-- PHP 8.2+
+- PHP 8.2+ (required for package and basis-company/nats)
 - Laravel 10.x, 11.x, or 12.x
 - NATS Server 2.x
 
@@ -22,7 +22,7 @@ A native NATS integration for Laravel that feels like home. Publish, subscribe, 
 composer require zaeem2396/laravel-nats
 ```
 
-Requires **v1.1.1** or later for Phase 4 commands (`nats:work`, `nats:consume`). The service provider will be auto-discovered. To publish the configuration file:
+Requires **v1.1.1** or later for Phase 4 commands (`nats:work`, `nats:consume`). The service provider will be auto-discovered. To publish the configuration file (includes `nats_basis` for v2):
 
 ```bash
 php artisan vendor:publish --tag=nats-config
@@ -42,7 +42,9 @@ NATS_TOKEN=
 
 ### NATS v2.0 foundation ([basis-company/nats](https://github.com/basis-company/nats.php))
 
-The package is adopting **basis-company/nats** for wire protocol handling. v2.0 adds a parallel stack configured via `config/nats_basis.php` (merged automatically; publish with `nats-config` to get the file on disk).
+Full write-up: [docs/v2/GUIDE.md](docs/v2/GUIDE.md), [FAQ](docs/v2/FAQ.md).
+
+v2.0 adds a **Laravel wrapper** on **basis-company/nats**: configuration, `NatsV2`, and the JSON envelope live in this package; the dependency handles the wire protocol. Settings go in `config/nats_basis.php` (merged automatically; publish with `nats-config` to get the file on disk).
 
 **Envelope** (JSON body): `{ "id": "<uuid>", "type": "<subject>", "version": "v1", "data": { ... } }`
 
@@ -383,6 +385,9 @@ NATS_TOKEN=my-secret-token
 ```
 
 ## Testing
+
+v2 testing details: [docs/v2/GUIDE.md](docs/v2/GUIDE.md).
+
 
 This package uses [Pest PHP](https://pestphp.com/) for testing.
 

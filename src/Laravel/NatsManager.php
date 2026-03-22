@@ -19,6 +19,10 @@ use LaravelNats\Core\Serialization\PhpSerializer;
 /**
  * NatsManager handles multiple NATS connections for Laravel.
  *
+ * @deprecated 2.0.0 Soft-deprecated alongside {@see \LaravelNats\Laravel\Facades\Nats}: prefer {@see \LaravelNats\Laravel\Facades\NatsV2}
+ *             and {@see \LaravelNats\Connection\ConnectionManager} for new publish-side code. Remains the backing manager for the
+ *             legacy `Nats` facade (subscribe, queue, JetStream) until v2.2+ parity; see [docs/v2/MIGRATION.md](../../docs/v2/MIGRATION.md).
+ *
  * This class follows the Manager pattern used by Laravel's DatabaseManager,
  * CacheManager, etc. It manages connection lifecycle and provides a
  * fluent interface for NATS operations.

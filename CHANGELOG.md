@@ -9,11 +9,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- **v2.0 foundation (basis-company/nats):** `ConnectionManager`, `NatsPublisher` with JSON envelope `{ id, type, version, data }`, `NatsV2` facade, `config/nats_basis.php` — see [docs/ROADMAP_V2_NATSPHP.md](docs/ROADMAP_V2_NATSPHP.md). Does not replace the legacy `Nats` facade or queue driver yet.
+- (none)
 
 ### Removed
 
-- Legacy planning/docs: `ROADMAP.md`, `PROGRESS.md`, `CODE_EXPLANATIONS.md`, and `docs/FEATURES.md` — superseded by [docs/ROADMAP_V2_NATSPHP.md](docs/ROADMAP_V2_NATSPHP.md) and README.
+- (none)
+
+## [2.0.0] - 2026-01-27
+
+### Added
+
+- **v2.0 foundation** ([basis-company/nats](https://github.com/basis-company/nats.php)): `ConnectionManager`, `NatsPublisher`, envelope `{ id, type, version, data }`, `NatsV2`, `config/nats_basis.php`.
+- **Optional PSR-3 logging** for the basis client: `nats_basis.logging` + `NATS_BASIS_LOGGING` / `NATS_BASIS_LOG_CHANNEL` (Laravel log channel).
+- **Docs:** [docs/v2/GUIDE.md](docs/v2/GUIDE.md), [MIGRATION.md](docs/v2/MIGRATION.md), [FAQ.md](docs/v2/FAQ.md), [README](docs/v2/README.md) (Laravel wrapper on basis-company/nats).
+
+### Deprecated
+
+- **Soft deprecation (2.0.0):** `Nats` facade, `NatsManager`, and `LaravelNats\Core\Client` for **new** integrations — use `NatsV2` for publish; legacy stack remains for subscribe, queue, and JetStream until v2.2+ parity ([docs/v2/MIGRATION.md](docs/v2/MIGRATION.md)). No removals in v2.x minors without notice.
+
+### Removed
+
+- Legacy planning/docs (`ROADMAP.md`, `PROGRESS.md`, `CODE_EXPLANATIONS.md`, `docs/FEATURES.md`).
 
 ## [1.1.1] - 2026-02-27
 
@@ -38,7 +54,7 @@ Patch release: Phase 4 Worker & Runtime (nats:work, nats:consume).
 ### Added
 
 #### Documentation
-- Features overview document (publish, subscribe, queue, JetStream, etc.) — removed in later releases in favor of README + v2 roadmap
+- Features overview document (publish, subscribe, queue, JetStream, etc.) — removed in later releases in favor of README and v2 docs
 - Feature 2: Subscribe to Subjects — queue groups, unsubscribe, wildcard notes
 - Feature 3: Request/Reply Pattern — synchronous request-response, timeout
 - Feature 4: Full Laravel Queue Driver — dispatch, retries, backoff, failed jobs, DLQ
@@ -57,7 +73,7 @@ Patch release: Phase 4 Worker & Runtime (nats:work, nats:consume).
 - `DelayStreamBootstrap::ensureStreamAndConsumer()` for use with an existing JetStream client
 - NatsConnector: when delayed enabled, bootstraps delay stream/consumer and passes JetStream + delayed config to NatsQueue
 - NatsQueue: optional `jetStream` and `delayedConfig` constructor params for `later()` (JetStream path)
-- README: Delayed Jobs (JetStream) section and roadmap update
+- README: Delayed Jobs (JetStream) section and documentation update
 
 #### JetStream Support (Phase 3 - Milestone 3.5 Artisan Commands)
 - `JetStreamClient::listStreams()` - List streams (paged) via STREAM.LIST API
@@ -66,7 +82,7 @@ Patch release: Phase 4 Worker & Runtime (nats:work, nats:consume).
 - Artisan command: `nats:jetstream:status` - JetStream account status and usage (table or `--json`)
 - `JetStreamClient::getAccountInfo()` - JetStream account information (memory, storage, streams, consumers, limits) via `$JS.API.INFO`
 - Commands support `--connection=` for non-default NATS connection
-- README Artisan Commands section and roadmap update
+- README Artisan Commands section and documentation update
 
 #### JetStream Support (Phase 3 - Milestone 3.4 Acknowledgement System)
 - `JetStreamConsumedMessage` - Value object for consumed pull messages (ack subject, stream/consumer name, sequences, payload)
@@ -205,7 +221,8 @@ Run `composer update zaeem2396/laravel-nats` to upgrade.
 
 ---
 
-[Unreleased]: https://github.com/zaeem2396/laravel-nats/compare/v1.1.0...HEAD
+[Unreleased]: https://github.com/zaeem2396/laravel-nats/compare/v2.0.0...HEAD
+[2.0.0]: https://github.com/zaeem2396/laravel-nats/releases/tag/v2.0.0
 [1.1.0]: https://github.com/zaeem2396/laravel-nats/releases/tag/v1.1.0
 [1.0.0]: https://github.com/zaeem2396/laravel-nats/releases/tag/v1.0.0
 
