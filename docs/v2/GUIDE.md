@@ -1,4 +1,4 @@
-# Laravel NATS v2.0 — Developer guide
+# Laravel NATS v2 - Developer guide
 
 The v2 stack is a **Laravel wrapper** around [basis-company/nats](https://packagist.org/packages/basis-company/nats): configuration, facades, and a JSON envelope are provided here; the wire protocol is handled by that client.
 
@@ -15,6 +15,7 @@ The v2 stack is a **Laravel wrapper** around [basis-company/nats](https://packag
 7. Dual stack
 8. Testing
 9. Migration strategy
+10. Subscribe (v2.1)
 
 ## Config
 
@@ -75,9 +76,13 @@ Legacy **`Nats`** / **`NatsManager`** / **`Core\Client`** are **soft-deprecated*
 
 Unit tests for envelope and provider; CI uses Docker NATS.
 
+## Subscribe (v2.1)
+
+`NatsV2::subscribe($subject, callable(InboundMessage): void, $queueGroup = null, $connection = null)` wraps `Basis\Nats\Client` subscribe / subscribeQueue. You must call `NatsV2::process($connection, $timeout)` in a loop (or use `php artisan nats:v2:listen`). Full reference: [SUBSCRIBER.md](SUBSCRIBER.md).
+
 ## See also
 
-[Migration](MIGRATION.md)
+[Migration](MIGRATION.md) - [Subscriber (v2.1)](SUBSCRIBER.md)
 
 ### Security
 
