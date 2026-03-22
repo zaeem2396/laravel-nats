@@ -33,7 +33,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Deprecated
 
-- **Soft deprecation (2.0.0):** `Nats` facade, `NatsManager`, and `LaravelNats\Core\Client` for **new** integrations — use `NatsV2` for publish; legacy stack remains for subscribe, queue, and JetStream until v2.2+ parity ([docs/v2/MIGRATION.md](docs/v2/MIGRATION.md)). No removals in v2.x minors without notice.
+- **Soft deprecation (2.0.0):** `Nats` facade, `NatsManager`, and `LaravelNats\Core\Client` for **new** integrations - use `NatsV2` for publish; legacy stack remains for subscribe, queue, and JetStream until v2.2+ parity ([docs/v2/MIGRATION.md](docs/v2/MIGRATION.md)). No removals in v2.x minors without notice.
 
 ### Removed
 
@@ -46,15 +46,15 @@ Patch release: Phase 4 Worker & Runtime (nats:work, nats:consume).
 ### Added
 
 #### Phase 4: Worker & Runtime (Milestone 4.1)
-- `nats:work` Artisan command — dedicated NATS queue worker with `--connection`, `--queue`, `--name`, `--pidfile`, `--stop-when-empty`
+- `nats:work` Artisan command - dedicated NATS queue worker with `--connection`, `--queue`, `--name`, `--pidfile`, `--stop-when-empty`
 - PID file support for process managers (Supervisor, systemd); file is removed on shutdown
 - Delegates to Laravel's Queue Worker (same job processing as `queue:work nats`) with graceful shutdown and signal handling (SIGTERM, SIGINT, etc.).
 
-#### Phase 4: Worker & Runtime (Milestone 4.2 — Subject-Based Consumer)
-- `nats:consume {subject}` Artisan command — subscribe to subject(s) with optional queue group and handler class
+#### Phase 4: Worker & Runtime (Milestone 4.2 - Subject-Based Consumer)
+- `nats:consume {subject}` Artisan command - subscribe to subject(s) with optional queue group and handler class
 - Wildcard subject support (`*` and `>`); multiple subjects via argument and `--subjects=` (comma-separated)
 - `--queue=` for queue group (load-balanced consumption); `--handler=` for class implementing `MessageHandlerInterface`. Without `--handler`, messages are printed to console
-- `MessageHandlerInterface` — contract for message handlers with `handle(MessageInterface $message): void`; handlers resolved from container (DI)
+- `MessageHandlerInterface` - contract for message handlers with `handle(MessageInterface $message): void`; handlers resolved from container (DI)
 - Graceful shutdown via SIGTERM/SIGINT when pcntl is available. Unsubscribes before exit.
 
 ## [1.1.0] - 2026-02-15
@@ -62,16 +62,16 @@ Patch release: Phase 4 Worker & Runtime (nats:work, nats:consume).
 ### Added
 
 #### Documentation
-- Features overview document (publish, subscribe, queue, JetStream, etc.) — removed in later releases in favor of README and v2 docs
-- Feature 2: Subscribe to Subjects — queue groups, unsubscribe, wildcard notes
-- Feature 3: Request/Reply Pattern — synchronous request-response, timeout
-- Feature 4: Full Laravel Queue Driver — dispatch, retries, backoff, failed jobs, DLQ
-- Feature 5: JetStream Support — streams, consumers, acks, StreamConfig
-- Feature 6: Delayed Jobs via JetStream — later(), delay(), queue.delayed config
-- Feature 7: Multiple Connections — named connections, Nats::connection('name')
-- Feature 8: Wildcard Subscriptions — * and > patterns, examples
-- Feature 9: Artisan Commands — nats:stream:*, nats:consumer:*, nats:jetstream:status
-- Feature 10: Laravel-Native API Design — dispatch, facade, config, queue worker
+- Features overview document (publish, subscribe, queue, JetStream, etc.) - removed in later releases in favor of README and v2 docs
+- Feature 2: Subscribe to Subjects - queue groups, unsubscribe, wildcard notes
+- Feature 3: Request/Reply Pattern - synchronous request-response, timeout
+- Feature 4: Full Laravel Queue Driver - dispatch, retries, backoff, failed jobs, DLQ
+- Feature 5: JetStream Support - streams, consumers, acks, StreamConfig
+- Feature 6: Delayed Jobs via JetStream - later(), delay(), queue.delayed config
+- Feature 7: Multiple Connections - named connections, Nats::connection('name')
+- Feature 8: Wildcard Subscriptions - * and > patterns, examples
+- Feature 9: Artisan Commands - nats:stream:*, nats:consumer:*, nats:jetstream:status
+- Feature 10: Laravel-Native API Design - dispatch, facade, config, queue worker
 - README link to features overview (historical)
 
 #### Queue Driver - Delayed Jobs (Phase 2 - Milestone 2.2)

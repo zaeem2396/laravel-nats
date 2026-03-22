@@ -1,6 +1,6 @@
-# Laravel NATS — plan (basis-company/nats wrapper)
+# Laravel NATS - plan (basis-company/nats wrapper)
 
-**laravel-nats** is built as a **Laravel wrapper** around **[basis-company/nats](https://github.com/basis-company/nats.php)** (Packagist: `basis-company/nats`). Application code uses this package’s facades, config, and helpers—not a hand-rolled NATS wire protocol.
+**laravel-nats** is built as a **Laravel wrapper** around **[basis-company/nats](https://github.com/basis-company/nats.php)** (Packagist: `basis-company/nats`). Application code uses this package’s facades, config, and helpers-not a hand-rolled NATS wire protocol.
 
 **Principles:** Laravel-first (container, config, facades), small SOLID classes, production-oriented, avoid overengineering.
 
@@ -8,7 +8,7 @@
 
 ---
 
-## Version v2.0 — Foundation
+## Version v2.0 - Foundation
 
 **Goals:** Core connectivity on `basis-company/nats`; config-driven multi-connection manager; standardized publish envelope; facade entry point. **Out of scope:** queue driver, JetStream, full subscriber runtime (stubs/wiring only as needed).
 
@@ -20,15 +20,15 @@
 | **M2** Dependency | Composer `basis-company/nats`; PHP/Laravel matrix documented | Completed |
 | **M2** Boundaries | Namespaces `Connection/`, `Publisher/`, `Subscriber/` (stubs), `Support/` | Completed |
 | **M2** Boundaries | Note when `LaravelNats\Core\Client` is legacy-only ([MIGRATION](v2/MIGRATION.md)) | Completed |
-| **M3** Config | `config/nats_basis.php` — `default`, `connections[]`, auth, TLS | Completed |
+| **M3** Config | `config/nats_basis.php` - `default`, `connections[]`, auth, TLS | Completed |
 | **M3** Config | Env mapping (`NATS_*` / `NATS_BASIS_*`), `vendor:publish` tag | Completed |
 | **M3** Config | Envelope schema `envelope_version` (default `v1`) | Completed |
-| **M4** Connection | `ConnectionManager` — `Basis\Nats\Client`, lazy connect, disconnect/disconnectAll | Completed |
+| **M4** Connection | `ConnectionManager` - `Basis\Nats\Client`, lazy connect, disconnect/disconnectAll | Completed |
 | **M4** Connection | Map config → `Basis\Nats\Configuration` (user/pass, token, JWT, NKey, TLS paths) | Completed |
 | **M4** Connection | Optional PSR-3 logger from Laravel `Log` (`nats_basis.logging`) | Completed |
 | **M5** Publisher | `MessageEnvelope` `{ id, type, version, data }` | Completed |
-| **M5** Publisher | `NatsPublisher` — JSON + headers (HPUB via `Basis\Nats\Message\Payload`) | Completed |
-| **M5** Publisher | `NatsV2Gateway` + `NatsV2` facade — `publish`, `connection(?name)` | Completed |
+| **M5** Publisher | `NatsPublisher` - JSON + headers (HPUB via `Basis\Nats\Message\Payload`) | Completed |
+| **M5** Publisher | `NatsV2Gateway` + `NatsV2` facade - `publish`, `connection(?name)` | Completed |
 | **M6** Provider | Register `ConnectionManager`, `NatsPublisher`, `nats.v2`; merge config | Completed |
 | **M6** Provider | Keep `NatsServiceProvider` for legacy during migration | Completed |
 | **M7** Quality | Unit tests (envelope, config); PHPStan for new code | Completed |
@@ -57,9 +57,9 @@
 
 ---
 
-## Version v2.2 — JetStream support
+## Version v2.2 - JetStream support
 
-**Goals:** Streams, consumers, publish/consume via `basis-company/nats` — **before** the Laravel queue driver.
+**Goals:** Streams, consumers, publish/consume via `basis-company/nats` - **before** the Laravel queue driver.
 
 | Area | Deliverable | Status |
 |------|-------------|--------|
@@ -73,7 +73,7 @@
 
 ---
 
-## Version v2.3 — Queue driver + DLQ
+## Version v2.3 - Queue driver + DLQ
 
 **Goals:** Laravel `nats` queue on the basis client **after** JetStream (v2.2). Retry, DLQ, failed-job handling in this release.
 
@@ -94,7 +94,7 @@
 
 ---
 
-## Version v2.4 — Idempotency
+## Version v2.4 - Idempotency
 
 | Area | Deliverable | Status |
 |------|-------------|--------|
@@ -105,7 +105,7 @@
 
 ---
 
-## Version v2.5 — Observability
+## Version v2.5 - Observability
 
 | Area | Deliverable | Status |
 |------|-------------|--------|
@@ -115,7 +115,7 @@
 
 ---
 
-## Version v2.6 — Security & config hardening
+## Version v2.6 - Security & config hardening
 
 | Area | Deliverable | Status |
 |------|-------------|--------|
@@ -126,7 +126,7 @@
 
 ---
 
-## Version v2.7 — Advanced features
+## Version v2.7 - Advanced features
 
 | Area | Deliverable | Status |
 |------|-------------|--------|
