@@ -15,33 +15,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - (none)
 
-## [2.1.1] - 2026-03-22
+## [1.3.0] - 2026-03-24
+
+### Added
+
+- **NatsV2 / basis stack** ([basis-company/nats](https://github.com/basis-company/nats.php)): `ConnectionManager`, `NatsPublisher`, envelope `{ id, type, version, data }`, `NatsV2`, `config/nats_basis.php`.
+- **Optional PSR-3 logging** for the basis client: `nats_basis.logging` + `NATS_BASIS_LOGGING` / `NATS_BASIS_LOG_CHANNEL` (Laravel log channel).
+- **Subscriber stack:** `NatsSubscriberContract`, `NatsBasisSubscriber` wrapping `Basis\Nats\Client::subscribe` / `subscribeQueue`; `InboundMessage` DTO; subject validation; optional inbound middleware pipeline and `NatsInboundMessageReceived` event; `nats_basis.subscriber` config.
+- **Artisan** `nats:v2:listen` for long-running console consumers.
+- **Docs:** [docs/v2/GUIDE.md](docs/v2/GUIDE.md), [MIGRATION.md](docs/v2/MIGRATION.md), [FAQ.md](docs/v2/FAQ.md), [README](docs/v2/README.md), [SUBSCRIBER.md](docs/v2/SUBSCRIBER.md).
 
 ### Changed
 
-- Documentation: migration guide, v2 guide, subscriber docs, and package README aligned with **`NatsV2::subscribe`** (v2.1); clarified dual-stack deprecation policy and basis config (**`NATS_PASS`**).
+- Documentation: migration guide, v2 guide, subscriber docs, and package README aligned with **`NatsV2::subscribe`**; clarified dual-stack deprecation policy and basis config (**`NATS_PASS`**).
 - **`composer.json`:** `minimum-stability` is **`stable`** for typical `composer require` installs.
 - **`docker-compose.yml`:** header comments reference **`docker compose`** (Compose V2).
 
-## [2.1.0] - 2026-01-27
-
-### Added
-
-- **v2.1 subscriber stack:** `NatsSubscriberContract`, `NatsBasisSubscriber` wrapping `Basis\Nats\Client::subscribe` / `subscribeQueue`; `InboundMessage` DTO; subject validation; optional inbound middleware pipeline and `NatsInboundMessageReceived` event; `nats_basis.subscriber` config.
-- **Artisan** `nats:v2:listen` for long-running console consumers.
-- **Docs:** [docs/v2/SUBSCRIBER.md](docs/v2/SUBSCRIBER.md); guide and FAQ updates.
-
-## [2.0.0] - 2026-01-27
-
-### Added
-
-- **v2.0 foundation** ([basis-company/nats](https://github.com/basis-company/nats.php)): `ConnectionManager`, `NatsPublisher`, envelope `{ id, type, version, data }`, `NatsV2`, `config/nats_basis.php`.
-- **Optional PSR-3 logging** for the basis client: `nats_basis.logging` + `NATS_BASIS_LOGGING` / `NATS_BASIS_LOG_CHANNEL` (Laravel log channel).
-- **Docs:** [docs/v2/GUIDE.md](docs/v2/GUIDE.md), [MIGRATION.md](docs/v2/MIGRATION.md), [FAQ.md](docs/v2/FAQ.md), [README](docs/v2/README.md) (Laravel wrapper on basis-company/nats).
-
 ### Deprecated
 
-- **Soft deprecation (2.0.0):** `Nats` facade, `NatsManager`, and `LaravelNats\Core\Client` for **new** integrations - use `NatsV2` for publish; **2.1.0** adds `NatsV2::subscribe` on the basis client. Legacy stack remains for request/reply, queue, and JetStream until v2.2+ parity ([docs/v2/MIGRATION.md](docs/v2/MIGRATION.md)). No removals in v2.x minors without notice.
+- **Soft deprecation (1.3.0):** `Nats` facade, `NatsManager`, and `LaravelNats\Core\Client` for **new** integrations - use **`NatsV2`** for publish and subscribe on the basis client. Legacy stack remains for request/reply, queue, and JetStream until future parity ([docs/v2/MIGRATION.md](docs/v2/MIGRATION.md)). No removals without notice in upcoming minor releases.
 
 ### Removed
 
@@ -203,6 +195,22 @@ Patch release: Phase 4 Worker & Runtime (nats:work, nats:consume).
 
 ## Upgrade Guide
 
+### From 1.2.0 to 1.3.0
+
+- **NatsV2 (basis client):** Add `config/nats_basis.php` (merged by the service provider; use `php artisan vendor:publish --tag=nats-config` if you publish config). Prefer **`NatsV2::publish`** / **`NatsV2::subscribe`** for new code; see [docs/v2/MIGRATION.md](docs/v2/MIGRATION.md) and [docs/v2/SUBSCRIBER.md](docs/v2/SUBSCRIBER.md).
+- **Long-running consumer:** `php artisan nats:v2:listen` (see subscriber docs).
+- **Composer:**
+
+```json
+{
+    "require": {
+        "zaeem2396/laravel-nats": "^1.3"
+    }
+}
+```
+
+Run `composer update zaeem2396/laravel-nats` to upgrade.
+
 ### From 1.0.0 to 1.1.0
 
 - **PHP:** Minimum PHP is now 8.2 (was 8.1). Ensure your environment meets this requirement.
@@ -237,10 +245,10 @@ Run `composer update zaeem2396/laravel-nats` to upgrade.
 
 ---
 
-[Unreleased]: https://github.com/zaeem2396/laravel-nats/compare/v2.1.1...HEAD
-[2.1.1]: https://github.com/zaeem2396/laravel-nats/compare/v2.1.0...v2.1.1
-[2.1.0]: https://github.com/zaeem2396/laravel-nats/releases/tag/v2.1.0
-[2.0.0]: https://github.com/zaeem2396/laravel-nats/releases/tag/v2.0.0
+[Unreleased]: https://github.com/zaeem2396/laravel-nats/compare/v1.3.0...HEAD
+[1.3.0]: https://github.com/zaeem2396/laravel-nats/compare/v1.2.0...v1.3.0
+[1.2.0]: https://github.com/zaeem2396/laravel-nats/compare/v1.1.1...v1.2.0
+[1.1.1]: https://github.com/zaeem2396/laravel-nats/compare/v1.1.0...v1.1.1
 [1.1.0]: https://github.com/zaeem2396/laravel-nats/releases/tag/v1.1.0
 [1.0.0]: https://github.com/zaeem2396/laravel-nats/releases/tag/v1.0.0
 

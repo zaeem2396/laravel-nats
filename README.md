@@ -8,7 +8,7 @@
 
 A native NATS integration for Laravel that feels like home. Publish, subscribe, and request/reply with a familiar, expressive API.
 
-> **v2:** Built as a Laravel **wrapper** on [basis-company/nats](https://github.com/basis-company/nats.php) (`NatsV2`, publish + subscribe). **Docs:** [Guide](docs/v2/GUIDE.md) · [Subscriber v2.1](docs/v2/SUBSCRIBER.md) · [FAQ](docs/v2/FAQ.md) · [Migration](docs/v2/MIGRATION.md). The **legacy** `Nats` facade API for subscribe, queue, and JetStream is also documented in this README.
+> **NatsV2** (basis stack, **package 1.3.0+**): Laravel **wrapper** on [basis-company/nats](https://github.com/basis-company/nats.php) for publish + subscribe. **Docs:** [Guide](docs/v2/GUIDE.md) · [Subscriber](docs/v2/SUBSCRIBER.md) · [FAQ](docs/v2/FAQ.md) · [Migration](docs/v2/MIGRATION.md). The **legacy** `Nats` facade API for subscribe, queue, and JetStream is also documented in this README.
 
 ## Requirements
 
@@ -23,8 +23,7 @@ composer require zaeem2396/laravel-nats
 ```
 
 - **v1.1.1+** for Phase 4 queue/worker commands (`nats:work`, `nats:consume`).
-- **v2.0+** for **`NatsV2::publish`**, `ConnectionManager`, and the JSON envelope (`config/nats_basis.php`).
-- **v2.1+** for **`NatsV2::subscribe`**, **`InboundMessage`**, and **`nats:v2:listen`**.
+- **v1.3.0+** for **`NatsV2::publish`** / **`NatsV2::subscribe`**, `ConnectionManager`, JSON envelope (`config/nats_basis.php`), **`InboundMessage`**, and **`nats:v2:listen`**.
 
 The service provider is auto-discovered. To publish configuration (includes **`nats_basis`** for v2):
 
@@ -46,11 +45,11 @@ NATS_TOKEN=
 # NATS_PASS=
 ```
 
-### NATS v2.0 foundation ([basis-company/nats](https://github.com/basis-company/nats.php))
+### NatsV2 foundation ([basis-company/nats](https://github.com/basis-company/nats.php), package **1.3.0+**)
 
 Full write-up: [docs/v2/GUIDE.md](docs/v2/GUIDE.md), [FAQ](docs/v2/FAQ.md).
 
-v2.0 adds a **Laravel wrapper** on **basis-company/nats**: configuration, `NatsV2`, and the JSON envelope live in this package; the dependency handles the wire protocol. Settings go in `config/nats_basis.php` (merged automatically; publish with `nats-config` to get the file on disk).
+**NatsV2** adds a **Laravel wrapper** on **basis-company/nats**: configuration, `NatsV2`, and the JSON envelope live in this package; the dependency handles the wire protocol. Settings go in `config/nats_basis.php` (merged automatically; publish with `nats-config` to get the file on disk).
 
 **Envelope** (JSON body): `{ "id": "<uuid>", "type": "<subject>", "version": "v1", "data": { ... } }`
 

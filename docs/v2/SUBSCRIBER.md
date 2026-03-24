@@ -1,6 +1,6 @@
-# Laravel NATS v2.1 - Subscriber (basis-company/nats wrapper)
+# NatsV2 subscriber (basis-company/nats wrapper)
 
-The v2.1 subscriber API is a **Laravel wrapper** around `Basis\Nats\Client::subscribe` / `subscribeQueue`: you register PHP callables that receive an `LaravelNats\Subscriber\InboundMessage` value object; the dependency still owns the NATS socket and protocol.
+The subscriber API (package **1.3.0+**) is a **Laravel wrapper** around `Basis\Nats\Client::subscribe` / `subscribeQueue`: you register PHP callables that receive an `LaravelNats\Subscriber\InboundMessage` value object; the dependency still owns the NATS socket and protocol.
 
 ## Configuration
 
