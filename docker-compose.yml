@@ -5,9 +5,9 @@
 # This file sets up NATS servers for development and testing.
 #
 # Usage:
-#   docker-compose up -d      # Start NATS servers
-#   docker-compose down       # Stop NATS servers
-#   docker-compose logs -f    # View logs
+#   docker compose up -d      # Start NATS servers (Compose V2)
+#   docker compose down       # Stop NATS servers
+#   docker compose logs -f    # View logs
 #
 # NATS Endpoints:
 #   - nats://localhost:4222   # Open client connections (no auth)

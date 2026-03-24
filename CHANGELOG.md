@@ -15,6 +15,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - (none)
 
+## [2.1.1] - 2026-03-22
+
+### Changed
+
+- Documentation: migration guide, v2 guide, subscriber docs, and package README aligned with **`NatsV2::subscribe`** (v2.1); clarified dual-stack deprecation policy and basis config (**`NATS_PASS`**).
+- **`composer.json`:** `minimum-stability` is **`stable`** for typical `composer require` installs.
+- **`docker-compose.yml`:** header comments reference **`docker compose`** (Compose V2).
+
 ## [2.1.0] - 2026-01-27
 
 ### Added
@@ -33,7 +41,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Deprecated
 
-- **Soft deprecation (2.0.0):** `Nats` facade, `NatsManager`, and `LaravelNats\Core\Client` for **new** integrations - use `NatsV2` for publish; legacy stack remains for subscribe, queue, and JetStream until v2.2+ parity ([docs/v2/MIGRATION.md](docs/v2/MIGRATION.md)). No removals in v2.x minors without notice.
+- **Soft deprecation (2.0.0):** `Nats` facade, `NatsManager`, and `LaravelNats\Core\Client` for **new** integrations - use `NatsV2` for publish; **2.1.0** adds `NatsV2::subscribe` on the basis client. Legacy stack remains for request/reply, queue, and JetStream until v2.2+ parity ([docs/v2/MIGRATION.md](docs/v2/MIGRATION.md)). No removals in v2.x minors without notice.
 
 ### Removed
 
@@ -229,7 +237,8 @@ Run `composer update zaeem2396/laravel-nats` to upgrade.
 
 ---
 
-[Unreleased]: https://github.com/zaeem2396/laravel-nats/compare/v2.1.0...HEAD
+[Unreleased]: https://github.com/zaeem2396/laravel-nats/compare/v2.1.1...HEAD
+[2.1.1]: https://github.com/zaeem2396/laravel-nats/compare/v2.1.0...v2.1.1
 [2.1.0]: https://github.com/zaeem2396/laravel-nats/releases/tag/v2.1.0
 [2.0.0]: https://github.com/zaeem2396/laravel-nats/releases/tag/v2.0.0
 [1.1.0]: https://github.com/zaeem2396/laravel-nats/releases/tag/v1.1.0

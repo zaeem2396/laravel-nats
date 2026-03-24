@@ -68,7 +68,7 @@ Legacy publish = raw JSON body; v2 = envelope. Migrate per subject.
 
 ## Migration strategy
 
-Legacy **`Nats`** / **`NatsManager`** / **`Core\Client`** are **soft-deprecated** for new work as of 2.0.0; **`NatsV2`** is the supported path for new publishers. Subscribe, queue, and JetStream stay on the legacy facade until **v2.2+**. **No silent removals** in v2.x minors.
+Legacy **`Nats`** / **`NatsManager`** / **`Core\Client`** are **soft-deprecated** for new work as of 2.0.0; **`NatsV2`** is the supported path for new **publish** and (since **2.1.0**) new **subscribe** code on the basis client. **Queue** and **JetStream** stay on the legacy facade until **v2.2+**. **No silent removals** in v2.x minors.
 
 **Full policy, config mapping (`nats.php` ↔ `nats_basis.php`), facade table, and per-minor testing checklist:** [MIGRATION.md](MIGRATION.md).
 

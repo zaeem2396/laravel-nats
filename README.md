@@ -22,7 +22,11 @@ A native NATS integration for Laravel that feels like home. Publish, subscribe, 
 composer require zaeem2396/laravel-nats
 ```
 
-Requires **v1.1.1** or later for Phase 4 commands (`nats:work`, `nats:consume`). The service provider will be auto-discovered. To publish the configuration file (includes `nats_basis` for v2):
+- **v1.1.1+** for Phase 4 queue/worker commands (`nats:work`, `nats:consume`).
+- **v2.0+** for **`NatsV2::publish`**, `ConnectionManager`, and the JSON envelope (`config/nats_basis.php`).
+- **v2.1+** for **`NatsV2::subscribe`**, **`InboundMessage`**, and **`nats:v2:listen`**.
+
+The service provider is auto-discovered. To publish configuration (includes **`nats_basis`** for v2):
 
 ```bash
 php artisan vendor:publish --tag=nats-config
@@ -38,6 +42,8 @@ NATS_PORT=4222
 NATS_USER=
 NATS_PASSWORD=
 NATS_TOKEN=
+# v2 basis client (`NatsV2`): password env is NATS_PASS (see docs/v2/MIGRATION.md)
+# NATS_PASS=
 ```
 
 ### NATS v2.0 foundation ([basis-company/nats](https://github.com/basis-company/nats.php))
@@ -394,8 +400,8 @@ This package uses [Pest PHP](https://pestphp.com/) for testing.
 ### Running Tests
 
 ```bash
-# Start the NATS server (requires Docker)
-docker-compose up -d
+# Start the NATS server (requires Docker; from package root)
+docker compose up -d
 
 # Run all tests
 composer test
@@ -432,8 +438,8 @@ composer format
 # Using Docker
 docker run -d --name nats -p 4222:4222 -p 8222:8222 nats:2.10
 
-# Or with Docker Compose
-docker-compose up -d
+# Or from this package's compose file
+docker compose up -d
 ```
 
 ### Authentication Failed
