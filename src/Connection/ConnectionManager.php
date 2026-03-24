@@ -15,6 +15,7 @@ use Psr\Log\LoggerInterface;
  *
  * @see \Basis\Nats\Client
  * @see \LaravelNats\Laravel\Facades\NatsV2
+ * @see \LaravelNats\Subscriber\NatsBasisSubscriber
  */
 final class ConnectionManager
 {

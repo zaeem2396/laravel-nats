@@ -1,6 +1,6 @@
-# Laravel NATS — plan (basis-company/nats wrapper)
+# Laravel NATS - plan (basis-company/nats wrapper)
 
-**laravel-nats** is built as a **Laravel wrapper** around **[basis-company/nats](https://github.com/basis-company/nats.php)** (Packagist: `basis-company/nats`). Application code uses this package’s facades, config, and helpers—not a hand-rolled NATS wire protocol.
+**laravel-nats** is built as a **Laravel wrapper** around **[basis-company/nats](https://github.com/basis-company/nats.php)** (Packagist: `basis-company/nats`). Application code uses this package’s facades, config, and helpers-not a hand-rolled NATS wire protocol.
 
 **Principles:** Laravel-first (container, config, facades), small SOLID classes, production-oriented, avoid overengineering.
 
@@ -8,7 +8,7 @@
 
 ---
 
-## Version v2.0 — Foundation
+## Version v2.0 - Foundation
 
 **Goals:** Core connectivity on `basis-company/nats`; config-driven multi-connection manager; standardized publish envelope; facade entry point. **Out of scope:** queue driver, JetStream, full subscriber runtime (stubs/wiring only as needed).
 
@@ -20,15 +20,15 @@
 | **M2** Dependency | Composer `basis-company/nats`; PHP/Laravel matrix documented | Completed |
 | **M2** Boundaries | Namespaces `Connection/`, `Publisher/`, `Subscriber/` (stubs), `Support/` | Completed |
 | **M2** Boundaries | Note when `LaravelNats\Core\Client` is legacy-only ([MIGRATION](v2/MIGRATION.md)) | Completed |
-| **M3** Config | `config/nats_basis.php` — `default`, `connections[]`, auth, TLS | Completed |
+| **M3** Config | `config/nats_basis.php` - `default`, `connections[]`, auth, TLS | Completed |
 | **M3** Config | Env mapping (`NATS_*` / `NATS_BASIS_*`), `vendor:publish` tag | Completed |
 | **M3** Config | Envelope schema `envelope_version` (default `v1`) | Completed |
-| **M4** Connection | `ConnectionManager` — `Basis\Nats\Client`, lazy connect, disconnect/disconnectAll | Completed |
+| **M4** Connection | `ConnectionManager` - `Basis\Nats\Client`, lazy connect, disconnect/disconnectAll | Completed |
 | **M4** Connection | Map config → `Basis\Nats\Configuration` (user/pass, token, JWT, NKey, TLS paths) | Completed |
 | **M4** Connection | Optional PSR-3 logger from Laravel `Log` (`nats_basis.logging`) | Completed |
 | **M5** Publisher | `MessageEnvelope` `{ id, type, version, data }` | Completed |
-| **M5** Publisher | `NatsPublisher` — JSON + headers (HPUB via `Basis\Nats\Message\Payload`) | Completed |
-| **M5** Publisher | `NatsV2Gateway` + `NatsV2` facade — `publish`, `connection(?name)` | Completed |
+| **M5** Publisher | `NatsPublisher` - JSON + headers (HPUB via `Basis\Nats\Message\Payload`) | Completed |
+| **M5** Publisher | `NatsV2Gateway` + `NatsV2` facade - `publish`, `connection(?name)` | Completed |
 | **M6** Provider | Register `ConnectionManager`, `NatsPublisher`, `nats.v2`; merge config | Completed |
 | **M6** Provider | Keep `NatsServiceProvider` for legacy during migration | Completed |
 | **M7** Quality | Unit tests (envelope, config); PHPStan for new code | Completed |
@@ -36,30 +36,30 @@
 
 ---
 
-## Version v2.1 — Subscriber system
+## Version v2.1 - Subscriber system
 
 **Goals:** First-class subscriptions and inbound handling; Laravel-friendly hooks without a heavy framework inside the package.
 
 | Area | Deliverable | Status |
 |------|-------------|--------|
-| **M1** Subscriber API | `SubscriberContract` + impl wrapping `Basis\Nats\Client::subscribe` / `subscribeQueue` | Planned |
-| **M1** Subscriber API | Subject validation, queue groups, graceful unsubscribe | Planned |
-| **M2** Runtime | Long-running `process()` for workers; optional `nats:listen`-style command | Planned |
-| **M2** Runtime | Signal handling (pcntl) notes for Supervisor/systemd | Planned |
-| **M3** Inbound | DTO for consumed messages decoupled from basis `Msg` | Planned |
-| **M3** Inbound | Optional v2 envelope decode on consume | Planned |
-| **M4** DX | Opt-in Laravel events on inbound; config subject → event mapping | Planned |
-| **M4** DX | Inbound middleware stack (logging, decode, exceptions) | Planned |
-| **M5** Defaults | Subject conventions + optional validation warn-only | Planned |
-| **M6** Observability | Structured log channel on connect/subscribe/error | Planned |
+| **M1** Subscriber API | `NatsSubscriberContract` + `NatsBasisSubscriber` wrapping `Basis\Nats\Client::subscribe` / `subscribeQueue` | Completed |
+| **M1** Subscriber API | Subject validation, queue groups, unsubscribe by id / `unsubscribeAll` | Completed |
+| **M2** Runtime | Long-running `process()`; `nats:v2:listen` Artisan command | Completed |
+| **M2** Runtime | Signal handling (pcntl) in `nats:v2:listen` + docs | Completed |
+| **M3** Inbound | `InboundMessage` DTO decoupled from basis `Msg` | Completed |
+| **M3** Inbound | Optional v2 envelope decode via `InboundMessage::envelopePayload()` | Completed |
+| **M4** DX | Opt-in `NatsInboundMessageReceived` event; middleware class list in config | Completed |
+| **M4** DX | Inbound middleware pipeline (`InboundMiddleware`, `LogInboundMiddleware`) | Completed |
+| **M5** Defaults | Subject max length; optional warn flag (reserved) | Completed |
+| **M6** Observability | Optional `LogInboundMiddleware` for debug traces | Completed |
 | **M6** Observability | Request-ID / correlation header convention | Planned |
-| **M7** Migration | Doc: map v1 consumers to v2.1 subscriber API | Planned |
+| **M7** Migration | Docs: [MIGRATION.md](v2/MIGRATION.md), [SUBSCRIBER.md](v2/SUBSCRIBER.md) | Completed |
 
 ---
 
-## Version v2.2 — JetStream support
+## Version v2.2 - JetStream support
 
-**Goals:** Streams, consumers, publish/consume via `basis-company/nats` — **before** the Laravel queue driver.
+**Goals:** Streams, consumers, publish/consume via `basis-company/nats` - **before** the Laravel queue driver.
 
 | Area | Deliverable | Status |
 |------|-------------|--------|
@@ -73,7 +73,7 @@
 
 ---
 
-## Version v2.3 — Queue driver + DLQ
+## Version v2.3 - Queue driver + DLQ
 
 **Goals:** Laravel `nats` queue on the basis client **after** JetStream (v2.2). Retry, DLQ, failed-job handling in this release.
 
@@ -94,7 +94,7 @@
 
 ---
 
-## Version v2.4 — Idempotency
+## Version v2.4 - Idempotency
 
 | Area | Deliverable | Status |
 |------|-------------|--------|
@@ -105,7 +105,7 @@
 
 ---
 
-## Version v2.5 — Observability
+## Version v2.5 - Observability
 
 | Area | Deliverable | Status |
 |------|-------------|--------|
@@ -115,7 +115,7 @@
 
 ---
 
-## Version v2.6 — Security & config hardening
+## Version v2.6 - Security & config hardening
 
 | Area | Deliverable | Status |
 |------|-------------|--------|
@@ -126,7 +126,7 @@
 
 ---
 
-## Version v2.7 — Advanced features
+## Version v2.7 - Advanced features
 
 | Area | Deliverable | Status |
 |------|-------------|--------|
@@ -141,7 +141,7 @@
 | Version | Focus | Status |
 |---------|--------|--------|
 | v2.0 | Foundation, wrapper on basis client, publisher, envelope, `NatsV2`, migration docs | Completed |
-| v2.1 | Subscribers, runtime, inbound DTOs, DX, defaults, baseline logging | Planned |
+| v2.1 | Subscribers, `InboundMessage`, `nats:v2:listen`, middleware, events | Completed |
 | v2.2 | JetStream on basis client | Planned |
 | v2.3 | Queue driver + DLQ + retry/backoff | Planned |
 | v2.4 | Idempotency | Planned |
@@ -151,6 +151,6 @@
 
 ---
 
-*Document version: 1.2 — tabular status; wrapper framing.*
+*Document version: 1.3 - tabular status; v2.1 subscriber completed.*
 
-**User docs:** [docs/v2/README.md](v2/README.md) · [GUIDE](v2/GUIDE.md) · [MIGRATION](v2/MIGRATION.md)
+**User docs:** [docs/v2/README.md](v2/README.md) · [GUIDE](v2/GUIDE.md) · [SUBSCRIBER](v2/SUBSCRIBER.md) · [MIGRATION](v2/MIGRATION.md)

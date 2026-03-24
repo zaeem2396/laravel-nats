@@ -8,7 +8,7 @@
 
 A native NATS integration for Laravel that feels like home. Publish, subscribe, and request/reply with a familiar, expressive API.
 
-> **v2:** Built as a Laravel **wrapper** on [basis-company/nats](https://github.com/basis-company/nats.php) (`NatsV2`, envelope publish). **Docs:** [Guide](docs/v2/GUIDE.md) · [FAQ](docs/v2/FAQ.md) · [Migration](docs/v2/MIGRATION.md). The **legacy** `Nats` facade API for subscribe, queue, and JetStream is documented in this README.
+> **v2:** Built as a Laravel **wrapper** on [basis-company/nats](https://github.com/basis-company/nats.php) (`NatsV2`, publish + subscribe). **Docs:** [Guide](docs/v2/GUIDE.md) · [Subscriber v2.1](docs/v2/SUBSCRIBER.md) · [FAQ](docs/v2/FAQ.md) · [Migration](docs/v2/MIGRATION.md). The **legacy** `Nats` facade API for subscribe, queue, and JetStream is also documented in this README.
 
 ## Requirements
 
@@ -52,7 +52,7 @@ v2.0 adds a **Laravel wrapper** on **basis-company/nats**: configuration, `NatsV
 use LaravelNats\Laravel\Facades\NatsV2;
 
 NatsV2::publish('orders.created', ['order_id' => 123], ['X-Request-Id' => 'abc']);
-// Underlying: Basis\Nats\Client — use NatsV2::connection() for advanced APIs.
+// Underlying: Basis\Nats\Client - use NatsV2::connection() for advanced APIs.
 ```
 
 ### Multiple Connections
@@ -303,7 +303,7 @@ When delayed is enabled, the connector automatically ensures the JetStream delay
 You can use either Laravel's standard `queue:work` or the package's dedicated **`nats:work`** command (Phase 4.1), which defaults to the NATS connection and supports a PID file for process management:
 
 ```bash
-# Dedicated NATS worker (Phase 4.1) — defaults to connection "nats", queue "default"
+# Dedicated NATS worker (Phase 4.1) - defaults to connection "nats", queue "default"
 php artisan nats:work
 
 # With PID file for process managers (Supervisor, systemd)
@@ -652,7 +652,7 @@ if ($msg instanceof JetStreamConsumedMessage) {
 
 ### Artisan Commands (JetStream and Worker)
 
-**Subject-based consumer (Phase 4.2 — Subject-Based Consumer):**
+**Subject-based consumer (Phase 4.2 - Subject-Based Consumer):**
 
 ```bash
 php artisan nats:consume {subject} [--connection=] [--queue=] [--handler=] [--subjects=]

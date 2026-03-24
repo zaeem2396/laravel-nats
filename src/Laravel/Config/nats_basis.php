@@ -45,6 +45,26 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Subscriber (v2.1) - Laravel wrapper around Basis\Nats\Client::subscribe
+    |--------------------------------------------------------------------------
+    |
+    | - middleware: list of class names implementing InboundMiddleware (container-resolved)
+    | - dispatch_events: fire NatsInboundMessageReceived before your handler
+    | - decode_envelope: reserved; use InboundMessage::envelopePayload() when needed
+    |
+    */
+    'subscriber' => [
+        'subject_max_length' => (int) env('NATS_SUBJECT_MAX_LENGTH', 512),
+        'warn_on_unconventional_subject' => filter_var(env('NATS_SUBJECT_WARN_UNCONVENTIONAL', false), FILTER_VALIDATE_BOOL),
+        'decode_envelope' => filter_var(env('NATS_SUBSCRIBER_DECODE_ENVELOPE', false), FILTER_VALIDATE_BOOL),
+        'dispatch_events' => filter_var(env('NATS_SUBSCRIBER_DISPATCH_EVENTS', false), FILTER_VALIDATE_BOOL),
+        'middleware' => [
+            // LaravelNats\Subscriber\Middleware\LogInboundMiddleware::class,
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Connections
     |--------------------------------------------------------------------------
     |
