@@ -9,6 +9,8 @@ See `nats_basis.subscriber` in `config/nats_basis.php` (merged from the package;
 | Key | Purpose |
 |-----|---------|
 | `subject_max_length` | Reject subscription subjects longer than this (default 512). |
+| `warn_on_unconventional_subject` | When `true`, may warn on unusual subject patterns (off by default). |
+| `decode_envelope` | Reserved; use `InboundMessage::envelopePayload()` instead. |
 | `dispatch_events` | When `true`, dispatches `LaravelNats\Laravel\Events\NatsInboundMessageReceived` before your handler. |
 | `middleware` | List of `InboundMiddleware` class names (resolved from the container). |
 

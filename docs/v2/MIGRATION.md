@@ -14,7 +14,8 @@ New code can use **`NatsV2::subscribe`** (basis client) with **`InboundMessage`*
 |------|--------|
 | **Soft deprecation** | `Nats`, `NatsManager`, and `Core\Client` are tagged `@deprecated` for **new** integrations as of **2.0.0**. |
 | **Publish** | Prefer **`NatsV2::publish`** (JSON envelope + [basis-company/nats](https://github.com/basis-company/nats.php)). |
-| **Subscribe / request / queue / JetStream** | Keep using **`Nats`** until **v2.2+** documents parity on the basis client. |
+| **Subscribe (basis client)** | Prefer **`NatsV2::subscribe`** + **`process()`** / **`nats:v2:listen`** since **2.1.0** ([SUBSCRIBER.md](SUBSCRIBER.md)). Legacy **`Nats::subscribe`** remains supported. |
+| **Request/reply, queue, JetStream** | Legacy **`Nats`** until **v2.2+** documents basis-client parity for those areas. |
 | **Minors** | **No silent removals** in v2.x minors. Removals only in a **future major** after parity and notice. |
 
 ## Config mapping: `config/nats.php` ↔ `config/nats_basis.php`
@@ -43,7 +44,8 @@ Both are merged when the package boots; run `php artisan vendor:publish --tag=na
 | Publish (envelope) | - | `NatsV2::publish($subject, $payload, $headers = [], $connection = null)` |
 | Publish (raw JSON body) | `Nats::publish(...)` | Migrate consumers, then switch to `NatsV2` |
 | Low-level client | `Nats::connection()` → `LaravelNats\Core\Client` | `NatsV2::connection()` → `Basis\Nats\Client` |
-| Subscribe, request/reply, queue, JetStream | `Nats::…` | Unchanged until v2.2+ |
+| Subscribe (basis stack) | `Nats::subscribe` + `MessageInterface` | **`NatsV2::subscribe`** + **`InboundMessage`** + **`process()`** / **`nats:v2:listen`** (2.1+) |
+| Request/reply, queue, JetStream | `Nats::…` | Unchanged on legacy until v2.2+ |
 
 ## `LaravelNats\Core\Client`
 
@@ -68,9 +70,10 @@ Consumers should read application data from **`data`**. Roll back publishers to 
 - [ ] Legacy **queue** / **JetStream** paths still pass your smoke tests if you use them.
 - [ ] `composer analyse` and test suite green in CI.
 
-### v2.1 (planned - subscriber on basis)
+### v2.1 (subscriber on basis)
 
-- [ ] Revisit subscribe / long-running consumers when the subscriber wrapper lands.
+- [ ] `NatsV2::subscribe` + `process()` or `nats:v2:listen` receives messages; handlers get `InboundMessage`.
+- [ ] Optional: `nats_basis.subscriber` (middleware, events) behaves as documented in [SUBSCRIBER.md](SUBSCRIBER.md).
 
 ### v2.2+ (planned - JetStream / queue on basis)
 
