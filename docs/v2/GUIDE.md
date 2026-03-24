@@ -15,7 +15,7 @@ The v2 stack is a **Laravel wrapper** around [basis-company/nats](https://packag
 7. Dual stack
 8. Testing
 9. Migration strategy
-10. Subscribe (v2.1)
+10. Subscribe (NatsV2)
 
 ## Config
 
@@ -68,7 +68,7 @@ Legacy publish = raw JSON body; v2 = envelope. Migrate per subject.
 
 ## Migration strategy
 
-Legacy **`Nats`** / **`NatsManager`** / **`Core\Client`** are **soft-deprecated** for new work as of 2.0.0; **`NatsV2`** is the supported path for new **publish** and (since **2.1.0**) new **subscribe** code on the basis client. **Queue** and **JetStream** stay on the legacy facade until **v2.2+**. **No silent removals** in v2.x minors.
+Legacy **`Nats`** / **`NatsManager`** / **`Core\Client`** are **soft-deprecated** for new work as of **1.3.0**; **`NatsV2`** is the supported path for new **publish** and **subscribe** code on the basis client. **Queue** and **JetStream** stay on the legacy facade until a **future parity** release. **No silent removals** in upcoming minor releases.
 
 **Full policy, config mapping (`nats.php` ↔ `nats_basis.php`), facade table, and per-minor testing checklist:** [MIGRATION.md](MIGRATION.md).
 
@@ -76,13 +76,13 @@ Legacy **`Nats`** / **`NatsManager`** / **`Core\Client`** are **soft-deprecated*
 
 Unit tests for envelope and provider; CI uses Docker NATS.
 
-## Subscribe (v2.1)
+## Subscribe (NatsV2)
 
 `NatsV2::subscribe($subject, callable(InboundMessage): void, $queueGroup = null, $connection = null)` wraps `Basis\Nats\Client` subscribe / subscribeQueue. You must call `NatsV2::process($connection, $timeout)` in a loop (or use `php artisan nats:v2:listen`). Full reference: [SUBSCRIBER.md](SUBSCRIBER.md).
 
 ## See also
 
-[Migration](MIGRATION.md) - [Subscriber (v2.1)](SUBSCRIBER.md)
+[Migration](MIGRATION.md) - [Subscriber](SUBSCRIBER.md)
 
 ### Security
 
