@@ -15,6 +15,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - (none)
 
+## [1.4.0] - 2026-03-24
+
+### Added
+
+- **NatsV2 JetStream (basis-company/nats):** `BasisJetStreamManager`, `BasisJetStreamPublisher`, `PullConsumerBatch`, `BasisStreamProvisioner`; `NatsV2::jetstream()`, `jetStreamPublish()`, `jetStreamPull()`, `jetStreamProvisionPreset()`; `nats_basis.jetstream` config (pull defaults, named presets); Artisan `nats:v2:jetstream:info`, `streams`, `pull`, `provision`. See [docs/v2/JETSTREAM.md](docs/v2/JETSTREAM.md).
+
 ## [1.3.0] - 2026-03-24
 
 ### Added
@@ -211,6 +217,20 @@ Patch release: Phase 4 Worker & Runtime (nats:work, nats:consume).
 
 Run `composer update zaeem2396/laravel-nats` to upgrade.
 
+### From 1.3.0 to 1.4.0
+
+- **JetStream on NatsV2:** See [docs/v2/JETSTREAM.md](docs/v2/JETSTREAM.md) and optional **`nats_basis.jetstream.presets`**. Legacy **`Nats::jetstream()`** is unchanged.
+
+```json
+{
+    "require": {
+        "zaeem2396/laravel-nats": "^1.4"
+    }
+}
+```
+
+Run `composer update zaeem2396/laravel-nats` to upgrade.
+
 ### From 1.0.0 to 1.1.0
 
 - **PHP:** Minimum PHP is now 8.2 (was 8.1). Ensure your environment meets this requirement.
@@ -245,7 +265,8 @@ Run `composer update zaeem2396/laravel-nats` to upgrade.
 
 ---
 
-[Unreleased]: https://github.com/zaeem2396/laravel-nats/compare/v1.3.0...HEAD
+[Unreleased]: https://github.com/zaeem2396/laravel-nats/compare/v1.4.0...HEAD
+[1.4.0]: https://github.com/zaeem2396/laravel-nats/compare/v1.3.0...v1.4.0
 [1.3.0]: https://github.com/zaeem2396/laravel-nats/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/zaeem2396/laravel-nats/compare/v1.1.1...v1.2.0
 [1.1.1]: https://github.com/zaeem2396/laravel-nats/compare/v1.1.0...v1.1.1
