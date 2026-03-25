@@ -9,6 +9,8 @@ use LaravelNats\Laravel\Facades\NatsV2;
 
 /**
  * Lists JetStream stream names via basis Api::getStreamNames().
+ *
+ * @see docs/v2/JETSTREAM.md
  */
 final class NatsV2JetStreamStreamsCommand extends Command
 {
