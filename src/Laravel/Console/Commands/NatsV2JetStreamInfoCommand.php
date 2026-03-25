@@ -9,6 +9,9 @@ use LaravelNats\Laravel\Facades\NatsV2;
 
 /**
  * JetStream account summary via basis client ($JS.API.INFO).
+ *
+ * @see \LaravelNats\Laravel\NatsV2Gateway::jetstream()
+ * @see docs/v2/JETSTREAM.md
  */
 final class NatsV2JetStreamInfoCommand extends Command
 {
