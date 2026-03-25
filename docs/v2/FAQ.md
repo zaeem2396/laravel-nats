@@ -4,6 +4,8 @@
 
 **NatsV2 subscribe (1.3.0+)?** Use `NatsV2::subscribe` with `InboundMessage` and a `process()` loop, or `php artisan nats:v2:listen`. See [SUBSCRIBER](SUBSCRIBER.md). Legacy `Nats::subscribe` remains available.
 
+**Correlation / Request-ID on messages?** See [CORRELATION.md](CORRELATION.md) (`X-Request-Id`, `Nats-Correlation-Id`, optional publish injection).
+
 **Why @deprecated on `Nats`?** Soft deprecation only: new **publish** code should use `NatsV2`. For **new** subscribe code on the basis stack, prefer `NatsV2::subscribe`. Queue and JetStream on legacy remain until parity. Details in [MIGRATION](MIGRATION.md).
 
 **Mix facades?** Yes, per subject or service boundary.

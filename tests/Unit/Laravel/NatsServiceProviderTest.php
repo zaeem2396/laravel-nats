@@ -100,3 +100,11 @@ it('merges nats_basis.jetstream defaults from package', function (): void {
     expect($config->get('nats_basis.jetstream.pull.default_batch'))->toBeInt()
         ->and($config->get('nats_basis.jetstream.presets.example_events.name'))->toBe('EXAMPLE_EVENTS');
 });
+
+it('merges nats_basis.correlation defaults from package', function (): void {
+    $config = $this->app->make('config');
+
+    expect($config->get('nats_basis.correlation.inject_on_publish'))->toBeFalse()
+        ->and($config->get('nats_basis.correlation.request_id_header'))->toBe('X-Request-Id')
+        ->and($config->get('nats_basis.correlation.correlation_id_header'))->toBe('Nats-Correlation-Id');
+});

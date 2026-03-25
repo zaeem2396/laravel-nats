@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - **NatsV2 JetStream (basis-company/nats):** `BasisJetStreamManager`, `BasisJetStreamPublisher`, `PullConsumerBatch`, `BasisStreamProvisioner`; `NatsV2::jetstream()`, `jetStreamPublish()`, `jetStreamPull()`, `jetStreamProvisionPreset()`; `nats_basis.jetstream` config (pull defaults, named presets); Artisan `nats:v2:jetstream:info`, `streams`, `pull`, `provision`. See [docs/v2/JETSTREAM.md](docs/v2/JETSTREAM.md).
+- **Request-ID / correlation headers:** `CorrelationHeaders`, optional HTTP-to-publish injection (`nats_basis.correlation`), `InboundMessage::requestId()` / `correlationId()`, optional `CorrelationLogInboundMiddleware`. See [docs/v2/CORRELATION.md](docs/v2/CORRELATION.md).
 
 ## [1.3.0] - 2026-03-24
 

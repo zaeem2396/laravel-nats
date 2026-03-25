@@ -36,7 +36,7 @@ NatsV2::jetStreamPublish(
 );
 ```
 
-**Headers:** The basis JetStream publish path in this package is body-focused today. For **HPUB** headers (including correlation IDs), use **`NatsV2::publish`** to the same subject, or embed trace metadata in **`data`**.
+**Headers:** The basis JetStream publish path in this package is body-focused today. For **HPUB** headers (including correlation IDs), use **`NatsV2::publish`** to the same subject, or embed trace metadata in **`data`**. See [CORRELATION.md](CORRELATION.md).
 
 ### Pull consumers
 

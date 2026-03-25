@@ -35,6 +35,7 @@ final class PullConsumerBatch
         $consumer->setExpires($expiresSeconds > 0 ? $expiresSeconds : 0.1);
 
         $queue = $consumer->getQueue();
+
         try {
             /** @var list<Msg> $messages */
             $messages = $queue->fetchAll($batch);

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace LaravelNats\Subscriber;
 
 use Basis\Nats\Message\Payload;
+use LaravelNats\Support\CorrelationHeaders;
 
 /**
  * Inbound NATS message for the v2 subscriber stack (decoupled from basis {@see Payload}).
@@ -68,5 +69,37 @@ final class InboundMessage
 
         /** @var array{id: string, type: string, version: string, data: mixed} */
         return $d;
+    }
+
+    /**
+     * First matching header (case-insensitive) for the configured request id name.
+     */
+    public function requestId(?string $headerName = null): ?string
+    {
+        return $this->headerIgnoringCase($headerName ?? CorrelationHeaders::DEFAULT_REQUEST_ID);
+    }
+
+    /**
+     * First matching header (case-insensitive) for the configured correlation id name.
+     */
+    public function correlationId(?string $headerName = null): ?string
+    {
+        return $this->headerIgnoringCase($headerName ?? CorrelationHeaders::DEFAULT_CORRELATION_ID);
+    }
+
+    private function headerIgnoringCase(string $name): ?string
+    {
+        foreach ($this->headers as $key => $value) {
+            if (strcasecmp((string) $key, $name) !== 0) {
+                continue;
+            }
+            if (! is_string($value) || $value === '') {
+                return null;
+            }
+
+            return $value;
+        }
+
+        return null;
     }
 }

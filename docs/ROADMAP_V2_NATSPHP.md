@@ -52,7 +52,7 @@
 | **M4** DX | Inbound middleware pipeline (`InboundMiddleware`, `LogInboundMiddleware`) | Completed |
 | **M5** Defaults | Subject max length; optional warn flag (reserved) | Completed |
 | **M6** Observability | Optional `LogInboundMiddleware` for debug traces | Completed |
-| **M6** Observability | Request-ID / correlation header convention | Planned |
+| **M6** Observability | Request-ID / correlation header convention | Completed |
 | **M7** Migration | Docs: [MIGRATION.md](v2/MIGRATION.md), [SUBSCRIBER.md](v2/SUBSCRIBER.md) | Completed |
 
 ---
@@ -153,4 +153,4 @@
 
 *Document version: 1.4 - tabular status; v2.2 JetStream on basis client completed.*
 
-**User docs:** [docs/v2/README.md](v2/README.md) · [GUIDE](v2/GUIDE.md) · [SUBSCRIBER](v2/SUBSCRIBER.md) · [JETSTREAM](v2/JETSTREAM.md) · [MIGRATION](v2/MIGRATION.md)
+**User docs:** [docs/v2/README.md](v2/README.md) · [GUIDE](v2/GUIDE.md) · [SUBSCRIBER](v2/SUBSCRIBER.md) · [JETSTREAM](v2/JETSTREAM.md) · [CORRELATION](v2/CORRELATION.md) · [MIGRATION](v2/MIGRATION.md)

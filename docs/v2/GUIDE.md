@@ -54,7 +54,7 @@ Configure `nats_basis.connections.{name}`.
 
 ## Headers
 
-String values; sent as HPUB when non-empty.
+String values; sent as HPUB when non-empty. **Request-ID / correlation:** [CORRELATION.md](CORRELATION.md).
 
 ## Errors
 

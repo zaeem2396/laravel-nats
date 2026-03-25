@@ -38,7 +38,7 @@ final class NatsV2JetStreamProvisionCommand extends Command
 
         try {
             $stream = NatsV2::jetStreamProvisionPreset($preset, $createIfNotExists, $conn);
-            $this->info('Stream ['.$stream->getName().'] provisioned.');
+            $this->info('Stream [' . $stream->getName() . '] provisioned.');
 
             return self::SUCCESS;
         } catch (\Throwable $e) {

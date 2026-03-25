@@ -5,5 +5,6 @@ The **NatsV2** stack (package **1.3.0+** for pub/sub; **1.4.0+** for basis JetSt
 - [Guide](GUIDE.md)
 - [Subscriber](SUBSCRIBER.md)
 - [JetStream (NatsV2)](JETSTREAM.md)
+- [Correlation headers](CORRELATION.md)
 - [Migration & upgrade strategy](MIGRATION.md)
 - [FAQ](FAQ.md)
