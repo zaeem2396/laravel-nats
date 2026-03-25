@@ -9,6 +9,9 @@ use LaravelNats\Laravel\Facades\NatsV2;
 
 /**
  * One-shot pull consumer fetch (prints message bodies, acks each).
+ *
+ * @see \LaravelNats\Laravel\NatsV2Gateway::jetStreamPull()
+ * @see docs/v2/JETSTREAM.md
  */
 final class NatsV2JetStreamPullCommand extends Command
 {
