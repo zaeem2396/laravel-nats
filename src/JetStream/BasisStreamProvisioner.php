@@ -22,18 +22,19 @@ final class BasisStreamProvisioner
     ) {
     }
 
-    /**
-     * @param non-empty-string $presetKey Key under nats_basis.jetstream.presets
-     */
     public function provision(string $presetKey, bool $createIfNotExists = true, ?string $connection = null): Stream
     {
-        /** @var array<string, array<string, mixed>> $presets */
+        if ($presetKey === '') {
+            throw new InvalidArgumentException('JetStream preset key must be non-empty.');
+        }
+
+        /** @var array<string, mixed> $presets */
         $presets = $this->config->get('nats_basis.jetstream.presets', []);
-        if (! isset($presets[$presetKey]) || ! is_array($presets[$presetKey])) {
+        $def = $presets[$presetKey] ?? null;
+        if (! is_array($def)) {
             throw new InvalidArgumentException("Unknown JetStream preset \"{$presetKey}\".");
         }
 
-        $def = $presets[$presetKey];
         $name = isset($def['name']) && is_string($def['name']) && $def['name'] !== '' ? $def['name'] : $presetKey;
         $subjects = $def['subjects'] ?? [];
         if (! is_array($subjects) || $subjects === []) {

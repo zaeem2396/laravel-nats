@@ -8,6 +8,7 @@ use Basis\Nats\Client;
 use Basis\Nats\Message\Msg;
 use Basis\Nats\Stream\Stream;
 use Illuminate\Contracts\Config\Repository;
+use InvalidArgumentException;
 use LaravelNats\Connection\ConnectionManager;
 use LaravelNats\JetStream\BasisJetStreamManager;
 use LaravelNats\JetStream\BasisJetStreamPublisher;
@@ -151,6 +152,10 @@ final class NatsV2Gateway
         bool $createIfNotExists = true,
         ?string $connection = null,
     ): Stream {
+        if ($presetKey === '') {
+            throw new InvalidArgumentException('JetStream preset key must be non-empty.');
+        }
+
         return $this->streamProvisioner->provision($presetKey, $createIfNotExists, $connection);
     }
 }

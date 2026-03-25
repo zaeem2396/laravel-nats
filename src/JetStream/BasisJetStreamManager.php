@@ -40,7 +40,12 @@ final class BasisJetStreamManager
      */
     public function accountInfo(?string $connection = null): object
     {
-        return $this->client($connection)->api('INFO');
+        $result = $this->client($connection)->api('INFO');
+        if ($result === null) {
+            throw new \RuntimeException('JetStream INFO returned no result.');
+        }
+
+        return $result;
     }
 
     /**
@@ -48,8 +53,12 @@ final class BasisJetStreamManager
      */
     public function streamNames(?string $connection = null): array
     {
-        $names = $this->api($connection)->getStreamNames();
+        $raw = $this->api($connection)->getStreamNames();
+        if (! is_array($raw)) {
+            return [];
+        }
 
-        return is_array($names) ? array_values($names) : [];
+        /** @var list<string> */
+        return array_values($raw);
     }
 }
