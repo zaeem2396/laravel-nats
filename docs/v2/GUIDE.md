@@ -16,6 +16,7 @@ The v2 stack is a **Laravel wrapper** around [basis-company/nats](https://packag
 8. Testing
 9. Migration strategy
 10. Subscribe (NatsV2)
+11. JetStream (NatsV2)
 
 ## Config
 
@@ -27,6 +28,7 @@ The v2 stack is a **Laravel wrapper** around [basis-company/nats](https://packag
 | `NATS_ENVELOPE_VERSION` | Envelope `version` field |
 | `NATS_BASIS_LOGGING` | When `true`, pass Laravel’s log channel to `Basis\Nats\Client` (wire-level traces from the dependency) |
 | `NATS_BASIS_LOG_CHANNEL` | Laravel channel name (default `stack`) when logging is enabled |
+| `NATS_V2_JS_PULL_BATCH` / `NATS_V2_JS_PULL_EXPIRES` | Defaults for `NatsV2::jetStreamPull()` (see [JETSTREAM.md](JETSTREAM.md)) |
 
 TLS file paths: `NATS_TLS_KEY`, `NATS_TLS_CERT`, `NATS_TLS_CA`.
 
@@ -68,7 +70,7 @@ Legacy publish = raw JSON body; v2 = envelope. Migrate per subject.
 
 ## Migration strategy
 
-Legacy **`Nats`** / **`NatsManager`** / **`Core\Client`** are **soft-deprecated** for new work as of **1.3.0**; **`NatsV2`** is the supported path for new **publish** and **subscribe** code on the basis client. **Queue** and **JetStream** stay on the legacy facade until a **future parity** release. **No silent removals** in upcoming minor releases.
+Legacy **`Nats`** / **`NatsManager`** / **`Core\Client`** are **soft-deprecated** for new work as of **1.3.0**; **`NatsV2`** is the supported path for new **publish** and **subscribe** code on the basis client. **JetStream** on the basis client is available from **1.4.0+** ([JETSTREAM.md](JETSTREAM.md)); the legacy **`Nats::jetstream()`** API remains for existing apps. **Queue** stays on the legacy stack until a **future parity** release. **No silent removals** in upcoming minor releases.
 
 **Full policy, config mapping (`nats.php` ↔ `nats_basis.php`), facade table, and per-minor testing checklist:** [MIGRATION.md](MIGRATION.md).
 
@@ -80,9 +82,13 @@ Unit tests for envelope and provider; CI uses Docker NATS.
 
 `NatsV2::subscribe($subject, callable(InboundMessage): void, $queueGroup = null, $connection = null)` wraps `Basis\Nats\Client` subscribe / subscribeQueue. You must call `NatsV2::process($connection, $timeout)` in a loop (or use `php artisan nats:v2:listen`). Full reference: [SUBSCRIBER.md](SUBSCRIBER.md).
 
+## JetStream (NatsV2)
+
+From **package 1.4.0+**, use **`NatsV2::jetstream()`** for **`Basis\Nats\Api`**, **`jetStreamPublish`**, **`jetStreamPull`**, presets, and **`nats:v2:jetstream:*`** commands. Full reference: [JETSTREAM.md](JETSTREAM.md).
+
 ## See also
 
-[Migration](MIGRATION.md) - [Subscriber](SUBSCRIBER.md)
+[Migration](MIGRATION.md) - [Subscriber](SUBSCRIBER.md) - [JetStream](JETSTREAM.md)
 
 ### Security
 
