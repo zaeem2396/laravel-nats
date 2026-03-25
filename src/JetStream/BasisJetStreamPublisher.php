@@ -6,6 +6,7 @@ namespace LaravelNats\JetStream;
 
 use Illuminate\Contracts\Config\Repository;
 use JsonException;
+use LaravelNats\Connection\ConnectionManager;
 use LaravelNats\Exceptions\PublishException;
 use LaravelNats\Support\MessageEnvelope;
 
@@ -15,7 +16,7 @@ use LaravelNats\Support\MessageEnvelope;
 final class BasisJetStreamPublisher
 {
     public function __construct(
-        private readonly BasisJetStreamManager $jetstream,
+        private readonly ConnectionManager $connections,
         private readonly Repository $config,
     ) {
     }
@@ -38,7 +39,8 @@ final class BasisJetStreamPublisher
         unset($headers);
 
         try {
-            $stream = $this->jetstream->stream($streamName, $connection);
+            $manager = new BasisJetStreamManager($this->connections, $connection);
+            $stream = $manager->stream($streamName, $connection);
             if ($useEnvelope) {
                 $version = (string) $this->config->get('nats_basis.envelope_version', 'v1');
                 $envelope = MessageEnvelope::create($subject, $payload, $version);

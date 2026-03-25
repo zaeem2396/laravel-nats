@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace LaravelNats\JetStream;
 
 use Basis\Nats\Message\Msg;
+use LaravelNats\Connection\ConnectionManager;
 
 /**
  * One-shot pull fetch aligned with basis {@see \Basis\Nats\Consumer\Consumer::getQueue}.
@@ -12,7 +13,7 @@ use Basis\Nats\Message\Msg;
 final class PullConsumerBatch
 {
     public function __construct(
-        private readonly BasisJetStreamManager $jetstream,
+        private readonly ConnectionManager $connections,
     ) {
     }
 
@@ -26,8 +27,9 @@ final class PullConsumerBatch
         float $expiresSeconds = 0.5,
         ?string $connection = null,
     ): array {
-        $client = $this->jetstream->client($connection);
-        $consumer = $this->jetstream->stream($stream, $connection)->getConsumer($consumerName);
+        $manager = new BasisJetStreamManager($this->connections, $connection);
+        $client = $manager->client($connection);
+        $consumer = $manager->stream($stream, $connection)->getConsumer($consumerName);
         $consumer->create();
         $consumer->setBatching(max(1, $batch));
         $consumer->setExpires($expiresSeconds > 0 ? $expiresSeconds : 0.1);
