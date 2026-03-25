@@ -93,3 +93,10 @@ it('merges nats_basis config from package', function (): void {
     expect($config->get('nats_basis.default'))->toBe('default')
         ->and($config->get('nats_basis.connections.default.host'))->not->toBeNull();
 });
+
+it('merges nats_basis.jetstream defaults from package', function (): void {
+    $config = $this->app->make('config');
+
+    expect($config->get('nats_basis.jetstream.pull.default_batch'))->toBeInt()
+        ->and($config->get('nats_basis.jetstream.presets.example_events.name'))->toBe('EXAMPLE_EVENTS');
+});
