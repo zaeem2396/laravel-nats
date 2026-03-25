@@ -6,7 +6,7 @@ JetStream on the **v2 stack** uses **`Basis\Nats\Api`**, **`Stream`**, and **`Co
 
 ## Prerequisites
 
-- NATS Server with JetStream enabled, e.g. `nats:2.10 --jetstream`.
+- NATS Server with JetStream enabled, e.g. `docker run ... nats:2.10 --jetstream` (see server docs for your environment).
 - **`config/nats_basis.php`** merged (publish with `php artisan vendor:publish --tag=nats-config`).
 
 ## API overview
