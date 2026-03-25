@@ -153,4 +153,4 @@
 
 *Document version: 1.4 - tabular status; v2.2 JetStream on basis client completed.*
 
-**User docs:** [docs/v2/README.md](v2/README.md) · [GUIDE](v2/GUIDE.md) · [SUBSCRIBER](v2/SUBSCRIBER.md) · [MIGRATION](v2/MIGRATION.md)
+**User docs:** [docs/v2/README.md](v2/README.md) · [GUIDE](v2/GUIDE.md) · [SUBSCRIBER](v2/SUBSCRIBER.md) · [JETSTREAM](v2/JETSTREAM.md) · [MIGRATION](v2/MIGRATION.md)
