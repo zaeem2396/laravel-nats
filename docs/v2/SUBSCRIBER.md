@@ -4,7 +4,7 @@ The subscriber API (package **1.3.0+**) is a **Laravel wrapper** around `Basis\N
 
 ## Configuration
 
-See `nats_basis.subscriber` in `config/nats_basis.php` (merged from the package; publish with `php artisan vendor:publish --tag=nats-config`).
+See `nats_basis.subscriber` in `config/nats_basis.php` (merged from the package; publish with `php artisan vendor:publish --tag=nats-config`). For **persisted / replayable** workloads, consider **JetStream** via [JETSTREAM.md](JETSTREAM.md).
 
 | Key | Purpose |
 |-----|---------|
