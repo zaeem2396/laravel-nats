@@ -9,6 +9,9 @@ use LaravelNats\Laravel\Facades\NatsV2;
 
 /**
  * Creates a stream from a named preset in config/nats_basis.php (jetstream.presets).
+ *
+ * @see \LaravelNats\JetStream\BasisStreamProvisioner
+ * @see docs/v2/JETSTREAM.md
  */
 final class NatsV2JetStreamProvisionCommand extends Command
 {
