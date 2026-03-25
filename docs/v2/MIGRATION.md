@@ -72,9 +72,15 @@ Consumers should read application data from **`data`**. Roll back publishers to 
 - [ ] Optional: `nats_basis.subscriber` (middleware, events) behaves as documented in [SUBSCRIBER.md](SUBSCRIBER.md).
 - [ ] `composer analyse` and test suite green in CI.
 
-### Future parity (JetStream / queue on basis)
+## Testing checklist (1.4.0) - NatsV2 JetStream
 
-- [ ] Re-run integration tests for JetStream and queue when parity is documented.
+- [ ] `php artisan nats:v2:jetstream:info` returns account JSON against a JetStream-enabled server.
+- [ ] `NatsV2::jetStreamPublish` lands messages in a stream that captures the subject (or provision a preset first).
+- [ ] `NatsV2::jetStreamPull` (or the `pull` Artisan command) receives and **acks** messages for a durable consumer.
+
+### Future parity (queue on basis)
+
+- [ ] Re-run integration tests for the **queue driver** when basis parity is documented.
 
 ## See also
 
