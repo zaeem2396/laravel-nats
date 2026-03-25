@@ -142,7 +142,7 @@
 |---------|--------|--------|
 | v2.0 | Foundation, wrapper on basis client, publisher, envelope, `NatsV2`, migration docs | Completed |
 | v2.1 | Subscribers, `InboundMessage`, `nats:v2:listen`, middleware, events | Completed |
-| v2.2 | JetStream on basis client | Planned |
+| v2.2 | JetStream on basis client | Completed |
 | v2.3 | Queue driver + DLQ + retry/backoff | Planned |
 | v2.4 | Idempotency | Planned |
 | v2.5 | Metrics, logging, health | Planned |
@@ -151,6 +151,6 @@
 
 ---
 
-*Document version: 1.3 - tabular status; v2.1 subscriber completed.*
+*Document version: 1.4 - tabular status; v2.2 JetStream on basis client completed.*
 
 **User docs:** [docs/v2/README.md](v2/README.md) · [GUIDE](v2/GUIDE.md) · [SUBSCRIBER](v2/SUBSCRIBER.md) · [MIGRATION](v2/MIGRATION.md)
