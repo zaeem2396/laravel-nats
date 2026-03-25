@@ -5,7 +5,10 @@ declare(strict_types=1);
 namespace LaravelNats\Laravel\Facades;
 
 use Basis\Nats\Client;
+use Basis\Nats\Message\Msg;
+use Basis\Nats\Stream\Stream;
 use Illuminate\Support\Facades\Facade;
+use LaravelNats\JetStream\BasisJetStreamManager;
 
 /**
  * Facade for the v2 NATS stack (basis-company/nats).
@@ -18,6 +21,10 @@ use Illuminate\Support\Facades\Facade;
  * @method static Client connection(string|null $name = null)
  * @method static void disconnect(string|null $name = null)
  * @method static void disconnectAll()
+ * @method static BasisJetStreamManager jetstream(string|null $connection = null)
+ * @method static void jetStreamPublish(string $stream, string $subject, array $payload, bool $useEnvelope = true, bool $waitForAck = true, array $headers = [], string|null $connection = null)
+ * @method static list<Msg> jetStreamPull(string $stream, string $consumer, int|null $batch = null, float|null $expiresSeconds = null, string|null $connection = null)
+ * @method static Stream jetStreamProvisionPreset(string $presetKey, bool $createIfNotExists = true, string|null $connection = null)
  *
  * @see \LaravelNats\Laravel\NatsV2Gateway
  */
