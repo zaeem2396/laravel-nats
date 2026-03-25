@@ -65,6 +65,30 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | JetStream (basis client, NatsV2)
+    |--------------------------------------------------------------------------
+    |
+    | Pull defaults for PullConsumerBatch. Presets are optional named stream
+    | definitions for BasisStreamProvisioner::provision() - see docs/v2/JETSTREAM.md.
+    |
+    */
+    'jetstream' => [
+        'pull' => [
+            'default_batch' => (int) env('NATS_V2_JS_PULL_BATCH', 10),
+            'default_expires' => (float) env('NATS_V2_JS_PULL_EXPIRES', 0.5),
+        ],
+        'presets' => [
+            'example_events' => [
+                'name' => 'EXAMPLE_EVENTS',
+                'subjects' => ['example.events.>'],
+                'storage' => 'file',
+                'retention' => 'limits',
+            ],
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Connections
     |--------------------------------------------------------------------------
     |
