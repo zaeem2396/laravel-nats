@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 use LaravelNats\Connection\ConnectionManager;
 use LaravelNats\Core\Client;
+use LaravelNats\JetStream\BasisJetStreamPublisher;
+use LaravelNats\JetStream\BasisStreamProvisioner;
+use LaravelNats\JetStream\PullConsumerBatch;
 use LaravelNats\Laravel\NatsManager;
 use LaravelNats\Laravel\NatsV2Gateway;
 use LaravelNats\Laravel\Providers\NatsServiceProvider;
@@ -40,6 +43,9 @@ it('provides deferred services', function (): void {
         ->and($provides)->toContain(NatsSubscriberContract::class)
         ->and($provides)->toContain(NatsBasisSubscriber::class)
         ->and($provides)->toContain(SubjectValidator::class)
+        ->and($provides)->toContain(BasisJetStreamPublisher::class)
+        ->and($provides)->toContain(PullConsumerBatch::class)
+        ->and($provides)->toContain(BasisStreamProvisioner::class)
         ->and($provides)->toContain(Client::class);
 });
 
