@@ -10,6 +10,6 @@
 
 **Is the envelope required?** Only if you use `NatsV2::publish`.
 
-**JetStream on NatsV2?** Planned in a future release; legacy `Nats::jetstream()` unchanged.
+**JetStream on NatsV2?** Yes from **1.4.0+**: `NatsV2::jetstream()`, publish/pull helpers, and `nats:v2:jetstream:*` commands ([JETSTREAM.md](JETSTREAM.md)). Legacy `Nats::jetstream()` remains available.
 
 **Overhead?** One JSON encode and UUID per publish; negligible vs network.
