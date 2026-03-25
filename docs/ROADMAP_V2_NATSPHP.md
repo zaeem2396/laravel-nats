@@ -63,13 +63,13 @@
 
 | Area | Deliverable | Status |
 |------|-------------|--------|
-| **M1** Facade layer | `JetStreamManager` (or equivalent) on `Basis\Nats\Api` | Planned |
-| **M1** Facade layer | Stream/consumer config; reuse `ConnectionManager` | Planned |
-| **M2** Publish | JetStream-aware publish; optional v2 envelope | Planned |
-| **M3** Consume | Pull consumer helper; batch fetch aligned with basis client | Planned |
-| **M3** Consume | Artisan commands only where they add value (thin wrappers) | Planned |
-| **M4** Defaults | Starter stream/consumer presets in docs + config | Planned |
-| **M5** Migration | Upgrade guide: v1 JetStream vs v2.2; parity checklist | Planned |
+| **M1** Facade layer | `BasisJetStreamManager` on `Basis\Nats\Api` via `NatsV2::jetstream()` | Completed |
+| **M1** Facade layer | Stream/consumer config; reuse `ConnectionManager` | Completed |
+| **M2** Publish | JetStream-aware publish; optional v2 envelope | Completed |
+| **M3** Consume | Pull consumer helper; batch fetch aligned with basis client | Completed |
+| **M3** Consume | Artisan commands only where they add value (thin wrappers) | Completed |
+| **M4** Defaults | Starter stream/consumer presets in docs + config | Completed |
+| **M5** Migration | Upgrade guide: v1 JetStream vs v2.2; parity checklist | Completed |
 
 ---
 
