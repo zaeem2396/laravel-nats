@@ -25,6 +25,12 @@ function createQueueTestSetup(string $queueName = 'test-queue', int $retryAfter 
 }
 
 describe('NatsQueue', function (): void {
+    beforeEach(function (): void {
+        if (! \LaravelNats\Tests\TestCase::isNatsReachable()) {
+            $this->markTestSkipped('NATS server not available');
+        }
+    });
+
     describe('getQueue', function (): void {
         it('returns the default queue name', function (): void {
             $setup = createQueueTestSetup();
