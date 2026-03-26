@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- (none)
+- **`nats_basis` max in-flight:** optional `max_in_flight` / `NATS_BASIS_QUEUE_MAX_IN_FLIGHT` and `nats_basis.queue.max_in_flight`; `BasisNatsQueue` tracks popped jobs per process and `NatsJob` notifies the queue on delete/release. See [docs/v2/QUEUE.md](docs/v2/QUEUE.md).
 
 ### Removed
 

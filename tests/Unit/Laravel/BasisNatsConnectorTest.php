@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use LaravelNats\Laravel\Queue\BasisNatsConnector;
 use LaravelNats\Laravel\Queue\BasisNatsQueue;
+use ReflectionProperty;
 
 describe('BasisNatsConnector', function (): void {
     it('returns BasisNatsQueue with connection config', function (): void {
@@ -32,5 +33,55 @@ describe('BasisNatsConnector', function (): void {
         ]);
 
         expect($queue->getDeadLetterQueueSubject())->toBe('errors.dlq.all');
+    });
+
+    it('applies max_in_flight from config', function (): void {
+        $connector = new BasisNatsConnector();
+        $queue = $connector->connect([
+            'queue' => 'default',
+            'max_in_flight' => 10,
+        ]);
+
+        expect($queue->getMaxInFlightLimit())->toBe(10);
+    });
+
+    it('treats zero max_in_flight as unlimited', function (): void {
+        $connector = new BasisNatsConnector();
+        $queue = $connector->connect([
+            'queue' => 'default',
+            'max_in_flight' => 0,
+        ]);
+
+        expect($queue->getMaxInFlightLimit())->toBeNull();
+    });
+
+    it('returns null from pop when in-flight cap is already reached', function (): void {
+        $connector = new BasisNatsConnector();
+        $queue = $connector->connect([
+            'queue' => 'q',
+            'max_in_flight' => 1,
+        ]);
+
+        $ref = new ReflectionProperty(BasisNatsQueue::class, 'inFlight');
+        $ref->setAccessible(true);
+        $ref->setValue($queue, 1);
+
+        expect($queue->pop())->toBeNull();
+    });
+
+    it('decrements in-flight via notifyJobHandled', function (): void {
+        $connector = new BasisNatsConnector();
+        $queue = $connector->connect([
+            'queue' => 'q',
+            'max_in_flight' => 5,
+        ]);
+
+        $ref = new ReflectionProperty(BasisNatsQueue::class, 'inFlight');
+        $ref->setAccessible(true);
+        $ref->setValue($queue, 2);
+
+        $queue->notifyJobHandled();
+
+        expect($queue->getInFlightCount())->toBe(1);
     });
 });

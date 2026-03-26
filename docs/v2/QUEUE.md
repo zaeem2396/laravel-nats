@@ -27,6 +27,7 @@ Add (or switch) a connection:
         'block_for' => (float) env('NATS_BASIS_QUEUE_BLOCK_FOR', 0.1),
         'prefix' => env('NATS_BASIS_QUEUE_PREFIX', 'laravel.queue.'),
         'dead_letter_queue' => env('NATS_BASIS_QUEUE_DLQ'), // optional full subject or short name
+        // 'max_in_flight' => (int) env('NATS_BASIS_QUEUE_MAX_IN_FLIGHT', 0), // optional; 0 = unlimited
         // Optional: named basis connection (defaults to nats_basis.default)
         // 'nats_basis_connection' => 'secondary',
     ],
@@ -34,6 +35,10 @@ Add (or switch) a connection:
 ```
 
 Set **`QUEUE_CONNECTION=nats_basis`** (or dispatch to this connection explicitly).
+
+You can set **`max_in_flight`** on the connection (or rely on **`nats_basis.queue.max_in_flight`**). When set to a positive integer, **`pop()`** returns **`null`** while the internal counter is at or above that limit. The counter increments when a message is delivered to a **`NatsJob`** and decrements when the job is **deleted**, **released**, or **failed** (via **`NatsJobQueueBridge::notifyJobHandled()`**).
+
+This is **per PHP worker process**, not cluster-wide. Standard **`queue:work`** runs one job at a time, so a limit greater than **1** only matters if you run custom code that holds multiple jobs without completing them, or future async worker modes. Omit **`max_in_flight`** (or use **0**) for unlimited behaviour.
 
 ### Defaults in `config/nats_basis.php`
 
@@ -45,6 +50,7 @@ The **`queue`** key supplies fallbacks when options are omitted from **`queue.ph
 | `retry_after` | `NATS_BASIS_QUEUE_RETRY_AFTER` | Seconds before a reserved job is released (worker visibility). |
 | `tries` | `NATS_BASIS_QUEUE_TRIES` | Default max attempts when building jobs. |
 | `block_for` | `NATS_BASIS_QUEUE_BLOCK_FOR` | Seconds the driver blocks while draining one message in **`pop()`**. |
+| `max_in_flight` | `NATS_BASIS_QUEUE_MAX_IN_FLIGHT` | Optional cap on jobs popped but not yet finished (delete/release) **per worker process**; see **Configuration** above. |
 
 ## Requirements
 
@@ -92,7 +98,7 @@ stopwaitsecs=3600
 
 - **`later()` / delayed dispatch** are not backed by JetStream on **`nats_basis`**; the driver **pushes immediately** (same pattern as NATS Core on the legacy driver without delayed JetStream).
 - **Queue depth** (`size()`) always returns **0** (NATS Core does not expose a durable depth).
-- **Max in-flight / backpressure** knobs from the roadmap are not implemented yet; treat as a future minor.
+- **Cross-process backpressure** (global cap across all workers) is not built in; use **`max_in_flight`** only for per-process limits or external coordination (e.g. Redis) if you need cluster-wide throttling.
 
 ## See also
 

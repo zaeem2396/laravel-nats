@@ -88,7 +88,7 @@
 | **M3** DLQ | Failed jobs via Laravel defaults | Completed |
 | **M3** DLQ | Documented DLQ convention (subject naming) | Completed |
 | **M4** Retry | Central retry/backoff in config | Completed (`nats_basis.queue` + connection options) |
-| **M4** Backpressure | Light-touch max in-flight (config + counter) | Planned (defer) |
+| **M4** Backpressure | Light-touch max in-flight (config + counter, per worker process) | Completed |
 | **M5** DX | Job serialization contract; helpers for subjects | Completed (legacy JSON documented) |
 | **M5** DX | Job middleware compatibility documented | Completed (same job class as legacy driver) |
 | **M6** Defaults | Retry/backoff stubs; queue subject conventions | Completed |

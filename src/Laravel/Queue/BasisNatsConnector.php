@@ -38,6 +38,8 @@ class BasisNatsConnector implements ConnectorInterface
             $basisConnection = null;
         }
 
+        $maxInFlight = $config['max_in_flight'] ?? $this->readConfig('nats_basis.queue.max_in_flight', null);
+
         return new BasisNatsQueue(
             connections: $manager,
             basisConnectionName: is_string($basisConnection) ? $basisConnection : null,
@@ -47,7 +49,26 @@ class BasisNatsConnector implements ConnectorInterface
             deadLetterQueue: is_string($dlqSubject) ? $dlqSubject : null,
             subjectPrefix: is_string($prefix) ? $prefix : 'laravel.queue.',
             popBlockSeconds: $blockFor,
+            maxInFlight: $this->normalizeMaxInFlight($maxInFlight),
         );
+    }
+
+    /**
+     * @param mixed $value
+     */
+    protected function normalizeMaxInFlight(mixed $value): ?int
+    {
+        if ($value === null || $value === '' || $value === false) {
+            return null;
+        }
+
+        if (! is_numeric($value)) {
+            return null;
+        }
+
+        $n = (int) $value;
+
+        return $n > 0 ? $n : null;
     }
 
     protected function resolveConnectionManager(): ConnectionManager

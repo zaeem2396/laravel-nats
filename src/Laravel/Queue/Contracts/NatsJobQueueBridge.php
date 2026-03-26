@@ -32,4 +32,9 @@ interface NatsJobQueueBridge
     public function getMaxTries(): int;
 
     public function publishRawToSubject(string $subject, string $payload): void;
+
+    /**
+     * Called when a popped job is finished (deleted, released, or failed) so drivers can decrement in-flight counters.
+     */
+    public function notifyJobHandled(): void;
 }

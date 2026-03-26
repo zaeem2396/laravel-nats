@@ -97,6 +97,7 @@ return [
         'retry_after' => (int) env('NATS_BASIS_QUEUE_RETRY_AFTER', 60),
         'tries' => (int) env('NATS_BASIS_QUEUE_TRIES', 3),
         'block_for' => (float) env('NATS_BASIS_QUEUE_BLOCK_FOR', 0.1),
+        'max_in_flight' => ($m = env('NATS_BASIS_QUEUE_MAX_IN_FLIGHT')) !== null && $m !== '' ? (int) $m : null,
     ],
 
     /*

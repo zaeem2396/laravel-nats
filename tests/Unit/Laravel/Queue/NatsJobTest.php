@@ -15,6 +15,7 @@ function createMockQueue(): \Mockery\MockInterface
     $queue->shouldReceive('getQueue')->andReturn('test-queue');
     $queue->shouldReceive('getDeadLetterQueueSubject')->andReturn(null); // No DLQ = no getClient() call
     $queue->shouldReceive('getRetryAfter')->andReturn(60);
+    $queue->shouldReceive('notifyJobHandled')->andReturnNull();
 
     return $queue;
 }
@@ -194,6 +195,7 @@ describe('NatsJob', function (): void {
             $queue->shouldReceive('getQueue')->andReturn('test-queue');
             $queue->shouldReceive('getDeadLetterQueueSubject')->andReturn(null);
             $queue->shouldReceive('getRetryAfter')->andReturn(45);
+            $queue->shouldReceive('notifyJobHandled')->andReturnNull();
             $job = createTestJob($payload, $queue);
 
             expect($job->getRetryDelay())->toBe(45);
@@ -344,6 +346,7 @@ describe('NatsJob', function (): void {
             $queue->shouldReceive('getQueue')->andReturn('test-queue');
             $queue->shouldReceive('getDeadLetterQueueSubject')->andReturn(null);
             $queue->shouldReceive('getRetryAfter')->andReturn(45);
+            $queue->shouldReceive('notifyJobHandled')->andReturnNull();
             $job = createTestJob($payload, $queue);
 
             $strategy = $job->getBackoffStrategy();
@@ -376,6 +379,7 @@ describe('NatsJob', function (): void {
             $queue->shouldReceive('getQueue')->andReturn('test-queue');
             $queue->shouldReceive('getDeadLetterQueueSubject')->andReturn(null);
             $queue->shouldReceive('getRetryAfter')->andReturn(45);
+            $queue->shouldReceive('notifyJobHandled')->once()->andReturnNull();
             $queue->shouldReceive('later')
                 ->once()
                 ->withArgs(function ($delay, $payload, $data, $queueName) {

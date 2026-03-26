@@ -50,6 +50,11 @@ class NatsJob extends Job implements JobContract
     protected ?Throwable $failureException = null;
 
     /**
+     * Whether {@see NatsJobQueueBridge::notifyJobHandled()} has already been invoked for this job.
+     */
+    protected bool $natsLifecycleFinalized = false;
+
+    /**
      * Create a new job instance.
      *
      * @param Container $container
@@ -105,11 +110,15 @@ class NatsJob extends Job implements JobContract
             $newPayload = $this->job;
         }
 
-        // Re-publish the job to the queue
-        if ($delay > 0) {
-            $this->nats->later($delay, $newPayload, '', $this->queue);
-        } else {
-            $this->nats->pushRaw($newPayload, $this->queue);
+        try {
+            // Re-publish the job to the queue
+            if ($delay > 0) {
+                $this->nats->later($delay, $newPayload, '', $this->queue);
+            } else {
+                $this->nats->pushRaw($newPayload, $this->queue);
+            }
+        } finally {
+            $this->finalizeNatsQueueJobLifecycle();
         }
     }
 
@@ -124,6 +133,7 @@ class NatsJob extends Job implements JobContract
 
         // In NATS Core, messages are automatically removed after delivery
         // No additional action needed
+        $this->finalizeNatsQueueJobLifecycle();
     }
 
     /**
@@ -508,6 +518,19 @@ class NatsJob extends Job implements JobContract
         }
 
         return $this->attempts() >= $maxTries;
+    }
+
+    /**
+     * Decrement basis-queue in-flight counters once per job (delete, release, or fail via delete).
+     */
+    protected function finalizeNatsQueueJobLifecycle(): void
+    {
+        if ($this->natsLifecycleFinalized) {
+            return;
+        }
+
+        $this->natsLifecycleFinalized = true;
+        $this->nats->notifyJobHandled();
     }
 
     /**

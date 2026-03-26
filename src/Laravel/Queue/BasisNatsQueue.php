@@ -15,6 +15,9 @@ use LaravelNats\Laravel\Queue\Contracts\NatsJobQueueBridge;
  * Laravel queue driver on {@see Client} (basis-company/nats) via {@see ConnectionManager}.
  *
  * Job payloads match the legacy {@see NatsQueue} JSON shape for `queue:work` compatibility.
+ *
+ * Optional {@see $maxInFlight} limits how many messages this worker process may hold before {@see pop()}
+ * returns null (per-process backpressure, not cluster-wide).
  */
 class BasisNatsQueue extends Queue implements QueueContract, NatsJobQueueBridge
 {
@@ -33,6 +36,16 @@ class BasisNatsQueue extends Queue implements QueueContract, NatsJobQueueBridge
      */
     protected float $popBlockSeconds;
 
+    /**
+     * Max jobs popped and not yet completed on this queue instance; used with {@see $maxInFlight}.
+     */
+    protected int $inFlight = 0;
+
+    /**
+     * When set and positive, {@see pop()} returns null while {@see $inFlight} is at this limit.
+     */
+    protected ?int $maxInFlight = null;
+
     public function __construct(
         protected ConnectionManager $connections,
         protected ?string $basisConnectionName,
@@ -42,6 +55,7 @@ class BasisNatsQueue extends Queue implements QueueContract, NatsJobQueueBridge
         ?string $deadLetterQueue = null,
         string $subjectPrefix = 'laravel.queue.',
         float $popBlockSeconds = 0.1,
+        ?int $maxInFlight = null,
     ) {
         $this->defaultQueue = $defaultQueue;
         $this->retryAfter = $retryAfter;
@@ -49,6 +63,7 @@ class BasisNatsQueue extends Queue implements QueueContract, NatsJobQueueBridge
         $this->deadLetterQueue = $deadLetterQueue;
         $this->subjectPrefix = $subjectPrefix;
         $this->popBlockSeconds = $popBlockSeconds > 0 ? $popBlockSeconds : 0.1;
+        $this->maxInFlight = $maxInFlight !== null && $maxInFlight > 0 ? $maxInFlight : null;
     }
 
     public function size($queue = null): int
@@ -87,6 +102,10 @@ class BasisNatsQueue extends Queue implements QueueContract, NatsJobQueueBridge
 
     public function pop($queue = null): ?NatsJob
     {
+        if ($this->maxInFlight !== null && $this->inFlight >= $this->maxInFlight) {
+            return null;
+        }
+
         $subject = $this->getSubject($queue);
         $body = null;
 
@@ -161,6 +180,29 @@ class BasisNatsQueue extends Queue implements QueueContract, NatsJobQueueBridge
     public function publishRawToSubject(string $subject, string $payload): void
     {
         $this->client()->publish($subject, $payload);
+    }
+
+    public function notifyJobHandled(): void
+    {
+        if ($this->inFlight > 0) {
+            $this->inFlight--;
+        }
+    }
+
+    /**
+     * Current number of jobs popped and not yet acknowledged via {@see notifyJobHandled()} (per process).
+     */
+    public function getInFlightCount(): int
+    {
+        return $this->inFlight;
+    }
+
+    /**
+     * Configured cap for {@see getInFlightCount()}, or null when unlimited.
+     */
+    public function getMaxInFlightLimit(): ?int
+    {
+        return $this->maxInFlight;
     }
 
     /**

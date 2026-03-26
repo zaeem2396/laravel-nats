@@ -293,6 +293,11 @@ class NatsQueue extends Queue implements QueueContract, NatsJobQueueBridge
         $this->client->publishRaw($subject, $payload);
     }
 
+    public function notifyJobHandled(): void
+    {
+        // Legacy queue has no in-flight limit.
+    }
+
     /**
      * Get the NATS subject for a queue.
      *
