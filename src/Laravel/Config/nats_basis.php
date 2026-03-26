@@ -82,6 +82,25 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Queue driver (`nats_basis` connection driver)
+    |--------------------------------------------------------------------------
+    |
+    | Used when `config/queue.php` sets `'driver' => 'nats_basis'`. Jobs use the
+    | same JSON payload shape as the legacy `nats` driver for `queue:work`.
+    | DLQ subject follows legacy rules (prefix + name when name has no dots).
+    |
+    | @see docs/v2/QUEUE.md
+    |
+    */
+    'queue' => [
+        'prefix' => env('NATS_BASIS_QUEUE_PREFIX', 'laravel.queue.'),
+        'retry_after' => (int) env('NATS_BASIS_QUEUE_RETRY_AFTER', 60),
+        'tries' => (int) env('NATS_BASIS_QUEUE_TRIES', 3),
+        'block_for' => (float) env('NATS_BASIS_QUEUE_BLOCK_FOR', 0.1),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | JetStream (basis client, NatsV2)
     |--------------------------------------------------------------------------
     |
