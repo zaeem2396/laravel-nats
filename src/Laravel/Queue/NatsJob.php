@@ -8,6 +8,7 @@ use Illuminate\Container\Container;
 use Illuminate\Contracts\Queue\Job as JobContract;
 use Illuminate\Queue\Jobs\Job;
 use Illuminate\Support\Arr;
+use LaravelNats\Laravel\Queue\Contracts\NatsJobQueueBridge;
 use LaravelNats\Laravel\Queue\Failed\NatsFailedJobProvider;
 use Throwable;
 
@@ -20,9 +21,9 @@ use Throwable;
 class NatsJob extends Job implements JobContract
 {
     /**
-     * The NATS queue instance.
+     * The NATS queue instance (legacy or basis).
      */
-    protected NatsQueue $nats;
+    protected NatsJobQueueBridge $nats;
 
     /**
      * The raw job payload.
@@ -49,17 +50,22 @@ class NatsJob extends Job implements JobContract
     protected ?Throwable $failureException = null;
 
     /**
+     * Whether {@see NatsJobQueueBridge::notifyJobHandled()} has already been invoked for this job.
+     */
+    protected bool $natsLifecycleFinalized = false;
+
+    /**
      * Create a new job instance.
      *
      * @param Container $container
-     * @param NatsQueue $nats
+     * @param NatsJobQueueBridge $nats
      * @param string $job
      * @param string $connectionName
      * @param string $queue
      */
     public function __construct(
         Container $container,
-        NatsQueue $nats,
+        NatsJobQueueBridge $nats,
         string $job,
         string $connectionName,
         string $queue,
@@ -104,11 +110,15 @@ class NatsJob extends Job implements JobContract
             $newPayload = $this->job;
         }
 
-        // Re-publish the job to the queue
-        if ($delay > 0) {
-            $this->nats->later($delay, $newPayload, '', $this->queue);
-        } else {
-            $this->nats->pushRaw($newPayload, $this->queue);
+        try {
+            // Re-publish the job to the queue
+            if ($delay > 0) {
+                $this->nats->later($delay, $newPayload, '', $this->queue);
+            } else {
+                $this->nats->pushRaw($newPayload, $this->queue);
+            }
+        } finally {
+            $this->finalizeNatsQueueJobLifecycle();
         }
     }
 
@@ -123,6 +133,7 @@ class NatsJob extends Job implements JobContract
 
         // In NATS Core, messages are automatically removed after delivery
         // No additional action needed
+        $this->finalizeNatsQueueJobLifecycle();
     }
 
     /**
@@ -329,9 +340,9 @@ class NatsJob extends Job implements JobContract
     /**
      * Get the NATS queue instance.
      *
-     * @return NatsQueue
+     * @return NatsJobQueueBridge
      */
-    public function getNatsQueue(): NatsQueue
+    public function getNatsQueue(): NatsJobQueueBridge
     {
         return $this->nats;
     }
@@ -510,6 +521,19 @@ class NatsJob extends Job implements JobContract
     }
 
     /**
+     * Decrement basis-queue in-flight counters once per job (delete, release, or fail via delete).
+     */
+    protected function finalizeNatsQueueJobLifecycle(): void
+    {
+        if ($this->natsLifecycleFinalized) {
+            return;
+        }
+
+        $this->natsLifecycleFinalized = true;
+        $this->nats->notifyJobHandled();
+    }
+
+    /**
      * Resolve the job instance and call its failed() method if it exists.
      *
      * @param Throwable|null $exception
@@ -634,7 +658,7 @@ class NatsJob extends Job implements JobContract
             }
 
             // Publish to DLQ
-            $this->nats->getClient()->publishRaw($dlqSubject, $dlqPayload);
+            $this->nats->publishRawToSubject($dlqSubject, $dlqPayload);
         } catch (Throwable $e) {
             // Silently fail if we can't route to DLQ
         }

@@ -52,6 +52,7 @@ uses(LaravelNats\Tests\LaravelTestCase::class)->in(
     'Unit/Laravel/NatsV2GatewayJetStreamTest.php',
     'Unit/Laravel/NatsV2JetStreamCommandsRegisteredTest.php',
     'Unit/Laravel/CorrelationHeadersTest.php',
+    'Unit/Laravel/BasisNatsConnectorTest.php',
 );
 
 // Unit/Laravel/Queue tests: Queue components (minimal Laravel context)

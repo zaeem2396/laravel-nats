@@ -11,6 +11,7 @@ use Illuminate\Queue\Queue;
 use Illuminate\Support\Str;
 use LaravelNats\Core\Client;
 use LaravelNats\Core\JetStream\JetStreamClient;
+use LaravelNats\Laravel\Queue\Contracts\NatsJobQueueBridge;
 
 /**
  * NatsQueue implements Laravel's Queue contract using NATS as the backend.
@@ -18,7 +19,7 @@ use LaravelNats\Core\JetStream\JetStreamClient;
  * This queue implementation uses NATS subjects as queue names.
  * Messages are published to subjects and consumed by workers.
  */
-class NatsQueue extends Queue implements QueueContract
+class NatsQueue extends Queue implements QueueContract, NatsJobQueueBridge
 {
     /**
      * The NATS client.
@@ -165,7 +166,7 @@ class NatsQueue extends Queue implements QueueContract
      *
      * @return string|null
      */
-    public function later($delay, $job, $data = '', $queue = null): ?string
+    public function later($delay, $job, $data = '', $queue = null): mixed
     {
         // Delayed jobs will be implemented with JetStream in Phase 2.2
         // For now, push immediately with a warning
@@ -285,6 +286,16 @@ class NatsQueue extends Queue implements QueueContract
     public function setDeadLetterQueueSubject(?string $subject): void
     {
         $this->deadLetterQueue = $subject;
+    }
+
+    public function publishRawToSubject(string $subject, string $payload): void
+    {
+        $this->client->publishRaw($subject, $payload);
+    }
+
+    public function notifyJobHandled(): void
+    {
+        // Legacy queue has no in-flight limit.
     }
 
     /**

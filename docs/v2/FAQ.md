@@ -6,7 +6,9 @@
 
 **Correlation / Request-ID on messages?** See [CORRELATION.md](CORRELATION.md) (`X-Request-Id`, `Nats-Correlation-Id`, optional publish injection).
 
-**Why @deprecated on `Nats`?** Soft deprecation only: new **publish** code should use `NatsV2`. For **new** subscribe code on the basis stack, prefer `NatsV2::subscribe`. Queue and JetStream on legacy remain until parity. Details in [MIGRATION](MIGRATION.md).
+**Why @deprecated on `Nats`?** Soft deprecation only: new **publish** code should use `NatsV2`. For **new** subscribe code on the basis stack, prefer `NatsV2::subscribe`. **Queue:** use **`nats_basis`** (1.5.0+, [QUEUE.md](QUEUE.md)) on the basis client, or keep **`nats`** on legacy. **JetStream:** basis helpers from 1.4.0+; legacy `Nats::jetstream()` unchanged. Details in [MIGRATION](MIGRATION.md).
+
+**`nats` vs `nats_basis` queue driver?** **`nats`** uses `LaravelNats\Core\Client`. **`nats_basis`** uses `ConnectionManager` / `Basis\Nats\Client` with the same job JSON for `queue:work`. See [QUEUE.md](QUEUE.md).
 
 **Mix facades?** Yes, per subject or service boundary.
 

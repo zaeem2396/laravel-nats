@@ -9,11 +9,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- (none)
+- **`nats_basis` max in-flight:** optional `max_in_flight` / `NATS_BASIS_QUEUE_MAX_IN_FLIGHT` and `nats_basis.queue.max_in_flight`; `BasisNatsQueue` tracks popped jobs per process and `NatsJob` notifies the queue on delete/release. See [docs/v2/QUEUE.md](docs/v2/QUEUE.md).
 
 ### Removed
 
 - (none)
+
+## [1.5.0] - 2026-03-24
+
+### Added
+
+- **`nats_basis` queue driver:** `BasisNatsConnector`, `BasisNatsQueue` using `ConnectionManager` and `Basis\Nats\Client`; job payload compatible with legacy `nats` for `queue:work`, retries, failed jobs, and DLQ routing via `NatsJob` + `NatsJobQueueBridge::publishRawToSubject()`.
+- **Config:** `nats_basis.queue` (`prefix`, `retry_after`, `tries`, `block_for`) with `NATS_BASIS_QUEUE_*` env vars.
+- **Docs:** [docs/v2/QUEUE.md](docs/v2/QUEUE.md); roadmap v2.3 marked completed.
+
+### Changed
+
+- **`NatsQueue` / `NatsJob`:** introduce `NatsJobQueueBridge` so DLQ and retries work for both legacy and basis queue implementations.
 
 ## [1.4.0] - 2026-03-24
 
@@ -266,7 +278,8 @@ Run `composer update zaeem2396/laravel-nats` to upgrade.
 
 ---
 
-[Unreleased]: https://github.com/zaeem2396/laravel-nats/compare/v1.4.0...HEAD
+[Unreleased]: https://github.com/zaeem2396/laravel-nats/compare/v1.5.0...HEAD
+[1.5.0]: https://github.com/zaeem2396/laravel-nats/compare/v1.4.0...v1.5.0
 [1.4.0]: https://github.com/zaeem2396/laravel-nats/compare/v1.3.0...v1.4.0
 [1.3.0]: https://github.com/zaeem2396/laravel-nats/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/zaeem2396/laravel-nats/compare/v1.1.1...v1.2.0

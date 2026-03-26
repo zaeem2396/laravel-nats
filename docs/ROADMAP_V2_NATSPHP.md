@@ -75,22 +75,24 @@
 
 ## Version v2.3 - Queue driver + DLQ
 
-**Goals:** Laravel `nats` queue on the basis client **after** JetStream (v2.2). Retry, DLQ, failed-job handling in this release.
+**Goals:** Laravel queue on the basis client **after** JetStream (v2.2). Retry, DLQ, failed-job handling in this release.
+
+**Shipped (package 1.5.0):** **`nats_basis`** driver — **`BasisNatsConnector`**, **`BasisNatsQueue`** (`ConnectionManager` + `Basis\Nats\Client`), same job JSON as legacy **`nats`** for **`queue:work`**, DLQ via **`NatsJob`** + **`publishRawToSubject`**, config **`nats_basis.queue`**, docs [docs/v2/QUEUE.md](v2/QUEUE.md).
 
 | Area | Deliverable | Status |
 |------|-------------|--------|
-| **M1** Queue | Connector + `NatsQueue` using `ConnectionManager` / `Basis\Nats\Client` | Planned |
-| **M1** Queue | Push/pop with job payload aligned to v2 envelope where practical | Planned |
-| **M2** Worker | `queue:work` compatibility; retries/backoff | Planned |
-| **M2** Worker | Supervisor/systemd docs | Planned |
-| **M3** DLQ | Failed jobs via Laravel defaults | Planned |
-| **M3** DLQ | Documented DLQ convention (stream/subject naming) | Planned |
-| **M4** Retry | Central retry/backoff in config | Planned |
-| **M4** Backpressure | Light-touch max in-flight (config + counter) | Planned |
-| **M5** DX | Job serialization contract; helpers for subjects | Planned |
-| **M5** DX | Job middleware compatibility documented | Planned |
-| **M6** Defaults | Retry/backoff stubs; queue subject conventions | Planned |
-| **M7** Migration | Upgrade guide: v1 queue → v2.3 driver | Planned |
+| **M1** Queue | Connector + queue class using `ConnectionManager` / `Basis\Nats\Client` | Completed |
+| **M1** Queue | Push/pop with job payload aligned with legacy `nats` (worker parity) | Completed |
+| **M2** Worker | `queue:work` compatibility; retries/backoff | Completed |
+| **M2** Worker | Supervisor/systemd docs | Completed (see QUEUE.md) |
+| **M3** DLQ | Failed jobs via Laravel defaults | Completed |
+| **M3** DLQ | Documented DLQ convention (subject naming) | Completed |
+| **M4** Retry | Central retry/backoff in config | Completed (`nats_basis.queue` + connection options) |
+| **M4** Backpressure | Light-touch max in-flight (config + counter, per worker process) | Completed |
+| **M5** DX | Job serialization contract; helpers for subjects | Completed (legacy JSON documented) |
+| **M5** DX | Job middleware compatibility documented | Completed (same job class as legacy driver) |
+| **M6** Defaults | Retry/backoff stubs; queue subject conventions | Completed |
+| **M7** Migration | Upgrade guide: legacy `nats` queue → `nats_basis` | Completed |
 
 ---
 
@@ -151,6 +153,6 @@
 
 ---
 
-*Document version: 1.4 - tabular status; v2.2 JetStream on basis client completed.*
+*Document version: 1.5 - v2.3 `nats_basis` queue driver completed.*
 
-**User docs:** [docs/v2/README.md](v2/README.md) · [GUIDE](v2/GUIDE.md) · [SUBSCRIBER](v2/SUBSCRIBER.md) · [JETSTREAM](v2/JETSTREAM.md) · [CORRELATION](v2/CORRELATION.md) · [MIGRATION](v2/MIGRATION.md)
+**User docs:** [docs/v2/README.md](v2/README.md) · [GUIDE](v2/GUIDE.md) · [SUBSCRIBER](v2/SUBSCRIBER.md) · [JETSTREAM](v2/JETSTREAM.md) · [QUEUE](v2/QUEUE.md) · [CORRELATION](v2/CORRELATION.md) · [MIGRATION](v2/MIGRATION.md)

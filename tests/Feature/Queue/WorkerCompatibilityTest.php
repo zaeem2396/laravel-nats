@@ -33,6 +33,12 @@ function createWorkerTestClient(): Client
 }
 
 describe('Queue Worker Compatibility', function (): void {
+    beforeEach(function (): void {
+        if (! \LaravelNats\Tests\TestCase::isNatsReachable()) {
+            $this->markTestSkipped('NATS server not available');
+        }
+    });
+
     describe('queue pop operation', function (): void {
         it('returns null when queue is empty', function (): void {
             $client = createWorkerTestClient();

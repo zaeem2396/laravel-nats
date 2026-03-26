@@ -34,6 +34,7 @@ use LaravelNats\Laravel\Console\Commands\NatsV2ListenCommand;
 use LaravelNats\Laravel\Console\Commands\NatsWorkCommand;
 use LaravelNats\Laravel\NatsManager;
 use LaravelNats\Laravel\NatsV2Gateway;
+use LaravelNats\Laravel\Queue\BasisNatsConnector;
 use LaravelNats\Laravel\Queue\NatsConnector;
 use LaravelNats\Publisher\Contracts\NatsPublisherContract;
 use LaravelNats\Publisher\NatsPublisher;
@@ -257,6 +258,9 @@ class NatsServiceProvider extends ServiceProvider implements DeferrableProvider
         $this->app->afterResolving('queue', function (\Illuminate\Queue\QueueManager $manager): void {
             $manager->addConnector('nats', function () {
                 return new NatsConnector();
+            });
+            $manager->addConnector('nats_basis', function () {
+                return new BasisNatsConnector();
             });
         });
     }

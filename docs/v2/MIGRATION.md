@@ -15,7 +15,8 @@ New code can use **`NatsV2::subscribe`** (basis client) with **`InboundMessage`*
 | **Soft deprecation** | `Nats`, `NatsManager`, and `Core\Client` are tagged `@deprecated` for **new** integrations as of **1.3.0**. |
 | **Publish** | Prefer **`NatsV2::publish`** (JSON envelope + [basis-company/nats](https://github.com/basis-company/nats.php)). |
 | **Subscribe (basis client)** | Prefer **`NatsV2::subscribe`** + **`process()`** / **`nats:v2:listen`** since **1.3.0** ([SUBSCRIBER.md](SUBSCRIBER.md)). Legacy **`Nats::subscribe`** remains supported. |
-| **Request/reply, queue** | Legacy **`Nats`** until a **future release** documents basis-client parity for those areas. |
+| **Queue (basis client)** | **`nats_basis`** driver from **1.5.0+** ([QUEUE.md](QUEUE.md)); legacy **`nats`** driver unchanged. |
+| **Request/reply** | Legacy **`Nats`** until a **future release** documents basis-client parity. |
 | **JetStream (basis client)** | **`NatsV2::jetstream()`** and helpers from **1.4.0+** ([JETSTREAM.md](JETSTREAM.md)); legacy **`Nats::jetstream()`** unchanged. |
 | **Minors** | **No silent removals** in upcoming minor releases. Removals only in a **future major** after parity and notice. |
 
@@ -35,6 +36,7 @@ Both are merged when the package boots; run `php artisan vendor:publish --tag=na
 | TLS | `tls.enabled` + `tls.options` | File paths: `tlsKeyFile`, `tlsCertFile`, `tlsCaFile` + `NATS_TLS_KEY`, `NATS_TLS_CERT`, `NATS_TLS_CA` |
 | Envelope schema | - | `envelope_version` / `NATS_ENVELOPE_VERSION` (default `v1`) |
 | Debug logging (basis client) | - | `nats_basis.logging` / `NATS_BASIS_LOGGING`, `NATS_BASIS_LOG_CHANNEL` |
+| Queue driver defaults (`nats_basis`) | `config/queue.php` per connection | `nats_basis.queue.*` / `NATS_BASIS_QUEUE_*` (includes optional **`max_in_flight`**) ([QUEUE.md](QUEUE.md)) |
 
 **Future unified config:** a later release may merge these into one file; until then, if you use **both** stacks, keep **both** configs consistent for shared connection names.
 
@@ -78,9 +80,12 @@ Consumers should read application data from **`data`**. Roll back publishers to 
 - [ ] `NatsV2::jetStreamPublish` lands messages in a stream that captures the subject (or provision a preset first).
 - [ ] `NatsV2::jetStreamPull` (or the `pull` Artisan command) receives and **acks** messages for a durable consumer.
 
-### Future parity (queue on basis)
+### Queue on the basis client (1.5.0+)
 
-- [ ] Re-run integration tests for the **queue driver** when basis parity is documented.
+- [ ] Add a **`nats_basis`** connection in `config/queue.php` and set `QUEUE_CONNECTION` (or migrate workers gradually).
+- [ ] Confirm `config/nats_basis.php` connections match your NATS deployment (same as `NatsV2`).
+- [ ] Run `php artisan queue:work nats_basis` (or your connection name); verify retries, `failed_jobs`, and optional DLQ subject.
+- [ ] See [QUEUE.md](QUEUE.md) for env keys and Supervisor example.
 
 ## See also
 
