@@ -8,7 +8,7 @@
 
 A native NATS integration for Laravel that feels like home. Publish, subscribe, and request/reply with a familiar, expressive API.
 
-> **NatsV2** (basis stack, **package 1.3.0+**): Laravel **wrapper** on [basis-company/nats](https://github.com/basis-company/nats.php) for publish + subscribe. **Docs:** [Guide](docs/v2/GUIDE.md) · [Subscriber](docs/v2/SUBSCRIBER.md) · [FAQ](docs/v2/FAQ.md) · [Migration](docs/v2/MIGRATION.md). The **legacy** `Nats` facade API for subscribe, queue, and JetStream is also documented in this README.
+> **NatsV2** (basis stack, **package 1.3.0+** pub/sub, **1.4.0+** JetStream helpers): Laravel **wrapper** on [basis-company/nats](https://github.com/basis-company/nats.php). **Docs:** [Guide](docs/v2/GUIDE.md) · [Subscriber](docs/v2/SUBSCRIBER.md) · [JetStream](docs/v2/JETSTREAM.md) · [FAQ](docs/v2/FAQ.md) · [Migration](docs/v2/MIGRATION.md). The **legacy** `Nats` facade API for subscribe, queue, and JetStream is also documented in this README.
 
 ## Requirements
 
@@ -24,6 +24,7 @@ composer require zaeem2396/laravel-nats
 
 - **v1.1.1+** for Phase 4 queue/worker commands (`nats:work`, `nats:consume`).
 - **v1.3.0+** for **`NatsV2::publish`** / **`NatsV2::subscribe`**, `ConnectionManager`, JSON envelope (`config/nats_basis.php`), **`InboundMessage`**, and **`nats:v2:listen`**.
+- **v1.4.0+** for **`NatsV2::jetstream()`**, **`jetStreamPublish`** / **`jetStreamPull`**, stream presets, and **`nats:v2:jetstream:*`** Artisan commands ([docs/v2/JETSTREAM.md](docs/v2/JETSTREAM.md)).
 
 The service provider is auto-discovered. To publish configuration (includes **`nats_basis`** for v2):
 
@@ -59,6 +60,10 @@ use LaravelNats\Laravel\Facades\NatsV2;
 NatsV2::publish('orders.created', ['order_id' => 123], ['X-Request-Id' => 'abc']);
 // Underlying: Basis\Nats\Client - use NatsV2::connection() for advanced APIs.
 ```
+
+### NatsV2 JetStream (basis client, package **1.4.0+**)
+
+Use **`NatsV2::jetstream()`** for **`Basis\Nats\Api`**, synchronous stream publish with optional envelope, one-shot pull batches, config presets, and CLI helpers. See **[docs/v2/JETSTREAM.md](docs/v2/JETSTREAM.md)** (legacy **`Nats::jetstream()`** remains on the native client).
 
 ### Multiple Connections
 

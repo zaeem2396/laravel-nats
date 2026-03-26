@@ -15,7 +15,8 @@ New code can use **`NatsV2::subscribe`** (basis client) with **`InboundMessage`*
 | **Soft deprecation** | `Nats`, `NatsManager`, and `Core\Client` are tagged `@deprecated` for **new** integrations as of **1.3.0**. |
 | **Publish** | Prefer **`NatsV2::publish`** (JSON envelope + [basis-company/nats](https://github.com/basis-company/nats.php)). |
 | **Subscribe (basis client)** | Prefer **`NatsV2::subscribe`** + **`process()`** / **`nats:v2:listen`** since **1.3.0** ([SUBSCRIBER.md](SUBSCRIBER.md)). Legacy **`Nats::subscribe`** remains supported. |
-| **Request/reply, queue, JetStream** | Legacy **`Nats`** until a **future release** documents basis-client parity for those areas. |
+| **Request/reply, queue** | Legacy **`Nats`** until a **future release** documents basis-client parity for those areas. |
+| **JetStream (basis client)** | **`NatsV2::jetstream()`** and helpers from **1.4.0+** ([JETSTREAM.md](JETSTREAM.md)); legacy **`Nats::jetstream()`** unchanged. |
 | **Minors** | **No silent removals** in upcoming minor releases. Removals only in a **future major** after parity and notice. |
 
 ## Config mapping: `config/nats.php` ↔ `config/nats_basis.php`
@@ -45,7 +46,8 @@ Both are merged when the package boots; run `php artisan vendor:publish --tag=na
 | Publish (raw JSON body) | `Nats::publish(...)` | Migrate consumers, then switch to `NatsV2` |
 | Low-level client | `Nats::connection()` → `LaravelNats\Core\Client` | `NatsV2::connection()` → `Basis\Nats\Client` |
 | Subscribe (basis stack) | `Nats::subscribe` + `MessageInterface` | **`NatsV2::subscribe`** + **`InboundMessage`** + **`process()`** / **`nats:v2:listen`** (1.3.0+) |
-| Request/reply, queue, JetStream | `Nats::…` | Unchanged on legacy until a future parity release |
+| JetStream (streams, pull, JS publish) | `Nats::jetstream()` | **`NatsV2::jetstream()`**, **`jetStreamPublish`**, **`jetStreamPull`**, presets (**1.4.0+**, [JETSTREAM.md](JETSTREAM.md)) |
+| Request/reply, queue | `Nats::…` | Unchanged on legacy until a future parity release |
 
 ## `LaravelNats\Core\Client`
 
@@ -70,9 +72,15 @@ Consumers should read application data from **`data`**. Roll back publishers to 
 - [ ] Optional: `nats_basis.subscriber` (middleware, events) behaves as documented in [SUBSCRIBER.md](SUBSCRIBER.md).
 - [ ] `composer analyse` and test suite green in CI.
 
-### Future parity (JetStream / queue on basis)
+## Testing checklist (1.4.0) - NatsV2 JetStream
 
-- [ ] Re-run integration tests for JetStream and queue when parity is documented.
+- [ ] `php artisan nats:v2:jetstream:info` returns account JSON against a JetStream-enabled server.
+- [ ] `NatsV2::jetStreamPublish` lands messages in a stream that captures the subject (or provision a preset first).
+- [ ] `NatsV2::jetStreamPull` (or the `pull` Artisan command) receives and **acks** messages for a durable consumer.
+
+### Future parity (queue on basis)
+
+- [ ] Re-run integration tests for the **queue driver** when basis parity is documented.
 
 ## See also
 

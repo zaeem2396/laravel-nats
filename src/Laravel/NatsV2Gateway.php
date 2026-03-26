@@ -5,7 +5,15 @@ declare(strict_types=1);
 namespace LaravelNats\Laravel;
 
 use Basis\Nats\Client;
+use Basis\Nats\Message\Msg;
+use Basis\Nats\Stream\Stream;
+use Illuminate\Contracts\Config\Repository;
+use InvalidArgumentException;
 use LaravelNats\Connection\ConnectionManager;
+use LaravelNats\JetStream\BasisJetStreamManager;
+use LaravelNats\JetStream\BasisJetStreamPublisher;
+use LaravelNats\JetStream\BasisStreamProvisioner;
+use LaravelNats\JetStream\PullConsumerBatch;
 use LaravelNats\Publisher\Contracts\NatsPublisherContract;
 use LaravelNats\Subscriber\Contracts\NatsSubscriberContract;
 use LaravelNats\Subscriber\InboundMessage;
@@ -21,6 +29,10 @@ final class NatsV2Gateway
         private readonly ConnectionManager $connections,
         private readonly NatsPublisherContract $publisher,
         private readonly NatsSubscriberContract $subscriber,
+        private readonly BasisJetStreamPublisher $jetStreamPublisher,
+        private readonly PullConsumerBatch $pullConsumerBatch,
+        private readonly BasisStreamProvisioner $streamProvisioner,
+        private readonly Repository $config,
     ) {
     }
 
@@ -82,5 +94,68 @@ final class NatsV2Gateway
     public function disconnectAll(): void
     {
         $this->connections->disconnectAll();
+    }
+
+    public function jetstream(?string $connection = null): BasisJetStreamManager
+    {
+        return new BasisJetStreamManager($this->connections, $connection);
+    }
+
+    /**
+     * @param array<string, mixed> $payload
+     * @param array<string, string> $headers Reserved for future JetStream header support in basis publish path
+     */
+    public function jetStreamPublish(
+        string $stream,
+        string $subject,
+        array $payload,
+        bool $useEnvelope = true,
+        bool $waitForAck = true,
+        array $headers = [],
+        ?string $connection = null,
+    ): void {
+        $this->jetStreamPublisher->publish(
+            $stream,
+            $subject,
+            $payload,
+            $useEnvelope,
+            $waitForAck,
+            $headers,
+            $connection,
+        );
+    }
+
+    /**
+     * @return list<Msg>
+     */
+    public function jetStreamPull(
+        string $stream,
+        string $consumer,
+        ?int $batch = null,
+        ?float $expiresSeconds = null,
+        ?string $connection = null,
+    ): array {
+        $batch ??= (int) $this->config->get('nats_basis.jetstream.pull.default_batch', 10);
+        $expiresSeconds ??= (float) $this->config->get('nats_basis.jetstream.pull.default_expires', 0.5);
+
+        return $this->pullConsumerBatch->fetch(
+            $stream,
+            $consumer,
+            $batch,
+            $expiresSeconds,
+            $connection,
+        );
+    }
+
+    public function jetStreamProvisionPreset(
+        string $presetKey,
+        bool $createIfNotExists = true,
+        ?string $connection = null,
+    ): Stream {
+        if ($presetKey === '') {
+            throw new InvalidArgumentException('JetStream preset key must be non-empty.');
+        }
+
+        return $this->streamProvisioner->provision($presetKey, $createIfNotExists, $connection);
     }
 }

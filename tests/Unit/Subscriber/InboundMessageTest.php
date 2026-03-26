@@ -29,3 +29,14 @@ it('decodes envelope-shaped json', function (): void {
     expect($env)->toBeArray()
         ->and($env['data'])->toBe(['k' => 1]);
 });
+
+it('exposes request and correlation ids from headers case-insensitively', function (): void {
+    $p = new Payload('{}', [
+        'X-Request-Id' => 'rid-1',
+        'nats-correlation-id' => 'cid-1',
+    ], 'subj', null);
+    $m = InboundMessage::fromPayload($p, null);
+
+    expect($m->requestId())->toBe('rid-1')
+        ->and($m->correlationId())->toBe('cid-1');
+});

@@ -10,6 +10,9 @@ use Illuminate\Queue\Worker;
 use Illuminate\Support\ServiceProvider;
 use LaravelNats\Connection\ConnectionManager;
 use LaravelNats\Core\Client;
+use LaravelNats\JetStream\BasisJetStreamPublisher;
+use LaravelNats\JetStream\BasisStreamProvisioner;
+use LaravelNats\JetStream\PullConsumerBatch;
 use LaravelNats\Laravel\Console\Commands\NatsConsumeCommand;
 use LaravelNats\Laravel\Console\Commands\NatsConsumerCreateCommand;
 use LaravelNats\Laravel\Console\Commands\NatsConsumerDeleteCommand;
@@ -23,6 +26,10 @@ use LaravelNats\Laravel\Console\Commands\NatsStreamInfoCommand;
 use LaravelNats\Laravel\Console\Commands\NatsStreamListCommand;
 use LaravelNats\Laravel\Console\Commands\NatsStreamPurgeCommand;
 use LaravelNats\Laravel\Console\Commands\NatsStreamUpdateCommand;
+use LaravelNats\Laravel\Console\Commands\NatsV2JetStreamInfoCommand;
+use LaravelNats\Laravel\Console\Commands\NatsV2JetStreamProvisionCommand;
+use LaravelNats\Laravel\Console\Commands\NatsV2JetStreamPullCommand;
+use LaravelNats\Laravel\Console\Commands\NatsV2JetStreamStreamsCommand;
 use LaravelNats\Laravel\Console\Commands\NatsV2ListenCommand;
 use LaravelNats\Laravel\Console\Commands\NatsWorkCommand;
 use LaravelNats\Laravel\NatsManager;
@@ -87,6 +94,9 @@ class NatsServiceProvider extends ServiceProvider implements DeferrableProvider
             NatsSubscriberContract::class,
             NatsBasisSubscriber::class,
             SubjectValidator::class,
+            BasisJetStreamPublisher::class,
+            PullConsumerBatch::class,
+            BasisStreamProvisioner::class,
             Client::class,
         ];
     }
@@ -107,6 +117,10 @@ class NatsServiceProvider extends ServiceProvider implements DeferrableProvider
         $this->commands([
             NatsWorkCommand::class,
             NatsV2ListenCommand::class,
+            NatsV2JetStreamInfoCommand::class,
+            NatsV2JetStreamStreamsCommand::class,
+            NatsV2JetStreamPullCommand::class,
+            NatsV2JetStreamProvisionCommand::class,
             NatsConsumeCommand::class,
             NatsConsumeStreamCommand::class,
             NatsStreamListCommand::class,
@@ -179,11 +193,33 @@ class NatsServiceProvider extends ServiceProvider implements DeferrableProvider
 
         $this->app->bind(NatsSubscriberContract::class, NatsBasisSubscriber::class);
 
+        $this->app->singleton(BasisJetStreamPublisher::class, function ($app) {
+            return new BasisJetStreamPublisher(
+                $app->make(ConnectionManager::class),
+                $app->make('config'),
+            );
+        });
+
+        $this->app->singleton(PullConsumerBatch::class, function ($app) {
+            return new PullConsumerBatch($app->make(ConnectionManager::class));
+        });
+
+        $this->app->singleton(BasisStreamProvisioner::class, function ($app) {
+            return new BasisStreamProvisioner(
+                $app->make(ConnectionManager::class),
+                $app->make('config'),
+            );
+        });
+
         $this->app->singleton('nats.v2', function ($app) {
             return new NatsV2Gateway(
                 $app->make(ConnectionManager::class),
                 $app->make(NatsPublisherContract::class),
                 $app->make(NatsSubscriberContract::class),
+                $app->make(BasisJetStreamPublisher::class),
+                $app->make(PullConsumerBatch::class),
+                $app->make(BasisStreamProvisioner::class),
+                $app->make('config'),
             );
         });
 

@@ -11,6 +11,7 @@ use JsonException;
 use LaravelNats\Connection\ConnectionManager;
 use LaravelNats\Exceptions\PublishException;
 use LaravelNats\Publisher\Contracts\NatsPublisherContract;
+use LaravelNats\Support\CorrelationHeaders;
 use LaravelNats\Support\MessageEnvelope;
 use LogicException;
 
@@ -45,7 +46,8 @@ final class NatsPublisher implements NatsPublisherContract
                 throw new LogicException('NATS client is disconnected; cannot publish.');
             }
 
-            $payloadMessage = new Payload($body, $this->normalizeHeaders($headers));
+            $merged = CorrelationHeaders::mergeForPublish($this->config, $this->normalizeHeaders($headers));
+            $payloadMessage = new Payload($body, $merged);
             $basisConnection->sendMessage(new Publish([
                 'subject' => $subject,
                 'payload' => $payloadMessage,

@@ -30,6 +30,22 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Correlation / Request-ID headers (NatsV2 publish)
+    |--------------------------------------------------------------------------
+    |
+    | When inject_on_publish is true, NatsPublisher merges these from the current
+    | HTTP request (if any) before sending HPUB. See docs/v2/CORRELATION.md.
+    |
+    */
+    'correlation' => [
+        'inject_on_publish' => filter_var(env('NATS_CORRELATION_INJECT', false), FILTER_VALIDATE_BOOL),
+        'request_id_header' => env('NATS_REQUEST_ID_HEADER', 'X-Request-Id'),
+        'correlation_id_header' => env('NATS_CORRELATION_ID_HEADER', 'Nats-Correlation-Id'),
+        'generate_when_missing' => filter_var(env('NATS_CORRELATION_GENERATE_REQUEST_ID', true), FILTER_VALIDATE_BOOL),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Logging (basis-company/nats client)
     |--------------------------------------------------------------------------
     |
@@ -60,6 +76,31 @@ return [
         'dispatch_events' => filter_var(env('NATS_SUBSCRIBER_DISPATCH_EVENTS', false), FILTER_VALIDATE_BOOL),
         'middleware' => [
             // LaravelNats\Subscriber\Middleware\LogInboundMiddleware::class,
+            // LaravelNats\Subscriber\Middleware\CorrelationLogInboundMiddleware::class,
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | JetStream (basis client, NatsV2)
+    |--------------------------------------------------------------------------
+    |
+    | Pull defaults for PullConsumerBatch. Presets are optional named stream
+    | definitions for BasisStreamProvisioner::provision() - see docs/v2/JETSTREAM.md.
+    |
+    */
+    'jetstream' => [
+        'pull' => [
+            'default_batch' => (int) env('NATS_V2_JS_PULL_BATCH', 10),
+            'default_expires' => (float) env('NATS_V2_JS_PULL_EXPIRES', 0.5),
+        ],
+        'presets' => [
+            'example_events' => [
+                'name' => 'EXAMPLE_EVENTS',
+                'subjects' => ['example.events.>'],
+                'storage' => 'file',
+                'retention' => 'limits',
+            ],
         ],
     ],
 

@@ -1,6 +1,6 @@
 {
     "name": "zaeem2396/laravel-nats",
-    "description": "Laravel NATS - v2 basis stack (basis-company/nats), subscriber API, queue driver, JetStream, Artisan commands",
+    "description": "Laravel NATS - v2 basis stack (basis-company/nats), subscriber, NatsV2 JetStream helpers, queue driver, legacy JetStream, Artisan commands",
     "keywords": [
         "laravel",
         "nats",

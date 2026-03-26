@@ -52,7 +52,7 @@
 | **M4** DX | Inbound middleware pipeline (`InboundMiddleware`, `LogInboundMiddleware`) | Completed |
 | **M5** Defaults | Subject max length; optional warn flag (reserved) | Completed |
 | **M6** Observability | Optional `LogInboundMiddleware` for debug traces | Completed |
-| **M6** Observability | Request-ID / correlation header convention | Planned |
+| **M6** Observability | Request-ID / correlation header convention | Completed |
 | **M7** Migration | Docs: [MIGRATION.md](v2/MIGRATION.md), [SUBSCRIBER.md](v2/SUBSCRIBER.md) | Completed |
 
 ---
@@ -63,13 +63,13 @@
 
 | Area | Deliverable | Status |
 |------|-------------|--------|
-| **M1** Facade layer | `JetStreamManager` (or equivalent) on `Basis\Nats\Api` | Planned |
-| **M1** Facade layer | Stream/consumer config; reuse `ConnectionManager` | Planned |
-| **M2** Publish | JetStream-aware publish; optional v2 envelope | Planned |
-| **M3** Consume | Pull consumer helper; batch fetch aligned with basis client | Planned |
-| **M3** Consume | Artisan commands only where they add value (thin wrappers) | Planned |
-| **M4** Defaults | Starter stream/consumer presets in docs + config | Planned |
-| **M5** Migration | Upgrade guide: v1 JetStream vs v2.2; parity checklist | Planned |
+| **M1** Facade layer | `BasisJetStreamManager` on `Basis\Nats\Api` via `NatsV2::jetstream()` | Completed |
+| **M1** Facade layer | Stream/consumer config; reuse `ConnectionManager` | Completed |
+| **M2** Publish | JetStream-aware publish; optional v2 envelope | Completed |
+| **M3** Consume | Pull consumer helper; batch fetch aligned with basis client | Completed |
+| **M3** Consume | Artisan commands only where they add value (thin wrappers) | Completed |
+| **M4** Defaults | Starter stream/consumer presets in docs + config | Completed |
+| **M5** Migration | Upgrade guide: v1 JetStream vs v2.2; parity checklist | Completed |
 
 ---
 
@@ -142,7 +142,7 @@
 |---------|--------|--------|
 | v2.0 | Foundation, wrapper on basis client, publisher, envelope, `NatsV2`, migration docs | Completed |
 | v2.1 | Subscribers, `InboundMessage`, `nats:v2:listen`, middleware, events | Completed |
-| v2.2 | JetStream on basis client | Planned |
+| v2.2 | JetStream on basis client | Completed |
 | v2.3 | Queue driver + DLQ + retry/backoff | Planned |
 | v2.4 | Idempotency | Planned |
 | v2.5 | Metrics, logging, health | Planned |
@@ -151,6 +151,6 @@
 
 ---
 
-*Document version: 1.3 - tabular status; v2.1 subscriber completed.*
+*Document version: 1.4 - tabular status; v2.2 JetStream on basis client completed.*
 
-**User docs:** [docs/v2/README.md](v2/README.md) · [GUIDE](v2/GUIDE.md) · [SUBSCRIBER](v2/SUBSCRIBER.md) · [MIGRATION](v2/MIGRATION.md)
+**User docs:** [docs/v2/README.md](v2/README.md) · [GUIDE](v2/GUIDE.md) · [SUBSCRIBER](v2/SUBSCRIBER.md) · [JETSTREAM](v2/JETSTREAM.md) · [CORRELATION](v2/CORRELATION.md) · [MIGRATION](v2/MIGRATION.md)
