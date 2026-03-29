@@ -132,6 +132,7 @@ class NatsServiceProvider extends ServiceProvider implements DeferrableProvider
         $this->commands([
             NatsWorkCommand::class,
             NatsPingCommand::class,
+            NatsValidateConfigCommand::class,
             NatsV2ListenCommand::class,
             NatsV2JetStreamInfoCommand::class,
             NatsV2JetStreamStreamsCommand::class,
