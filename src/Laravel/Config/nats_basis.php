@@ -167,6 +167,45 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Security & validation (v2.6)
+    |--------------------------------------------------------------------------
+    |
+    | validate_on_boot: fail fast on bad host/port/timeout (and optional TLS rules in production).
+    | tls.require_in_production: when APP_ENV=production, each connection must set TLS material
+    | or tlsHandshakeFirst. See docs/v2/SECURITY.md.
+    |
+    */
+    'security' => [
+        'validate_on_boot' => filter_var(env('NATS_BASIS_VALIDATE_CONFIG', false), FILTER_VALIDATE_BOOL),
+        'tls' => [
+            'require_in_production' => filter_var(env('NATS_TLS_REQUIRE_IN_PRODUCTION', false), FILTER_VALIDATE_BOOL),
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Subject ACL (v2.6) — optional client-side allowlists
+    |--------------------------------------------------------------------------
+    |
+    | Not a substitute for NATS server authorization. When enabled, publish/subscribe subjects
+    | must match allowed_publish_prefixes / allowed_subscribe_prefixes (prefix or exact; trailing
+    | dot means prefix). Empty list when enabled denies all. See docs/v2/SECURITY.md.
+    |
+    */
+    'acl' => [
+        'enabled' => filter_var(env('NATS_ACL_ENABLED', false), FILTER_VALIDATE_BOOL),
+        'allowed_publish_prefixes' => array_values(array_filter(array_map(
+            static fn (string $s): string => trim($s),
+            explode(',', (string) env('NATS_ACL_PUBLISH_PREFIXES', '')),
+        ))),
+        'allowed_subscribe_prefixes' => array_values(array_filter(array_map(
+            static fn (string $s): string => trim($s),
+            explode(',', (string) env('NATS_ACL_SUBSCRIBE_PREFIXES', '')),
+        ))),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Connections
     |--------------------------------------------------------------------------
     |
