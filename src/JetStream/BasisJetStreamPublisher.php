@@ -83,6 +83,10 @@ final class BasisJetStreamPublisher
                 throw $e;
             }
 
+            if ($e instanceof SubjectNotAllowedException) {
+                throw $e;
+            }
+
             throw new PublishException(
                 sprintf('Failed to publish to JetStream stream "%s": %s', $streamName, $e->getMessage()),
                 0,
