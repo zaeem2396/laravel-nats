@@ -317,4 +317,15 @@ class NatsServiceProvider extends ServiceProvider implements DeferrableProvider
             });
         });
     }
+
+    /**
+     * Optional fail-fast validation for `nats_basis` (see `nats_basis.security.validate_on_boot`).
+     */
+    protected function bootNatsBasisSecurity(): void
+    {
+        $this->app->make(NatsBasisConfigurationValidator::class)->validate(
+            $this->app->make('config'),
+            $this->app,
+        );
+    }
 }
