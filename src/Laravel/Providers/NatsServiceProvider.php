@@ -198,6 +198,7 @@ class NatsServiceProvider extends ServiceProvider implements DeferrableProvider
                 $app->make(ConnectionManager::class),
                 $app->make('config'),
                 $app->make(NatsMetricsContract::class),
+                $app->make(SubjectAclChecker::class),
             );
         });
 
