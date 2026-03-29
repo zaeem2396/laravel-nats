@@ -9,18 +9,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- **`nats_basis` max in-flight:** optional `max_in_flight` / `NATS_BASIS_QUEUE_MAX_IN_FLIGHT` and `nats_basis.queue.max_in_flight`; `BasisNatsQueue` tracks popped jobs per process and `NatsJob` notifies the queue on delete/release. See [docs/v2/QUEUE.md](docs/v2/QUEUE.md).
+- (none)
 
 ### Removed
 
 - (none)
+
+## [1.6.0] - 2026-03-29
+
+### Added
+
+- **Idempotency (v2.4):** optional `idempotency_key` on `NatsV2::publish` / `jetStreamPublish` payloads (lifted to envelope root + `Nats-Idempotency-Key` HPUB header via `IdempotencyHeaders`); `IdempotencyStoreContract`, `CacheIdempotencyStore`; `IdempotencyInboundMiddleware`; `InboundMessage::idempotencyKey()`; `nats_basis.idempotency` config and `NATS_IDEMPOTENCY_*` env vars. See [docs/v2/IDEMPOTENCY.md](docs/v2/IDEMPOTENCY.md).
 
 ## [1.5.0] - 2026-03-24
 
 ### Added
 
 - **`nats_basis` queue driver:** `BasisNatsConnector`, `BasisNatsQueue` using `ConnectionManager` and `Basis\Nats\Client`; job payload compatible with legacy `nats` for `queue:work`, retries, failed jobs, and DLQ routing via `NatsJob` + `NatsJobQueueBridge::publishRawToSubject()`.
-- **Config:** `nats_basis.queue` (`prefix`, `retry_after`, `tries`, `block_for`) with `NATS_BASIS_QUEUE_*` env vars.
+- **Config:** `nats_basis.queue` (`prefix`, `retry_after`, `tries`, `block_for`, optional `max_in_flight`) with `NATS_BASIS_QUEUE_*` env vars; per-process in-flight cap for `BasisNatsQueue` with `NatsJob` lifecycle notifications.
 - **Docs:** [docs/v2/QUEUE.md](docs/v2/QUEUE.md); roadmap v2.3 marked completed.
 
 ### Changed
@@ -278,7 +284,8 @@ Run `composer update zaeem2396/laravel-nats` to upgrade.
 
 ---
 
-[Unreleased]: https://github.com/zaeem2396/laravel-nats/compare/v1.5.0...HEAD
+[Unreleased]: https://github.com/zaeem2396/laravel-nats/compare/v1.6.0...HEAD
+[1.6.0]: https://github.com/zaeem2396/laravel-nats/compare/v1.5.0...v1.6.0
 [1.5.0]: https://github.com/zaeem2396/laravel-nats/compare/v1.4.0...v1.5.0
 [1.4.0]: https://github.com/zaeem2396/laravel-nats/compare/v1.3.0...v1.4.0
 [1.3.0]: https://github.com/zaeem2396/laravel-nats/compare/v1.2.0...v1.3.0
