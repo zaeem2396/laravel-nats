@@ -18,4 +18,6 @@
 
 **Idempotent subscribers?** From **1.6.0+**, add **`idempotency_key`** to the publish payload (or header), enable **`NATS_IDEMPOTENCY_ENABLED`**, register **`IdempotencyInboundMiddleware`**, and use a shared cache store ([IDEMPOTENCY.md](IDEMPOTENCY.md)).
 
+**Metrics, redacted logs, NATS health?** From **1.7.0+**, see [OBSERVABILITY.md](OBSERVABILITY.md) (`NatsMetricsContract`, `nats:ping`, envelope redaction).
+
 **Overhead?** One JSON encode and UUID per publish; negligible vs network.

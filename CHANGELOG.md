@@ -15,6 +15,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - (none)
 
+## [1.7.0] - 2026-03-29
+
+### Added
+
+- **Observability (v2.5):** `NatsMetricsContract`, `NullNatsMetrics`, `InMemoryNatsMetrics`; optional publish metrics from `NatsPublisher` when `nats_basis.observability.metrics_enabled` (`NATS_OBSERVABILITY_METRICS`) and optional `laravel_nats.publish.latency_ms` histogram (`NATS_OBSERVABILITY_PUBLISH_LATENCY_MS`); `EnvelopeDataRedactor`, `CorrelationLogContext`, `RedactedEnvelopeLogInboundMiddleware`; `NatsV2::ping()` and Artisan `nats:ping` (`--connection`, `--json`); `nats_basis.observability` and `NATS_REDACT_KEY_SUBSTRINGS`. See [docs/v2/OBSERVABILITY.md](docs/v2/OBSERVABILITY.md).
+
 ## [1.6.0] - 2026-03-29
 
 ### Added
@@ -284,7 +290,8 @@ Run `composer update zaeem2396/laravel-nats` to upgrade.
 
 ---
 
-[Unreleased]: https://github.com/zaeem2396/laravel-nats/compare/v1.6.0...HEAD
+[Unreleased]: https://github.com/zaeem2396/laravel-nats/compare/v1.7.0...HEAD
+[1.7.0]: https://github.com/zaeem2396/laravel-nats/compare/v1.6.0...v1.7.0
 [1.6.0]: https://github.com/zaeem2396/laravel-nats/compare/v1.5.0...v1.6.0
 [1.5.0]: https://github.com/zaeem2396/laravel-nats/compare/v1.4.0...v1.5.0
 [1.4.0]: https://github.com/zaeem2396/laravel-nats/compare/v1.3.0...v1.4.0

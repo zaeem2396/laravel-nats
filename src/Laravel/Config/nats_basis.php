@@ -46,6 +46,25 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Observability (v2.5) — metrics hooks, envelope redaction, health ping
+    |--------------------------------------------------------------------------
+    |
+    | Metrics: rebind NatsMetricsContract to forward to Prometheus or OpenTelemetry. Labels use
+    | low-cardinality values only (connection name, outcome).
+    | Redaction: substring match against array keys when logging envelope data (EnvelopeDataRedactor).
+    |
+    */
+    'observability' => [
+        'metrics_enabled' => filter_var(env('NATS_OBSERVABILITY_METRICS', false), FILTER_VALIDATE_BOOL),
+        'publish_latency_histogram' => filter_var(env('NATS_OBSERVABILITY_PUBLISH_LATENCY_MS', false), FILTER_VALIDATE_BOOL),
+        'redact_key_substrings' => array_values(array_filter(array_map(
+            static fn (string $s): string => trim($s),
+            explode(',', (string) env('NATS_REDACT_KEY_SUBSTRINGS', 'password,secret,token,authorization')),
+        ))),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Idempotency (v2.4) — subscriber middleware + publish envelope/header
     |--------------------------------------------------------------------------
     |
@@ -97,6 +116,7 @@ return [
         'middleware' => [
             // LaravelNats\Subscriber\Middleware\LogInboundMiddleware::class,
             // LaravelNats\Subscriber\Middleware\CorrelationLogInboundMiddleware::class,
+            // LaravelNats\Subscriber\Middleware\RedactedEnvelopeLogInboundMiddleware::class,
             // LaravelNats\Subscriber\Middleware\IdempotencyInboundMiddleware::class,
         ],
     ],

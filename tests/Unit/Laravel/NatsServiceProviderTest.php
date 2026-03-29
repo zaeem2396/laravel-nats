@@ -12,6 +12,8 @@ use LaravelNats\JetStream\PullConsumerBatch;
 use LaravelNats\Laravel\NatsManager;
 use LaravelNats\Laravel\NatsV2Gateway;
 use LaravelNats\Laravel\Providers\NatsServiceProvider;
+use LaravelNats\Observability\Contracts\NatsMetricsContract;
+use LaravelNats\Observability\NullNatsMetrics;
 use LaravelNats\Publisher\Contracts\NatsPublisherContract;
 use LaravelNats\Publisher\NatsPublisher;
 use LaravelNats\Subscriber\Contracts\NatsSubscriberContract;
@@ -49,7 +51,8 @@ it('provides deferred services', function (): void {
         ->and($provides)->toContain(PullConsumerBatch::class)
         ->and($provides)->toContain(BasisStreamProvisioner::class)
         ->and($provides)->toContain(Client::class)
-        ->and($provides)->toContain(IdempotencyStoreContract::class);
+        ->and($provides)->toContain(IdempotencyStoreContract::class)
+        ->and($provides)->toContain(NatsMetricsContract::class);
 });
 
 it('resolves IdempotencyStoreContract as cache-backed store', function (): void {
@@ -116,4 +119,18 @@ it('merges nats_basis.correlation defaults from package', function (): void {
     expect($config->get('nats_basis.correlation.inject_on_publish'))->toBeFalse()
         ->and($config->get('nats_basis.correlation.request_id_header'))->toBe('X-Request-Id')
         ->and($config->get('nats_basis.correlation.correlation_id_header'))->toBe('Nats-Correlation-Id');
+});
+
+it('merges nats_basis.observability defaults from package', function (): void {
+    $config = $this->app->make('config');
+
+    expect($config->get('nats_basis.observability.metrics_enabled'))->toBeFalse()
+        ->and($config->get('nats_basis.observability.publish_latency_histogram'))->toBeFalse()
+        ->and($config->get('nats_basis.observability.redact_key_substrings'))->toContain('password');
+});
+
+it('resolves NatsMetricsContract as null implementation by default', function (): void {
+    $metrics = $this->app->make(NatsMetricsContract::class);
+
+    expect($metrics)->toBeInstanceOf(NullNatsMetrics::class);
 });
