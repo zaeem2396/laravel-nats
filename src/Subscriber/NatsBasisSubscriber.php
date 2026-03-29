@@ -10,6 +10,7 @@ use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher;
 use LaravelNats\Connection\ConnectionManager;
 use LaravelNats\Laravel\Events\NatsInboundMessageReceived;
+use LaravelNats\Security\SubjectAclChecker;
 use LaravelNats\Subscriber\Contracts\NatsSubscriberContract;
 use LaravelNats\Subscriber\Exceptions\SubscriptionConflictException;
 use LaravelNats\Subscriber\Exceptions\SubscriptionNotFoundException;
