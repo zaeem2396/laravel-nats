@@ -47,6 +47,7 @@ uses(LaravelNats\Tests\TestCase::class)->in(
     'Unit/JetStreamFinalityTest.php',
     'Unit/Idempotency',
     'Unit/Support',
+    'Unit/Observability',
     'Unit/Subscriber',
 );
 
@@ -63,6 +64,8 @@ uses(LaravelNats\Tests\LaravelTestCase::class)->in(
     'Unit/Laravel/NatsV2JetStreamCommandsRegisteredTest.php',
     'Unit/Laravel/CorrelationHeadersTest.php',
     'Unit/Laravel/BasisNatsConnectorTest.php',
+    'Unit/Laravel/NatsPingCommandRegisteredTest.php',
+    'Unit/Laravel/RedactedEnvelopeLogInboundMiddlewareTest.php',
 );
 
 // Unit/Laravel/Queue tests: Queue components (minimal Laravel context)
