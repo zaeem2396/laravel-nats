@@ -84,6 +84,7 @@ class NatsServiceProvider extends ServiceProvider implements DeferrableProvider
         $this->publishConfig();
         $this->registerQueueDriver();
         $this->registerJetStreamCommands();
+        $this->bootNatsBasisSecurity();
     }
 
     /**
