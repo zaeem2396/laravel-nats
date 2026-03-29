@@ -18,6 +18,7 @@ The v2 stack is a **Laravel wrapper** around [basis-company/nats](https://packag
 10. Subscribe (NatsV2)
 11. JetStream (NatsV2)
 12. Idempotency — [IDEMPOTENCY.md](IDEMPOTENCY.md)
+13. Observability — [OBSERVABILITY.md](OBSERVABILITY.md) (package 1.7.0+)
 
 ## Config
 
@@ -30,6 +31,8 @@ The v2 stack is a **Laravel wrapper** around [basis-company/nats](https://packag
 | `NATS_BASIS_LOGGING` | When `true`, pass Laravel’s log channel to `Basis\Nats\Client` (wire-level traces from the dependency) |
 | `NATS_BASIS_LOG_CHANNEL` | Laravel channel name (default `stack`) when logging is enabled |
 | `NATS_V2_JS_PULL_BATCH` / `NATS_V2_JS_PULL_EXPIRES` | Defaults for `NatsV2::jetStreamPull()` (see [JETSTREAM.md](JETSTREAM.md)) |
+| `NATS_OBSERVABILITY_METRICS` / `NATS_OBSERVABILITY_PUBLISH_LATENCY_MS` | Optional publish counters and latency histogram via `NatsMetricsContract` ([OBSERVABILITY.md](OBSERVABILITY.md)) |
+| `NATS_REDACT_KEY_SUBSTRINGS` | Comma-separated key substrings redacted when logging envelope `data` |
 
 TLS file paths: `NATS_TLS_KEY`, `NATS_TLS_CERT`, `NATS_TLS_CA`.
 
