@@ -185,6 +185,12 @@ class NatsServiceProvider extends ServiceProvider implements DeferrableProvider
             return new ConnectionManager($config, $logger);
         });
 
+        $this->app->singleton(NatsBasisConfigurationValidator::class, static fn () => new NatsBasisConfigurationValidator());
+
+        $this->app->singleton(SubjectAclChecker::class, function ($app) {
+            return new SubjectAclChecker($app->make('config'));
+        });
+
         $this->app->singleton(NatsMetricsContract::class, static fn () => new NullNatsMetrics());
 
         $this->app->singleton(NatsPublisher::class, function ($app) {
