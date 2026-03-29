@@ -45,6 +45,8 @@ use LaravelNats\Observability\Contracts\NatsMetricsContract;
 use LaravelNats\Observability\NullNatsMetrics;
 use LaravelNats\Publisher\Contracts\NatsPublisherContract;
 use LaravelNats\Publisher\NatsPublisher;
+use LaravelNats\Security\NatsBasisConfigurationValidator;
+use LaravelNats\Security\SubjectAclChecker;
 use LaravelNats\Subscriber\Contracts\NatsSubscriberContract;
 use LaravelNats\Subscriber\NatsBasisSubscriber;
 use LaravelNats\Subscriber\SubjectValidator;
