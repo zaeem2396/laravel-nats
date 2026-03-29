@@ -111,11 +111,13 @@
 
 ## Version v2.5 - Observability
 
+**Shipped (package 1.7.0):** **`NatsMetricsContract`** + **`NullNatsMetrics`** / **`InMemoryNatsMetrics`**; optional publish counters and latency histogram from **`NatsPublisher`** when **`nats_basis.observability.metrics_enabled`**; **`CorrelationLogContext`** for HTTP logs; **`EnvelopeDataRedactor`** and **`RedactedEnvelopeLogInboundMiddleware`**; Artisan **`nats:ping`** and **`NatsV2::ping()`**; docs [docs/v2/OBSERVABILITY.md](v2/OBSERVABILITY.md).
+
 | Area | Deliverable | Status |
 |------|-------------|--------|
-| **M1** Metrics | Counters/histograms interface; optional Prometheus/Otel bridge | Planned |
-| **M2** Logging | Correlation ID; redaction hooks for `data` | Planned |
-| **M3** Health | `nats:ping` / readiness; optional route recipe | Planned |
+| **M1** Metrics | Counters/histograms interface; optional Prometheus/Otel bridge | Completed |
+| **M2** Logging | Correlation ID; redaction hooks for `data` | Completed |
+| **M3** Health | `nats:ping` / readiness; optional route recipe | Completed |
 
 ---
 
@@ -149,12 +151,12 @@
 | v2.2 | JetStream on basis client | Completed |
 | v2.3 | Queue driver + DLQ + retry/backoff | Completed |
 | v2.4 | Idempotency | Completed |
-| v2.5 | Metrics, logging, health | Planned |
+| v2.5 | Metrics, logging, health | Completed |
 | v2.6 | Security, TLS, ACLs | Planned |
 | v2.7 | Advanced headers, clustering, optional outbox | Planned |
 
 ---
 
-*Document version: 1.6 - v2.4 idempotency completed.*
+*Document version: 1.7 - v2.5 observability completed.*
 
-**User docs:** [docs/v2/README.md](v2/README.md) · [GUIDE](v2/GUIDE.md) · [SUBSCRIBER](v2/SUBSCRIBER.md) · [JETSTREAM](v2/JETSTREAM.md) · [QUEUE](v2/QUEUE.md) · [IDEMPOTENCY](v2/IDEMPOTENCY.md) · [CORRELATION](v2/CORRELATION.md) · [MIGRATION](v2/MIGRATION.md)
+**User docs:** [docs/v2/README.md](v2/README.md) · [GUIDE](v2/GUIDE.md) · [SUBSCRIBER](v2/SUBSCRIBER.md) · [JETSTREAM](v2/JETSTREAM.md) · [QUEUE](v2/QUEUE.md) · [IDEMPOTENCY](v2/IDEMPOTENCY.md) · [OBSERVABILITY](v2/OBSERVABILITY.md) · [CORRELATION](v2/CORRELATION.md) · [MIGRATION](v2/MIGRATION.md)
