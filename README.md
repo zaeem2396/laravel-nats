@@ -8,7 +8,7 @@
 
 A native NATS integration for Laravel that feels like home. Publish, subscribe, and request/reply with a familiar, expressive API.
 
-> **NatsV2** (basis stack, **package 1.3.0+** pub/sub, **1.4.0+** JetStream helpers, **1.5.0+** **`nats_basis`** queue driver): Laravel **wrapper** on [basis-company/nats](https://github.com/basis-company/nats.php). **Docs:** [Guide](docs/v2/GUIDE.md) · [Subscriber](docs/v2/SUBSCRIBER.md) · [JetStream](docs/v2/JETSTREAM.md) · [Queue](docs/v2/QUEUE.md) · [FAQ](docs/v2/FAQ.md) · [Migration](docs/v2/MIGRATION.md). The **legacy** `Nats` facade API for subscribe, queue, and JetStream is also documented in this README.
+> **NatsV2** (basis stack, **package 1.3.0+** pub/sub, **1.4.0+** JetStream helpers, **1.5.0+** **`nats_basis`** queue driver, **1.6.0+** optional **idempotency**): Laravel **wrapper** on [basis-company/nats](https://github.com/basis-company/nats.php). **Docs:** [Guide](docs/v2/GUIDE.md) · [Subscriber](docs/v2/SUBSCRIBER.md) · [JetStream](docs/v2/JETSTREAM.md) · [Queue](docs/v2/QUEUE.md) · [Idempotency](docs/v2/IDEMPOTENCY.md) · [FAQ](docs/v2/FAQ.md) · [Migration](docs/v2/MIGRATION.md). The **legacy** `Nats` facade API for subscribe, queue, and JetStream is also documented in this README.
 
 ## Requirements
 
@@ -26,6 +26,7 @@ composer require zaeem2396/laravel-nats
 - **v1.3.0+** for **`NatsV2::publish`** / **`NatsV2::subscribe`**, `ConnectionManager`, JSON envelope (`config/nats_basis.php`), **`InboundMessage`**, and **`nats:v2:listen`**.
 - **v1.4.0+** for **`NatsV2::jetstream()`**, **`jetStreamPublish`** / **`jetStreamPull`**, stream presets, and **`nats:v2:jetstream:*`** Artisan commands ([docs/v2/JETSTREAM.md](docs/v2/JETSTREAM.md)).
 - **v1.5.0+** for the **`nats_basis`** queue driver (`queue:work` on **`Basis\Nats\Client`** via **`ConnectionManager`**, same job JSON as legacy **`nats`**; [docs/v2/QUEUE.md](docs/v2/QUEUE.md)).
+- **v1.6.0+** for optional **idempotency** (`idempotency_key` in envelope + header, cache-backed **`IdempotencyInboundMiddleware`**; [docs/v2/IDEMPOTENCY.md](docs/v2/IDEMPOTENCY.md)).
 
 The service provider is auto-discovered. To publish configuration (includes **`nats_basis`** for v2):
 
