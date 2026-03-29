@@ -17,6 +17,7 @@ The v2 stack is a **Laravel wrapper** around [basis-company/nats](https://packag
 9. Migration strategy
 10. Subscribe (NatsV2)
 11. JetStream (NatsV2)
+12. Idempotency — [IDEMPOTENCY.md](IDEMPOTENCY.md)
 
 ## Config
 
