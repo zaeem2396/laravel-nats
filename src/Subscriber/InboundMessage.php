@@ -6,6 +6,7 @@ namespace LaravelNats\Subscriber;
 
 use Basis\Nats\Message\Payload;
 use LaravelNats\Support\CorrelationHeaders;
+use LaravelNats\Support\IdempotencyHeaders;
 
 /**
  * Inbound NATS message for the v2 subscriber stack (decoupled from basis {@see Payload}).
@@ -55,7 +56,7 @@ final class InboundMessage
     /**
      * When the body matches the v2 publisher envelope, returns the decoded root array.
      *
-     * @return array{id: string, type: string, version: string, data: mixed}|null
+     * @return array{id: string, type: string, version: string, data: mixed, idempotency_key?: string}|null
      */
     public function envelopePayload(): ?array
     {
@@ -85,6 +86,32 @@ final class InboundMessage
     public function correlationId(?string $headerName = null): ?string
     {
         return $this->headerIgnoringCase($headerName ?? CorrelationHeaders::DEFAULT_CORRELATION_ID);
+    }
+
+    /**
+     * Idempotency key from NATS headers first, then optional {@see envelopePayload()} `idempotency_key`.
+     */
+    public function idempotencyKey(?string $headerName = null): ?string
+    {
+        $name = $headerName ?? IdempotencyHeaders::DEFAULT_HEADER;
+        $fromHeader = $this->headerIgnoringCase($name);
+        if ($fromHeader !== null && $fromHeader !== '') {
+            return $fromHeader;
+        }
+
+        $env = $this->envelopePayload();
+        if ($env === null) {
+            return null;
+        }
+
+        $k = $env['idempotency_key'] ?? null;
+        if (! is_string($k)) {
+            return null;
+        }
+
+        $trimmed = trim($k);
+
+        return $trimmed !== '' ? $trimmed : null;
     }
 
     private function headerIgnoringCase(string $name): ?string
