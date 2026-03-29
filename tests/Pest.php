@@ -38,7 +38,17 @@ declare(strict_types=1);
 */
 
 // Unit tests: Pure PHP, no framework dependencies (excluding Laravel folder)
-uses(LaravelNats\Tests\TestCase::class)->in('Unit/Connection', 'Unit/Messaging', 'Unit/Protocol', 'Unit/Serialization', 'Unit/Core/JetStream', 'Unit/JetStreamFinalityTest.php');
+uses(LaravelNats\Tests\TestCase::class)->in(
+    'Unit/Connection',
+    'Unit/Messaging',
+    'Unit/Protocol',
+    'Unit/Serialization',
+    'Unit/Core/JetStream',
+    'Unit/JetStreamFinalityTest.php',
+    'Unit/Idempotency',
+    'Unit/Support',
+    'Unit/Subscriber',
+);
 
 // Unit/Laravel tests: Laravel application context with Orchestra Testbench
 uses(LaravelNats\Tests\LaravelTestCase::class)->in(
