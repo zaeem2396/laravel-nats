@@ -31,6 +31,7 @@ final class NatsBasisSubscriber implements NatsSubscriberContract
         private readonly ConnectionManager $connections,
         private readonly Repository $config,
         private readonly SubjectValidator $subjects,
+        private readonly SubjectAclChecker $subjectAcl,
         private readonly Container $container,
         private readonly ?Dispatcher $events = null,
     ) {
