@@ -42,6 +42,8 @@ final class BasisJetStreamPublisher
         unset($headers);
 
         try {
+            $this->subjectAcl->assertPublishAllowed($subject);
+
             $manager = new BasisJetStreamManager($this->connections, $connection);
             $stream = $manager->stream($streamName, $connection);
             if ($useEnvelope) {
