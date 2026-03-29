@@ -15,36 +15,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - (none)
 
-## [1.7.0] - 2026-03-29
+## [1.4.0] - 2026-03-29
 
-### Added
-
-- **Observability (v2.5):** `NatsMetricsContract`, `NullNatsMetrics`, `InMemoryNatsMetrics`; optional publish metrics from `NatsPublisher` when `nats_basis.observability.metrics_enabled` (`NATS_OBSERVABILITY_METRICS`) and optional `laravel_nats.publish.latency_ms` histogram (`NATS_OBSERVABILITY_PUBLISH_LATENCY_MS`); `EnvelopeDataRedactor`, `CorrelationLogContext`, `RedactedEnvelopeLogInboundMiddleware`; `NatsV2::ping()` and Artisan `nats:ping` (`--connection`, `--json`); `nats_basis.observability` and `NATS_REDACT_KEY_SUBSTRINGS`. See [docs/v2/OBSERVABILITY.md](docs/v2/OBSERVABILITY.md).
-
-## [1.6.0] - 2026-03-29
-
-### Added
-
-- **Idempotency (v2.4):** optional `idempotency_key` on `NatsV2::publish` / `jetStreamPublish` payloads (lifted to envelope root + `Nats-Idempotency-Key` HPUB header via `IdempotencyHeaders`); `IdempotencyStoreContract`, `CacheIdempotencyStore`; `IdempotencyInboundMiddleware`; `InboundMessage::idempotencyKey()`; `nats_basis.idempotency` config and `NATS_IDEMPOTENCY_*` env vars. See [docs/v2/IDEMPOTENCY.md](docs/v2/IDEMPOTENCY.md).
-
-## [1.5.0] - 2026-03-24
-
-### Added
-
-- **`nats_basis` queue driver:** `BasisNatsConnector`, `BasisNatsQueue` using `ConnectionManager` and `Basis\Nats\Client`; job payload compatible with legacy `nats` for `queue:work`, retries, failed jobs, and DLQ routing via `NatsJob` + `NatsJobQueueBridge::publishRawToSubject()`.
-- **Config:** `nats_basis.queue` (`prefix`, `retry_after`, `tries`, `block_for`, optional `max_in_flight`) with `NATS_BASIS_QUEUE_*` env vars; per-process in-flight cap for `BasisNatsQueue` with `NatsJob` lifecycle notifications.
-- **Docs:** [docs/v2/QUEUE.md](docs/v2/QUEUE.md); roadmap v2.3 marked completed.
-
-### Changed
-
-- **`NatsQueue` / `NatsJob`:** introduce `NatsJobQueueBridge` so DLQ and retries work for both legacy and basis queue implementations.
-
-## [1.4.0] - 2026-03-24
+First release after **1.3.0** on Packagist: bundles NatsV2 JetStream on the basis client, **`nats_basis`** queue driver, idempotency, and observability (metrics hooks, redaction, **`nats:ping`**).
 
 ### Added
 
 - **NatsV2 JetStream (basis-company/nats):** `BasisJetStreamManager`, `BasisJetStreamPublisher`, `PullConsumerBatch`, `BasisStreamProvisioner`; `NatsV2::jetstream()`, `jetStreamPublish()`, `jetStreamPull()`, `jetStreamProvisionPreset()`; `nats_basis.jetstream` config (pull defaults, named presets); Artisan `nats:v2:jetstream:info`, `streams`, `pull`, `provision`. See [docs/v2/JETSTREAM.md](docs/v2/JETSTREAM.md).
 - **Request-ID / correlation headers:** `CorrelationHeaders`, optional HTTP-to-publish injection (`nats_basis.correlation`), `InboundMessage::requestId()` / `correlationId()`, optional `CorrelationLogInboundMiddleware`. See [docs/v2/CORRELATION.md](docs/v2/CORRELATION.md).
+- **`nats_basis` queue driver:** `BasisNatsConnector`, `BasisNatsQueue` using `ConnectionManager` and `Basis\Nats\Client`; job payload compatible with legacy `nats` for `queue:work`, retries, failed jobs, and DLQ routing via `NatsJob` + `NatsJobQueueBridge::publishRawToSubject()`.
+- **Config:** `nats_basis.queue` (`prefix`, `retry_after`, `tries`, `block_for`, optional `max_in_flight`) with `NATS_BASIS_QUEUE_*` env vars; per-process in-flight cap for `BasisNatsQueue` with `NatsJob` lifecycle notifications.
+- **Docs:** [docs/v2/QUEUE.md](docs/v2/QUEUE.md); roadmap v2.3 marked completed.
+- **Idempotency (v2.4):** optional `idempotency_key` on `NatsV2::publish` / `jetStreamPublish` payloads (lifted to envelope root + `Nats-Idempotency-Key` HPUB header via `IdempotencyHeaders`); `IdempotencyStoreContract`, `CacheIdempotencyStore`; `IdempotencyInboundMiddleware`; `InboundMessage::idempotencyKey()`; `nats_basis.idempotency` config and `NATS_IDEMPOTENCY_*` env vars. See [docs/v2/IDEMPOTENCY.md](docs/v2/IDEMPOTENCY.md).
+- **Observability (v2.5):** `NatsMetricsContract`, `NullNatsMetrics`, `InMemoryNatsMetrics`; optional publish metrics from `NatsPublisher` when `nats_basis.observability.metrics_enabled` (`NATS_OBSERVABILITY_METRICS`) and optional `laravel_nats.publish.latency_ms` histogram (`NATS_OBSERVABILITY_PUBLISH_LATENCY_MS`); `EnvelopeDataRedactor`, `CorrelationLogContext`, `RedactedEnvelopeLogInboundMiddleware`; `NatsV2::ping()` and Artisan `nats:ping` (`--connection`, `--json`); `nats_basis.observability` and `NATS_REDACT_KEY_SUBSTRINGS`. See [docs/v2/OBSERVABILITY.md](docs/v2/OBSERVABILITY.md).
+
+### Changed
+
+- **`NatsQueue` / `NatsJob`:** introduce `NatsJobQueueBridge` so DLQ and retries work for both legacy and basis queue implementations.
 
 ## [1.3.0] - 2026-03-24
 
@@ -244,7 +231,10 @@ Run `composer update zaeem2396/laravel-nats` to upgrade.
 
 ### From 1.3.0 to 1.4.0
 
-- **JetStream on NatsV2:** See [docs/v2/JETSTREAM.md](docs/v2/JETSTREAM.md) and optional **`nats_basis.jetstream.presets`**. Legacy **`Nats::jetstream()`** is unchanged.
+- **JetStream on NatsV2:** [docs/v2/JETSTREAM.md](docs/v2/JETSTREAM.md); optional **`nats_basis.jetstream.presets`**. Legacy **`Nats::jetstream()`** is unchanged.
+- **Queue on the basis client:** **`nats_basis`** driver — [docs/v2/QUEUE.md](docs/v2/QUEUE.md).
+- **Idempotency:** [docs/v2/IDEMPOTENCY.md](docs/v2/IDEMPOTENCY.md).
+- **Observability:** metrics hooks, redaction, **`nats:ping`** — [docs/v2/OBSERVABILITY.md](docs/v2/OBSERVABILITY.md).
 
 ```json
 {
@@ -290,10 +280,7 @@ Run `composer update zaeem2396/laravel-nats` to upgrade.
 
 ---
 
-[Unreleased]: https://github.com/zaeem2396/laravel-nats/compare/v1.7.0...HEAD
-[1.7.0]: https://github.com/zaeem2396/laravel-nats/compare/v1.6.0...v1.7.0
-[1.6.0]: https://github.com/zaeem2396/laravel-nats/compare/v1.5.0...v1.6.0
-[1.5.0]: https://github.com/zaeem2396/laravel-nats/compare/v1.4.0...v1.5.0
+[Unreleased]: https://github.com/zaeem2396/laravel-nats/compare/v1.4.0...HEAD
 [1.4.0]: https://github.com/zaeem2396/laravel-nats/compare/v1.3.0...v1.4.0
 [1.3.0]: https://github.com/zaeem2396/laravel-nats/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/zaeem2396/laravel-nats/compare/v1.1.1...v1.2.0

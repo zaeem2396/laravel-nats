@@ -1,4 +1,4 @@
-# Observability (v2.5, package 1.7.0+)
+# Observability (v2.5, package 1.4.0+)
 
 This release adds **optional publish metrics** (`NatsMetricsContract`), **HTTP correlation context** for application logs, **redaction helpers** for envelope `data` when logging inbound messages, and a **`nats:ping`** Artisan command for readiness checks.
 

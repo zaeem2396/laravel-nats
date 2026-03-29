@@ -6,7 +6,7 @@
 
 **Correlation / Request-ID on messages?** See [CORRELATION.md](CORRELATION.md) (`X-Request-Id`, `Nats-Correlation-Id`, optional publish injection).
 
-**Why @deprecated on `Nats`?** Soft deprecation only: new **publish** code should use `NatsV2`. For **new** subscribe code on the basis stack, prefer `NatsV2::subscribe`. **Queue:** use **`nats_basis`** (1.5.0+, [QUEUE.md](QUEUE.md)) on the basis client, or keep **`nats`** on legacy. **JetStream:** basis helpers from 1.4.0+; legacy `Nats::jetstream()` unchanged. Details in [MIGRATION](MIGRATION.md).
+**Why @deprecated on `Nats`?** Soft deprecation only: new **publish** code should use `NatsV2`. For **new** subscribe code on the basis stack, prefer `NatsV2::subscribe`. **Queue:** use **`nats_basis`** (1.4.0+, [QUEUE.md](QUEUE.md)) on the basis client, or keep **`nats`** on legacy. **JetStream:** basis helpers from 1.4.0+; legacy `Nats::jetstream()` unchanged. Details in [MIGRATION](MIGRATION.md).
 
 **`nats` vs `nats_basis` queue driver?** **`nats`** uses `LaravelNats\Core\Client`. **`nats_basis`** uses `ConnectionManager` / `Basis\Nats\Client` with the same job JSON for `queue:work`. See [QUEUE.md](QUEUE.md).
 
@@ -16,8 +16,8 @@
 
 **JetStream on NatsV2?** Yes from **1.4.0+**: `NatsV2::jetstream()`, publish/pull helpers, and `nats:v2:jetstream:*` commands ([JETSTREAM.md](JETSTREAM.md)). Legacy `Nats::jetstream()` remains available.
 
-**Idempotent subscribers?** From **1.6.0+**, add **`idempotency_key`** to the publish payload (or header), enable **`NATS_IDEMPOTENCY_ENABLED`**, register **`IdempotencyInboundMiddleware`**, and use a shared cache store ([IDEMPOTENCY.md](IDEMPOTENCY.md)).
+**Idempotent subscribers?** From **1.4.0+**, add **`idempotency_key`** to the publish payload (or header), enable **`NATS_IDEMPOTENCY_ENABLED`**, register **`IdempotencyInboundMiddleware`**, and use a shared cache store ([IDEMPOTENCY.md](IDEMPOTENCY.md)).
 
-**Metrics, redacted logs, NATS health?** From **1.7.0+**, see [OBSERVABILITY.md](OBSERVABILITY.md) (`NatsMetricsContract`, `nats:ping`, envelope redaction).
+**Metrics, redacted logs, NATS health?** From **1.4.0+**, see [OBSERVABILITY.md](OBSERVABILITY.md) (`NatsMetricsContract`, `nats:ping`, envelope redaction).
 
 **Overhead?** One JSON encode and UUID per publish; negligible vs network.

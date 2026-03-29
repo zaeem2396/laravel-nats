@@ -18,7 +18,7 @@ The v2 stack is a **Laravel wrapper** around [basis-company/nats](https://packag
 10. Subscribe (NatsV2)
 11. JetStream (NatsV2)
 12. Idempotency — [IDEMPOTENCY.md](IDEMPOTENCY.md)
-13. Observability — [OBSERVABILITY.md](OBSERVABILITY.md) (package 1.7.0+)
+13. Observability — [OBSERVABILITY.md](OBSERVABILITY.md) (package 1.4.0+)
 
 ## Config
 
@@ -74,7 +74,7 @@ Legacy publish = raw JSON body; v2 = envelope. Migrate per subject.
 
 ## Migration strategy
 
-Legacy **`Nats`** / **`NatsManager`** / **`Core\Client`** are **soft-deprecated** for new work as of **1.3.0**; **`NatsV2`** is the supported path for new **publish** and **subscribe** code on the basis client. **JetStream** on the basis client is available from **1.4.0+** ([JETSTREAM.md](JETSTREAM.md)); the legacy **`Nats::jetstream()`** API remains for existing apps. **Queue on the basis client** is available from **1.5.0+** via the **`nats_basis`** driver ([QUEUE.md](QUEUE.md)); the legacy **`nats`** queue driver remains supported. **No silent removals** in upcoming minor releases.
+Legacy **`Nats`** / **`NatsManager`** / **`Core\Client`** are **soft-deprecated** for new work as of **1.3.0**; **`NatsV2`** is the supported path for new **publish** and **subscribe** code on the basis client. **JetStream** on the basis client, the **`nats_basis`** queue driver, idempotency, and observability ship together from **1.4.0+** ([JETSTREAM.md](JETSTREAM.md), [QUEUE.md](QUEUE.md), [IDEMPOTENCY.md](IDEMPOTENCY.md), [OBSERVABILITY.md](OBSERVABILITY.md)); the legacy **`Nats::jetstream()`** and **`nats`** queue driver remain supported. **No silent removals** in upcoming minor releases.
 
 **Full policy, config mapping (`nats.php` ↔ `nats_basis.php`), facade table, and per-minor testing checklist:** [MIGRATION.md](MIGRATION.md).
 

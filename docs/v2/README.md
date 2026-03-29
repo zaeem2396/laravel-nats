@@ -1,6 +1,6 @@
 # v2 documentation index
 
-The **NatsV2** stack (package **1.3.0+** for pub/sub; **1.4.0+** for basis JetStream helpers; **1.5.0+** for the **`nats_basis`** queue driver; **1.6.0+** for optional idempotency; **1.7.0+** for observability hooks and **`nats:ping`**) is a **Laravel wrapper** around **[basis-company/nats](https://packagist.org/packages/basis-company/nats)** - use these pages for `NatsV2`, `config/nats_basis.php`, and the JSON envelope.
+The **NatsV2** stack (package **1.3.0+** for pub/sub; **1.4.0+** for basis JetStream, the **`nats_basis`** queue driver, optional idempotency, and observability including **`nats:ping`**) is a **Laravel wrapper** around **[basis-company/nats](https://packagist.org/packages/basis-company/nats)** - use these pages for `NatsV2`, `config/nats_basis.php`, and the JSON envelope.
 
 - [Guide](GUIDE.md)
 - [Subscriber](SUBSCRIBER.md)
