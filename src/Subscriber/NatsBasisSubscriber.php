@@ -40,6 +40,7 @@ final class NatsBasisSubscriber implements NatsSubscriberContract
     public function subscribe(string $subject, callable $handler, ?string $queueGroup = null, ?string $connection = null): string
     {
         $this->subjects->validate($subject);
+        $this->subjectAcl->assertSubscribeAllowed($subject);
 
         $connName = $connection ?? $this->connections->getDefaultConnection();
         $key = $this->subscriptionKey($connName, $subject, $queueGroup);
