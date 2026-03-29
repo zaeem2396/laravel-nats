@@ -133,6 +133,23 @@ it('merges nats_basis.observability defaults from package', function (): void {
         ->and($config->get('nats_basis.observability.redact_key_substrings'))->toContain('password');
 });
 
+it('merges nats_basis.security and acl defaults from package', function (): void {
+    $config = $this->app->make('config');
+
+    expect($config->get('nats_basis.security.validate_on_boot'))->toBeFalse()
+        ->and($config->get('nats_basis.security.tls.require_in_production'))->toBeFalse()
+        ->and($config->get('nats_basis.acl.enabled'))->toBeFalse()
+        ->and($config->get('nats_basis.acl.allowed_publish_prefixes'))->toBe([])
+        ->and($config->get('nats_basis.acl.allowed_subscribe_prefixes'))->toBe([]);
+});
+
+it('resolves security validator and ACL checker from container', function (): void {
+    expect($this->app->make(NatsBasisConfigurationValidator::class))
+        ->toBeInstanceOf(NatsBasisConfigurationValidator::class)
+        ->and($this->app->make(SubjectAclChecker::class))
+        ->toBeInstanceOf(SubjectAclChecker::class);
+});
+
 it('resolves NatsMetricsContract as null implementation by default', function (): void {
     $metrics = $this->app->make(NatsMetricsContract::class);
 
