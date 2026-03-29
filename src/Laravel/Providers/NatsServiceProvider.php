@@ -250,6 +250,7 @@ class NatsServiceProvider extends ServiceProvider implements DeferrableProvider
             return new BasisJetStreamPublisher(
                 $app->make(ConnectionManager::class),
                 $app->make('config'),
+                $app->make(SubjectAclChecker::class),
             );
         });
 
