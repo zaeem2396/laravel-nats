@@ -39,6 +39,7 @@ Both are merged when the package boots; run `php artisan vendor:publish --tag=na
 | Queue driver defaults (`nats_basis`) | `config/queue.php` per connection | `nats_basis.queue.*` / `NATS_BASIS_QUEUE_*` (includes optional **`max_in_flight`**) ([QUEUE.md](QUEUE.md)) |
 | Idempotency (1.4.0+) | — | `nats_basis.idempotency.*` / `NATS_IDEMPOTENCY_*`; bind **`IdempotencyStoreContract`** for custom stores ([IDEMPOTENCY.md](IDEMPOTENCY.md)) |
 | Observability (1.4.0+) | — | `nats_basis.observability.*` / `NATS_OBSERVABILITY_*`, `NATS_REDACT_KEY_SUBSTRINGS`; **`NatsMetricsContract`**, **`nats:ping`** ([OBSERVABILITY.md](OBSERVABILITY.md)) |
+| Security / ACL (1.5.0+) | — | `nats_basis.security.*`, `nats_basis.acl.*`; **`NATS_BASIS_VALIDATE_CONFIG`**, **`NATS_TLS_REQUIRE_IN_PRODUCTION`**, **`NATS_ACL_*`**; Artisan **`nats:v2:config:validate`** ([SECURITY.md](SECURITY.md)) |
 
 **Future unified config:** a later release may merge these into one file; until then, if you use **both** stacks, keep **both** configs consistent for shared connection names.
 
@@ -88,6 +89,12 @@ Consumers should read application data from **`data`**. Roll back publishers to 
 - [ ] Confirm `config/nats_basis.php` connections match your NATS deployment (same as `NatsV2`).
 - [ ] Run `php artisan queue:work nats_basis` (or your connection name); verify retries, `failed_jobs`, and optional DLQ subject.
 - [ ] See [QUEUE.md](QUEUE.md) for env keys and Supervisor example.
+
+## Security & config hardening (1.5.0+)
+
+- [ ] Read [SECURITY.md](SECURITY.md): boot validation, TLS production guard, optional subject ACL.
+- [ ] If you enable **`NATS_ACL_ENABLED`**, set **`NATS_ACL_PUBLISH_PREFIXES`** / **`NATS_ACL_SUBSCRIBE_PREFIXES`**; remember **queue** traffic uses the client directly—ACL applies to **`NatsPublisher`**, **`NatsBasisSubscriber`**, and **`BasisJetStreamPublisher`**, not **`nats_basis`** queue internals.
+- [ ] Add **`php artisan nats:v2:config:validate`** to CI if you want forced checks without **`validate_on_boot`**.
 
 ## See also
 
