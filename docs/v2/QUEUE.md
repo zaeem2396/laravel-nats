@@ -1,6 +1,6 @@
 # Laravel queue on the basis client (`nats_basis`)
 
-**Package 1.5.0+** adds a queue connection driver **`nats_basis`** that uses **`Basis\Nats\Client`** via **`ConnectionManager`** (same stack as **`NatsV2`**). Job payloads match the **legacy `nats` driver** JSON shape so **`php artisan queue:work`** behaves the same (retries, `failed_jobs`, DLQ routing).
+**Package 1.4.0+** adds a queue connection driver **`nats_basis`** that uses **`Basis\Nats\Client`** via **`ConnectionManager`** (same stack as **`NatsV2`**). Job payloads match the **legacy `nats` driver** JSON shape so **`php artisan queue:work`** behaves the same (retries, `failed_jobs`, DLQ routing).
 
 The legacy **`nats`** driver ( **`LaravelNats\Core\Client`** ) is unchanged.
 

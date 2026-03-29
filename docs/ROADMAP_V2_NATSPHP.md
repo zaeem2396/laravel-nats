@@ -77,7 +77,7 @@
 
 **Goals:** Laravel queue on the basis client **after** JetStream (v2.2). Retry, DLQ, failed-job handling in this release.
 
-**Shipped (package 1.5.0):** **`nats_basis`** driver — **`BasisNatsConnector`**, **`BasisNatsQueue`** (`ConnectionManager` + `Basis\Nats\Client`), same job JSON as legacy **`nats`** for **`queue:work`**, DLQ via **`NatsJob`** + **`publishRawToSubject`**, config **`nats_basis.queue`**, docs [docs/v2/QUEUE.md](v2/QUEUE.md).
+**Shipped (package 1.4.0):** **`nats_basis`** driver — **`BasisNatsConnector`**, **`BasisNatsQueue`** (`ConnectionManager` + `Basis\Nats\Client`), same job JSON as legacy **`nats`** for **`queue:work`**, DLQ via **`NatsJob`** + **`publishRawToSubject`**, config **`nats_basis.queue`**, docs [docs/v2/QUEUE.md](v2/QUEUE.md).
 
 | Area | Deliverable | Status |
 |------|-------------|--------|
@@ -98,7 +98,7 @@
 
 ## Version v2.4 - Idempotency
 
-**Shipped (package 1.6.0):** optional **`idempotency_key`** on publish (lifted to **`MessageEnvelope`** + **`Nats-Idempotency-Key`** header); **`CacheIdempotencyStore`** + **`IdempotencyStoreContract`**; **`IdempotencyInboundMiddleware`**; **`InboundMessage::idempotencyKey()`**; docs [docs/v2/IDEMPOTENCY.md](v2/IDEMPOTENCY.md).
+**Shipped (package 1.4.0):** optional **`idempotency_key`** on publish (lifted to **`MessageEnvelope`** + **`Nats-Idempotency-Key`** header); **`CacheIdempotencyStore`** + **`IdempotencyStoreContract`**; **`IdempotencyInboundMiddleware`**; **`InboundMessage::idempotencyKey()`**; docs [docs/v2/IDEMPOTENCY.md](v2/IDEMPOTENCY.md).
 
 | Area | Deliverable | Status |
 |------|-------------|--------|
@@ -111,7 +111,7 @@
 
 ## Version v2.5 - Observability
 
-**Shipped (package 1.7.0):** **`NatsMetricsContract`** + **`NullNatsMetrics`** / **`InMemoryNatsMetrics`**; optional publish counters and latency histogram from **`NatsPublisher`** when **`nats_basis.observability.metrics_enabled`**; **`CorrelationLogContext`** for HTTP logs; **`EnvelopeDataRedactor`** and **`RedactedEnvelopeLogInboundMiddleware`**; Artisan **`nats:ping`** and **`NatsV2::ping()`**; docs [docs/v2/OBSERVABILITY.md](v2/OBSERVABILITY.md).
+**Shipped (package 1.4.0):** **`NatsMetricsContract`** + **`NullNatsMetrics`** / **`InMemoryNatsMetrics`**; optional publish counters and latency histogram from **`NatsPublisher`** when **`nats_basis.observability.metrics_enabled`**; **`CorrelationLogContext`** for HTTP logs; **`EnvelopeDataRedactor`** and **`RedactedEnvelopeLogInboundMiddleware`**; Artisan **`nats:ping`** and **`NatsV2::ping()`**; docs [docs/v2/OBSERVABILITY.md](v2/OBSERVABILITY.md).
 
 | Area | Deliverable | Status |
 |------|-------------|--------|
@@ -157,6 +157,6 @@
 
 ---
 
-*Document version: 1.7 - v2.5 observability completed.*
+*Document version: 1.8 - v2.2–v2.5 shipped as package 1.4.0.*
 
 **User docs:** [docs/v2/README.md](v2/README.md) · [GUIDE](v2/GUIDE.md) · [SUBSCRIBER](v2/SUBSCRIBER.md) · [JETSTREAM](v2/JETSTREAM.md) · [QUEUE](v2/QUEUE.md) · [IDEMPOTENCY](v2/IDEMPOTENCY.md) · [OBSERVABILITY](v2/OBSERVABILITY.md) · [CORRELATION](v2/CORRELATION.md) · [MIGRATION](v2/MIGRATION.md)

@@ -8,7 +8,7 @@
 
 A native NATS integration for Laravel that feels like home. Publish, subscribe, and request/reply with a familiar, expressive API.
 
-> **NatsV2** (basis stack, **package 1.3.0+** pub/sub, **1.4.0+** JetStream helpers, **1.5.0+** **`nats_basis`** queue driver, **1.6.0+** optional **idempotency**, **1.7.0+** **observability** hooks and **`nats:ping`**): Laravel **wrapper** on [basis-company/nats](https://github.com/basis-company/nats.php). **Docs:** [Guide](docs/v2/GUIDE.md) · [Subscriber](docs/v2/SUBSCRIBER.md) · [JetStream](docs/v2/JETSTREAM.md) · [Queue](docs/v2/QUEUE.md) · [Idempotency](docs/v2/IDEMPOTENCY.md) · [Observability](docs/v2/OBSERVABILITY.md) · [FAQ](docs/v2/FAQ.md) · [Migration](docs/v2/MIGRATION.md). The **legacy** `Nats` facade API for subscribe, queue, and JetStream is also documented in this README.
+> **NatsV2** (basis stack, **package 1.3.0+** pub/sub; **1.4.0+** JetStream on the basis client, **`nats_basis`** queue driver, optional **idempotency**, and **observability** including **`nats:ping`**): Laravel **wrapper** on [basis-company/nats](https://github.com/basis-company/nats.php). **Docs:** [Guide](docs/v2/GUIDE.md) · [Subscriber](docs/v2/SUBSCRIBER.md) · [JetStream](docs/v2/JETSTREAM.md) · [Queue](docs/v2/QUEUE.md) · [Idempotency](docs/v2/IDEMPOTENCY.md) · [Observability](docs/v2/OBSERVABILITY.md) · [FAQ](docs/v2/FAQ.md) · [Migration](docs/v2/MIGRATION.md). The **legacy** `Nats` facade API for subscribe, queue, and JetStream is also documented in this README.
 
 ## Requirements
 
@@ -24,10 +24,7 @@ composer require zaeem2396/laravel-nats
 
 - **v1.1.1+** for Phase 4 queue/worker commands (`nats:work`, `nats:consume`).
 - **v1.3.0+** for **`NatsV2::publish`** / **`NatsV2::subscribe`**, `ConnectionManager`, JSON envelope (`config/nats_basis.php`), **`InboundMessage`**, and **`nats:v2:listen`**.
-- **v1.4.0+** for **`NatsV2::jetstream()`**, **`jetStreamPublish`** / **`jetStreamPull`**, stream presets, and **`nats:v2:jetstream:*`** Artisan commands ([docs/v2/JETSTREAM.md](docs/v2/JETSTREAM.md)).
-- **v1.5.0+** for the **`nats_basis`** queue driver (`queue:work` on **`Basis\Nats\Client`** via **`ConnectionManager`**, same job JSON as legacy **`nats`**; [docs/v2/QUEUE.md](docs/v2/QUEUE.md)).
-- **v1.6.0+** for optional **idempotency** (`idempotency_key` in envelope + header, cache-backed **`IdempotencyInboundMiddleware`**; [docs/v2/IDEMPOTENCY.md](docs/v2/IDEMPOTENCY.md)).
-- **v1.7.0+** for **observability** (`NatsMetricsContract`, publish counters/histogram hooks, **`CorrelationLogContext`**, envelope **`data`** redaction middleware, **`nats:ping`** / **`NatsV2::ping()`**; [docs/v2/OBSERVABILITY.md](docs/v2/OBSERVABILITY.md)).
+- **v1.4.0+** (first release after **1.3.0** on Packagist) for **`NatsV2::jetstream()`**, **`jetStreamPublish`** / **`jetStreamPull`**, stream presets, **`nats:v2:jetstream:*`** commands ([docs/v2/JETSTREAM.md](docs/v2/JETSTREAM.md)), the **`nats_basis`** queue driver ([docs/v2/QUEUE.md](docs/v2/QUEUE.md)), optional **idempotency** ([docs/v2/IDEMPOTENCY.md](docs/v2/IDEMPOTENCY.md)), and **observability** ([docs/v2/OBSERVABILITY.md](docs/v2/OBSERVABILITY.md)).
 
 The service provider is auto-discovered. To publish configuration (includes **`nats_basis`** for v2):
 
@@ -153,7 +150,7 @@ Nats::subscribe('logs.>', function ($message) {
 Use NATS as a Laravel queue backend. Two drivers are available:
 
 - **`nats`** — legacy `LaravelNats\Core\Client` (connection options in `config/queue.php` as below).
-- **`nats_basis`** — **`Basis\Nats\Client`** via **`ConnectionManager`** (package **1.5.0+**); configure `config/queue.php` + `config/nats_basis.php`. Full reference: [docs/v2/QUEUE.md](docs/v2/QUEUE.md).
+- **`nats_basis`** — **`Basis\Nats\Client`** via **`ConnectionManager`** (package **1.4.0+**); configure `config/queue.php` + `config/nats_basis.php`. Full reference: [docs/v2/QUEUE.md](docs/v2/QUEUE.md).
 
 ### Configuration
 

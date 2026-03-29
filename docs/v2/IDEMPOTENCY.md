@@ -1,4 +1,4 @@
-# Idempotency (v2.4, package 1.6.0+)
+# Idempotency (v2.4, package 1.4.0+)
 
 Optional **idempotency keys** let subscribers skip duplicate work when the same logical event is delivered more than once (retries, at-least-once consumers, or producer retries).
 
