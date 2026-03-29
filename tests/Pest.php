@@ -39,6 +39,8 @@ declare(strict_types=1);
 
 // Unit tests: Pure PHP, no framework dependencies (excluding Laravel folder)
 uses(LaravelNats\Tests\TestCase::class)->in(
+    'Unit/Security/SubjectPrefixMatcherTest.php',
+    'Unit/Security/SubjectAclCheckerTest.php',
     'Unit/Connection',
     'Unit/Messaging',
     'Unit/Protocol',
@@ -65,7 +67,9 @@ uses(LaravelNats\Tests\LaravelTestCase::class)->in(
     'Unit/Laravel/CorrelationHeadersTest.php',
     'Unit/Laravel/BasisNatsConnectorTest.php',
     'Unit/Laravel/NatsPingCommandRegisteredTest.php',
+    'Unit/Laravel/NatsValidateConfigCommandRegisteredTest.php',
     'Unit/Laravel/RedactedEnvelopeLogInboundMiddlewareTest.php',
+    'Unit/Security/NatsBasisConfigurationValidatorTest.php',
 );
 
 // Unit/Laravel/Queue tests: Queue components (minimal Laravel context)
