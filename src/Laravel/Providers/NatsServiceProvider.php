@@ -35,6 +35,7 @@ use LaravelNats\Laravel\Console\Commands\NatsV2JetStreamProvisionCommand;
 use LaravelNats\Laravel\Console\Commands\NatsV2JetStreamPullCommand;
 use LaravelNats\Laravel\Console\Commands\NatsV2JetStreamStreamsCommand;
 use LaravelNats\Laravel\Console\Commands\NatsV2ListenCommand;
+use LaravelNats\Laravel\Console\Commands\NatsValidateConfigCommand;
 use LaravelNats\Laravel\Console\Commands\NatsWorkCommand;
 use LaravelNats\Laravel\NatsManager;
 use LaravelNats\Laravel\NatsV2Gateway;
