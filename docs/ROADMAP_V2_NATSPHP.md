@@ -123,12 +123,14 @@
 
 ## Version v2.6 - Security & config hardening
 
+**Shipped (package 1.5.0):** **`NatsBasisConfigurationValidator`** (boot or **`nats:v2:config:validate`**); **`nats_basis.security`** (`NATS_BASIS_VALIDATE_CONFIG`, **`NATS_TLS_REQUIRE_IN_PRODUCTION`**); **`SubjectAclChecker`** + **`SubjectPrefixMatcher`** with **`nats_basis.acl`** / **`NATS_ACL_*`** on **`NatsPublisher`**, **`NatsBasisSubscriber`**, **`BasisJetStreamPublisher`**; docs [docs/v2/SECURITY.md](v2/SECURITY.md).
+
 | Area | Deliverable | Status |
 |------|-------------|--------|
-| **M1** Auth | JWT/NKey/token rotation docs; validate config on boot | Planned |
-| **M1** Auth | Optional encrypted env for secrets | Planned |
-| **M2** TLS | TLS-first production profile | Planned |
-| **M3** ACLs | Optional publish/subscribe allowlist | Planned |
+| **M1** Auth | JWT/NKey/token rotation docs; validate config on boot | Completed |
+| **M1** Auth | Optional encrypted env for secrets | Completed (documented; Laravel `env:encrypt`) |
+| **M2** TLS | TLS-first production profile | Completed (`require_in_production` + TLS fields) |
+| **M3** ACLs | Optional publish/subscribe allowlist | Completed |
 
 ---
 
@@ -157,6 +159,6 @@
 
 ---
 
-*Document version: 1.8 - v2.2–v2.5 shipped as package 1.4.0.*
+*Document version: 1.9 - v2.6 shipped as package 1.5.0; v2.2–v2.5 shipped as package 1.4.0.*
 
-**User docs:** [docs/v2/README.md](v2/README.md) · [GUIDE](v2/GUIDE.md) · [SUBSCRIBER](v2/SUBSCRIBER.md) · [JETSTREAM](v2/JETSTREAM.md) · [QUEUE](v2/QUEUE.md) · [IDEMPOTENCY](v2/IDEMPOTENCY.md) · [OBSERVABILITY](v2/OBSERVABILITY.md) · [CORRELATION](v2/CORRELATION.md) · [MIGRATION](v2/MIGRATION.md)
+**User docs:** [docs/v2/README.md](v2/README.md) · [GUIDE](v2/GUIDE.md) · [SUBSCRIBER](v2/SUBSCRIBER.md) · [JETSTREAM](v2/JETSTREAM.md) · [QUEUE](v2/QUEUE.md) · [IDEMPOTENCY](v2/IDEMPOTENCY.md) · [OBSERVABILITY](v2/OBSERVABILITY.md) · [SECURITY](v2/SECURITY.md) · [CORRELATION](v2/CORRELATION.md) · [MIGRATION](v2/MIGRATION.md)
