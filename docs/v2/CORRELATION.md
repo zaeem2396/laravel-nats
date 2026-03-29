@@ -33,6 +33,8 @@ Env toggles: **`NATS_CORRELATION_INJECT`**, **`NATS_REQUEST_ID_HEADER`**, **`NAT
 
 Optional middleware **`CorrelationLogInboundMiddleware`** forwards those into **`Log::shareContext()`** when supported.
 
+For **HTTP application logs** (outside the subscriber), use **`LaravelNats\Observability\CorrelationLogContext::fromRequest()`** with **`Log::withContext()`** so log lines include the same ids before you publish. See [OBSERVABILITY.md](OBSERVABILITY.md).
+
 ## JetStream note
 
 The basis **JetStream** publish path in this package is **body-first**; use **`NatsV2::publish`** with headers for correlation on subjects captured by a stream, or embed ids in **`data`**.
@@ -42,3 +44,4 @@ The basis **JetStream** publish path in this package is **body-first**; use **`N
 - [GUIDE.md](GUIDE.md) - headers on publish
 - [SUBSCRIBER.md](SUBSCRIBER.md) - inbound middleware list
 - [IDEMPOTENCY.md](IDEMPOTENCY.md) - `Nats-Idempotency-Key` and subscriber deduplication
+- [OBSERVABILITY.md](OBSERVABILITY.md) - correlation context helper for HTTP logging
