@@ -43,7 +43,20 @@ final class BasisJetStreamPublisher
             $stream = $manager->stream($streamName, $connection);
             if ($useEnvelope) {
                 $version = (string) $this->config->get('nats_basis.envelope_version', 'v1');
-                $envelope = MessageEnvelope::create($subject, $payload, $version);
+                $data = $payload;
+                $idempotencyKey = null;
+                if (array_key_exists('idempotency_key', $data)) {
+                    $raw = $data['idempotency_key'];
+                    unset($data['idempotency_key']);
+                    if (is_string($raw)) {
+                        $trimmed = trim($raw);
+                        if ($trimmed !== '') {
+                            $idempotencyKey = $trimmed;
+                        }
+                    }
+                }
+
+                $envelope = MessageEnvelope::create($subject, $data, $version, $idempotencyKey);
                 $body = json_encode($envelope->toArray(), JSON_THROW_ON_ERROR);
             } else {
                 $body = json_encode($payload, JSON_THROW_ON_ERROR);
