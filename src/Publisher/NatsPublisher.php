@@ -88,6 +88,12 @@ final class NatsPublisher implements NatsPublisherContract
             );
         } catch (\Throwable $e) {
             if ($e instanceof PublishException) {
+                $this->recordPublishOutcome(false, $connection, (microtime(true) - $t0) * 1000.0);
+
+                throw $e;
+            }
+
+            if ($e instanceof SubjectNotAllowedException) {
                 throw $e;
             }
 
