@@ -30,6 +30,7 @@ final class NatsPublisher implements NatsPublisherContract
         private readonly ConnectionManager $connections,
         private readonly Repository $config,
         private readonly NatsMetricsContract $metrics,
+        private readonly SubjectAclChecker $subjectAcl,
     ) {
     }
 
