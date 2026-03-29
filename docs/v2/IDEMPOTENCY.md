@@ -16,6 +16,8 @@ NatsV2::publish('payments.captured', [
 ]);
 ```
 
+The same **`idempotency_key`** field works with **`NatsV2::jetStreamPublish(..., useEnvelope: true)`**; the JetStream wire path remains body-only (no HPUB headers on that API today).
+
 2. **Header only** — you may pass the same name in the `$headers` argument; it wins over auto-merge from the payload (existing header takes precedence, same rule as correlation headers).
 
 3. **Envelope only** — consumers reading **`InboundMessage::envelopePayload()`** see optional **`idempotency_key`** on the root object.
