@@ -23,6 +23,7 @@ use LaravelNats\Laravel\Console\Commands\NatsConsumerInfoCommand;
 use LaravelNats\Laravel\Console\Commands\NatsConsumerListCommand;
 use LaravelNats\Laravel\Console\Commands\NatsConsumeStreamCommand;
 use LaravelNats\Laravel\Console\Commands\NatsJetStreamStatusCommand;
+use LaravelNats\Laravel\Console\Commands\NatsPingCommand;
 use LaravelNats\Laravel\Console\Commands\NatsStreamCreateCommand;
 use LaravelNats\Laravel\Console\Commands\NatsStreamDeleteCommand;
 use LaravelNats\Laravel\Console\Commands\NatsStreamInfoCommand;
@@ -124,6 +125,7 @@ class NatsServiceProvider extends ServiceProvider implements DeferrableProvider
 
         $this->commands([
             NatsWorkCommand::class,
+            NatsPingCommand::class,
             NatsV2ListenCommand::class,
             NatsV2JetStreamInfoCommand::class,
             NatsV2JetStreamStreamsCommand::class,
