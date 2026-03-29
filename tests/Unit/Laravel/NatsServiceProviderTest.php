@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 use LaravelNats\Connection\ConnectionManager;
 use LaravelNats\Core\Client;
+use LaravelNats\Idempotency\CacheIdempotencyStore;
+use LaravelNats\Idempotency\Contracts\IdempotencyStoreContract;
 use LaravelNats\JetStream\BasisJetStreamPublisher;
 use LaravelNats\JetStream\BasisStreamProvisioner;
 use LaravelNats\JetStream\PullConsumerBatch;
@@ -46,7 +48,14 @@ it('provides deferred services', function (): void {
         ->and($provides)->toContain(BasisJetStreamPublisher::class)
         ->and($provides)->toContain(PullConsumerBatch::class)
         ->and($provides)->toContain(BasisStreamProvisioner::class)
-        ->and($provides)->toContain(Client::class);
+        ->and($provides)->toContain(Client::class)
+        ->and($provides)->toContain(IdempotencyStoreContract::class);
+});
+
+it('resolves IdempotencyStoreContract as cache-backed store', function (): void {
+    $store = $this->app->make(IdempotencyStoreContract::class);
+
+    expect($store)->toBeInstanceOf(CacheIdempotencyStore::class);
 });
 
 it('resolves nats as NatsManager', function (): void {
