@@ -19,6 +19,7 @@ use LaravelNats\JetStream\BasisJetStreamManager;
  * @method static void unsubscribeAll(string|null $connection = null)
  * @method static mixed process(string|null $connection = null, int|float|null $timeout = 0)
  * @method static Client connection(string|null $name = null)
+ * @method static bool ping(string|null $connection = null)
  * @method static void disconnect(string|null $name = null)
  * @method static void disconnectAll()
  * @method static BasisJetStreamManager jetstream(string|null $connection = null)

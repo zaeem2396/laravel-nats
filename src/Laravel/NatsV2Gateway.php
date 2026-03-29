@@ -86,6 +86,11 @@ final class NatsV2Gateway
         return $this->connections->connection($name);
     }
 
+    public function ping(?string $connection = null): bool
+    {
+        return $this->connections->connection($connection)->ping();
+    }
+
     public function disconnect(?string $name = null): void
     {
         $this->connections->disconnect($name);
