@@ -16,6 +16,8 @@ See `nats_basis.subscriber` in `config/nats_basis.php` (merged from the package;
 
 Environment: `NATS_SUBJECT_MAX_LENGTH`, `NATS_SUBSCRIBER_DISPATCH_EVENTS`, `NATS_SUBSCRIBER_DECODE_ENVELOPE` (reserved for future use).
 
+**Security (1.5.0+):** When **`nats_basis.acl.enabled`** is true, subscription subjects are checked against **`allowed_subscribe_prefixes`** before **`Basis\Nats\Client::subscribe`**. See [SECURITY.md](SECURITY.md).
+
 ## Subscribe
 
 ```php
