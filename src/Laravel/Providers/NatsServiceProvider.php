@@ -39,6 +39,8 @@ use LaravelNats\Laravel\NatsManager;
 use LaravelNats\Laravel\NatsV2Gateway;
 use LaravelNats\Laravel\Queue\BasisNatsConnector;
 use LaravelNats\Laravel\Queue\NatsConnector;
+use LaravelNats\Observability\Contracts\NatsMetricsContract;
+use LaravelNats\Observability\NullNatsMetrics;
 use LaravelNats\Publisher\Contracts\NatsPublisherContract;
 use LaravelNats\Publisher\NatsPublisher;
 use LaravelNats\Subscriber\Contracts\NatsSubscriberContract;
@@ -103,6 +105,7 @@ class NatsServiceProvider extends ServiceProvider implements DeferrableProvider
             BasisStreamProvisioner::class,
             Client::class,
             IdempotencyStoreContract::class,
+            NatsMetricsContract::class,
         ];
     }
 
@@ -173,10 +176,13 @@ class NatsServiceProvider extends ServiceProvider implements DeferrableProvider
             return new ConnectionManager($config, $logger);
         });
 
+        $this->app->singleton(NatsMetricsContract::class, static fn () => new NullNatsMetrics());
+
         $this->app->singleton(NatsPublisher::class, function ($app) {
             return new NatsPublisher(
                 $app->make(ConnectionManager::class),
                 $app->make('config'),
+                $app->make(NatsMetricsContract::class),
             );
         });
 

@@ -10,6 +10,7 @@ use Illuminate\Contracts\Config\Repository;
 use JsonException;
 use LaravelNats\Connection\ConnectionManager;
 use LaravelNats\Exceptions\PublishException;
+use LaravelNats\Observability\Contracts\NatsMetricsContract;
 use LaravelNats\Publisher\Contracts\NatsPublisherContract;
 use LaravelNats\Support\CorrelationHeaders;
 use LaravelNats\Support\IdempotencyHeaders;
@@ -26,6 +27,7 @@ final class NatsPublisher implements NatsPublisherContract
     public function __construct(
         private readonly ConnectionManager $connections,
         private readonly Repository $config,
+        private readonly NatsMetricsContract $metrics,
     ) {
     }
 
@@ -36,6 +38,8 @@ final class NatsPublisher implements NatsPublisherContract
      */
     public function publish(string $subject, array $payload, array $headers = [], ?string $connection = null): void
     {
+        $t0 = microtime(true);
+
         try {
             $version = (string) $this->config->get('nats_basis.envelope_version', 'v1');
             $data = $payload;
@@ -68,7 +72,10 @@ final class NatsPublisher implements NatsPublisherContract
                 'payload' => $payloadMessage,
                 'replyTo' => null,
             ]));
+            $this->recordPublishOutcome(true, $connection, (microtime(true) - $t0) * 1000.0);
         } catch (JsonException $e) {
+            $this->recordPublishOutcome(false, $connection, (microtime(true) - $t0) * 1000.0);
+
             throw new PublishException(
                 sprintf('Failed to publish to "%s": %s', $subject, 'Failed to encode message envelope: ' . $e->getMessage()),
                 0,
@@ -79,11 +86,35 @@ final class NatsPublisher implements NatsPublisherContract
                 throw $e;
             }
 
+            $this->recordPublishOutcome(false, $connection, (microtime(true) - $t0) * 1000.0);
+
             throw new PublishException(
                 sprintf('Failed to publish to "%s": %s', $subject, $e->getMessage()),
                 0,
                 $e,
             );
+        }
+    }
+
+    private function recordPublishOutcome(bool $success, ?string $connection, float $elapsedMs): void
+    {
+        if (! filter_var($this->config->get('nats_basis.observability.metrics_enabled', false), FILTER_VALIDATE_BOOL)) {
+            return;
+        }
+
+        $connName = $connection ?? $this->connections->getDefaultConnection();
+        $labels = [
+            'connection' => $connName,
+            'outcome' => $success ? 'success' : 'failure',
+        ];
+        $this->metrics->incrementCounter('laravel_nats.publish.total', $labels);
+        if (
+            $success
+            && filter_var($this->config->get('nats_basis.observability.publish_latency_histogram', false), FILTER_VALIDATE_BOOL)
+        ) {
+            $this->metrics->observeHistogram('laravel_nats.publish.latency_ms', $elapsedMs, [
+                'connection' => $connName,
+            ]);
         }
     }
 
