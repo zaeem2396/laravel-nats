@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace LaravelNats\Laravel\Providers;
 
+use Illuminate\Contracts\Cache\Factory as CacheFactory;
 use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Log\LogManager;
 use Illuminate\Queue\Worker;
 use Illuminate\Support\ServiceProvider;
 use LaravelNats\Connection\ConnectionManager;
 use LaravelNats\Core\Client;
+use LaravelNats\Idempotency\CacheIdempotencyStore;
+use LaravelNats\Idempotency\Contracts\IdempotencyStoreContract;
 use LaravelNats\JetStream\BasisJetStreamPublisher;
 use LaravelNats\JetStream\BasisStreamProvisioner;
 use LaravelNats\JetStream\PullConsumerBatch;
@@ -99,6 +102,7 @@ class NatsServiceProvider extends ServiceProvider implements DeferrableProvider
             PullConsumerBatch::class,
             BasisStreamProvisioner::class,
             Client::class,
+            IdempotencyStoreContract::class,
         ];
     }
 
@@ -177,6 +181,31 @@ class NatsServiceProvider extends ServiceProvider implements DeferrableProvider
         });
 
         $this->app->bind(NatsPublisherContract::class, NatsPublisher::class);
+
+        $this->app->singleton(IdempotencyStoreContract::class, function ($app) {
+            $config = $app->make('config');
+            $backend = (string) $config->get('nats_basis.idempotency.store', 'cache');
+            if ($backend !== 'cache') {
+                throw new \InvalidArgumentException(
+                    sprintf(
+                        'Unsupported nats_basis.idempotency.store "%s"; use "cache" or bind %s to a custom implementation in a service provider.',
+                        $backend,
+                        IdempotencyStoreContract::class,
+                    ),
+                );
+            }
+
+            /** @var CacheFactory $cacheFactory */
+            $cacheFactory = $app->make('cache');
+            $storeName = $config->get('nats_basis.idempotency.cache_store');
+            $repository = is_string($storeName) && $storeName !== ''
+                ? $cacheFactory->store($storeName)
+                : $cacheFactory->store();
+
+            $prefix = (string) $config->get('nats_basis.idempotency.cache_key_prefix', 'nats:idempotency:');
+
+            return new CacheIdempotencyStore($repository, $prefix);
+        });
 
         $this->app->singleton(SubjectValidator::class, function ($app) {
             return new SubjectValidator($app->make('config'));

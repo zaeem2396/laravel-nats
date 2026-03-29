@@ -12,6 +12,7 @@ use LaravelNats\Connection\ConnectionManager;
 use LaravelNats\Exceptions\PublishException;
 use LaravelNats\Publisher\Contracts\NatsPublisherContract;
 use LaravelNats\Support\CorrelationHeaders;
+use LaravelNats\Support\IdempotencyHeaders;
 use LaravelNats\Support\MessageEnvelope;
 use LogicException;
 
@@ -37,7 +38,20 @@ final class NatsPublisher implements NatsPublisherContract
     {
         try {
             $version = (string) $this->config->get('nats_basis.envelope_version', 'v1');
-            $envelope = MessageEnvelope::create($subject, $payload, $version);
+            $data = $payload;
+            $idempotencyKey = null;
+            if (array_key_exists('idempotency_key', $data)) {
+                $raw = $data['idempotency_key'];
+                unset($data['idempotency_key']);
+                if (is_string($raw)) {
+                    $trimmed = trim($raw);
+                    if ($trimmed !== '') {
+                        $idempotencyKey = $trimmed;
+                    }
+                }
+            }
+
+            $envelope = MessageEnvelope::create($subject, $data, $version, $idempotencyKey);
             $body = json_encode($envelope->toArray(), JSON_THROW_ON_ERROR);
 
             $client = $this->connections->connection($connection);
@@ -47,6 +61,7 @@ final class NatsPublisher implements NatsPublisherContract
             }
 
             $merged = CorrelationHeaders::mergeForPublish($this->config, $this->normalizeHeaders($headers));
+            $merged = IdempotencyHeaders::mergeForPublish($this->config, $merged, $idempotencyKey);
             $payloadMessage = new Payload($body, $merged);
             $basisConnection->sendMessage(new Publish([
                 'subject' => $subject,

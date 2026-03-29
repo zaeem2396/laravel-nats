@@ -41,3 +41,4 @@ The basis **JetStream** publish path in this package is **body-first**; use **`N
 
 - [GUIDE.md](GUIDE.md) - headers on publish
 - [SUBSCRIBER.md](SUBSCRIBER.md) - inbound middleware list
+- [IDEMPOTENCY.md](IDEMPOTENCY.md) - `Nats-Idempotency-Key` and subscriber deduplication

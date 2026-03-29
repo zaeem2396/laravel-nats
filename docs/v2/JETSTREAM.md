@@ -22,7 +22,7 @@ JetStream on the **v2 stack** uses **`Basis\Nats\Api`**, **`Stream`**, and **`Co
 
 ### Publish
 
-`jetStreamPublish` wraps `Basis\Nats\Stream\Stream::publish()` (wait for ack) or `put()` (core publish without JS ack). With **`$useEnvelope = true`** (default), the body is the same JSON envelope as **`NatsV2::publish`**.
+`jetStreamPublish` wraps `Basis\Nats\Stream\Stream::publish()` (wait for ack) or `put()` (core publish without JS ack). With **`$useEnvelope = true`** (default), the body is the same JSON envelope as **`NatsV2::publish`**, including optional **`idempotency_key`** lifted from the payload into the envelope root ([IDEMPOTENCY.md](IDEMPOTENCY.md)).
 
 ```php
 use LaravelNats\Laravel\Facades\NatsV2;

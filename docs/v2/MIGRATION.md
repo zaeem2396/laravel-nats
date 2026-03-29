@@ -37,6 +37,7 @@ Both are merged when the package boots; run `php artisan vendor:publish --tag=na
 | Envelope schema | - | `envelope_version` / `NATS_ENVELOPE_VERSION` (default `v1`) |
 | Debug logging (basis client) | - | `nats_basis.logging` / `NATS_BASIS_LOGGING`, `NATS_BASIS_LOG_CHANNEL` |
 | Queue driver defaults (`nats_basis`) | `config/queue.php` per connection | `nats_basis.queue.*` / `NATS_BASIS_QUEUE_*` (includes optional **`max_in_flight`**) ([QUEUE.md](QUEUE.md)) |
+| Idempotency (1.6.0+) | — | `nats_basis.idempotency.*` / `NATS_IDEMPOTENCY_*`; bind **`IdempotencyStoreContract`** for custom stores ([IDEMPOTENCY.md](IDEMPOTENCY.md)) |
 
 **Future unified config:** a later release may merge these into one file; until then, if you use **both** stacks, keep **both** configs consistent for shared connection names.
 

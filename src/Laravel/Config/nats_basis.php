@@ -46,6 +46,26 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Idempotency (v2.4) — subscriber middleware + publish envelope/header
+    |--------------------------------------------------------------------------
+    |
+    | Publishers may set `idempotency_key` on the payload (lifted into the JSON
+    | envelope and mirrored as an HPUB header). Register
+    | IdempotencyInboundMiddleware in nats_basis.subscriber.middleware and use a
+    | shared cache store (e.g. Redis) for multi-worker consumers.
+    |
+    */
+    'idempotency' => [
+        'enabled' => filter_var(env('NATS_IDEMPOTENCY_ENABLED', false), FILTER_VALIDATE_BOOL),
+        'store' => env('NATS_IDEMPOTENCY_STORE', 'cache'),
+        'cache_store' => env('NATS_IDEMPOTENCY_CACHE_STORE'),
+        'cache_key_prefix' => env('NATS_IDEMPOTENCY_CACHE_PREFIX', 'nats:idempotency:'),
+        'ttl_seconds' => (int) env('NATS_IDEMPOTENCY_TTL', 86400),
+        'header_name' => env('NATS_IDEMPOTENCY_HEADER', 'Nats-Idempotency-Key'),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Logging (basis-company/nats client)
     |--------------------------------------------------------------------------
     |
@@ -77,6 +97,7 @@ return [
         'middleware' => [
             // LaravelNats\Subscriber\Middleware\LogInboundMiddleware::class,
             // LaravelNats\Subscriber\Middleware\CorrelationLogInboundMiddleware::class,
+            // LaravelNats\Subscriber\Middleware\IdempotencyInboundMiddleware::class,
         ],
     ],
 

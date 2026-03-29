@@ -16,4 +16,6 @@
 
 **JetStream on NatsV2?** Yes from **1.4.0+**: `NatsV2::jetstream()`, publish/pull helpers, and `nats:v2:jetstream:*` commands ([JETSTREAM.md](JETSTREAM.md)). Legacy `Nats::jetstream()` remains available.
 
+**Idempotent subscribers?** From **1.6.0+**, add **`idempotency_key`** to the publish payload (or header), enable **`NATS_IDEMPOTENCY_ENABLED`**, register **`IdempotencyInboundMiddleware`**, and use a shared cache store ([IDEMPOTENCY.md](IDEMPOTENCY.md)).
+
 **Overhead?** One JSON encode and UUID per publish; negligible vs network.

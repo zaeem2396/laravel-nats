@@ -17,6 +17,7 @@ The v2 stack is a **Laravel wrapper** around [basis-company/nats](https://packag
 9. Migration strategy
 10. Subscribe (NatsV2)
 11. JetStream (NatsV2)
+12. Idempotency — [IDEMPOTENCY.md](IDEMPOTENCY.md)
 
 ## Config
 
@@ -36,7 +37,7 @@ TLS file paths: `NATS_TLS_KEY`, `NATS_TLS_CERT`, `NATS_TLS_CA`.
 
 `NatsV2::publish(subject, payload, headers, connection)`.
 
-Envelope JSON: `id` (uuid), `type` (subject), `version`, `data` (payload).
+Envelope JSON: `id` (uuid), `type` (subject), `version`, `data` (payload), optional root **`idempotency_key`** when you pass **`idempotency_key`** in the payload (stripped from `data`, mirrored as HPUB **`Nats-Idempotency-Key`** by default). See [IDEMPOTENCY.md](IDEMPOTENCY.md).
 
 ```php
 NatsV2::publish('a.b', ['k' => 1]);

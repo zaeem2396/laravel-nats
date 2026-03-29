@@ -55,7 +55,7 @@ NatsV2::unsubscribeAll(); // or scoped: unsubscribeAll('connection-name')
 
 ## Middleware
 
-Implement `LaravelNats\Subscriber\Middleware\InboundMiddleware` and add the class name to `nats_basis.subscriber.middleware`. The package ships with `LogInboundMiddleware` (commented out by default) for debug logging via `Psr\Log\LoggerInterface`.
+Implement `LaravelNats\Subscriber\Middleware\InboundMiddleware` and add the class name to `nats_basis.subscriber.middleware`. The package ships with `LogInboundMiddleware` (commented out by default) for debug logging via `Psr\Log\LoggerInterface`, and **`IdempotencyInboundMiddleware`** for deduplication when **`nats_basis.idempotency.enabled`** is true ([IDEMPOTENCY.md](IDEMPOTENCY.md)).
 
 ## Events
 

@@ -98,12 +98,14 @@
 
 ## Version v2.4 - Idempotency
 
+**Shipped (package 1.6.0):** optional **`idempotency_key`** on publish (lifted to **`MessageEnvelope`** + **`Nats-Idempotency-Key`** header); **`CacheIdempotencyStore`** + **`IdempotencyStoreContract`**; **`IdempotencyInboundMiddleware`**; **`InboundMessage::idempotencyKey()`**; docs [docs/v2/IDEMPOTENCY.md](v2/IDEMPOTENCY.md).
+
 | Area | Deliverable | Status |
 |------|-------------|--------|
-| **M1** Keys | Optional `idempotency_key` in envelope + header mirror | Planned |
-| **M1** Store | Pluggable store (`Cache`, Redis, custom) | Planned |
-| **M2** Middleware | Subscriber middleware: skip if key seen (TTL) | Planned |
-| **M2** Docs | Key generation patterns | Planned |
+| **M1** Keys | Optional `idempotency_key` in envelope + header mirror | Completed |
+| **M1** Store | Pluggable store (`Cache`, Redis, custom) | Completed |
+| **M2** Middleware | Subscriber middleware: skip if key seen (TTL) | Completed |
+| **M2** Docs | Key generation patterns | Completed |
 
 ---
 
@@ -145,14 +147,14 @@
 | v2.0 | Foundation, wrapper on basis client, publisher, envelope, `NatsV2`, migration docs | Completed |
 | v2.1 | Subscribers, `InboundMessage`, `nats:v2:listen`, middleware, events | Completed |
 | v2.2 | JetStream on basis client | Completed |
-| v2.3 | Queue driver + DLQ + retry/backoff | Planned |
-| v2.4 | Idempotency | Planned |
+| v2.3 | Queue driver + DLQ + retry/backoff | Completed |
+| v2.4 | Idempotency | Completed |
 | v2.5 | Metrics, logging, health | Planned |
 | v2.6 | Security, TLS, ACLs | Planned |
 | v2.7 | Advanced headers, clustering, optional outbox | Planned |
 
 ---
 
-*Document version: 1.5 - v2.3 `nats_basis` queue driver completed.*
+*Document version: 1.6 - v2.4 idempotency completed.*
 
-**User docs:** [docs/v2/README.md](v2/README.md) · [GUIDE](v2/GUIDE.md) · [SUBSCRIBER](v2/SUBSCRIBER.md) · [JETSTREAM](v2/JETSTREAM.md) · [QUEUE](v2/QUEUE.md) · [CORRELATION](v2/CORRELATION.md) · [MIGRATION](v2/MIGRATION.md)
+**User docs:** [docs/v2/README.md](v2/README.md) · [GUIDE](v2/GUIDE.md) · [SUBSCRIBER](v2/SUBSCRIBER.md) · [JETSTREAM](v2/JETSTREAM.md) · [QUEUE](v2/QUEUE.md) · [IDEMPOTENCY](v2/IDEMPOTENCY.md) · [CORRELATION](v2/CORRELATION.md) · [MIGRATION](v2/MIGRATION.md)
