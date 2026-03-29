@@ -54,7 +54,9 @@ it('provides deferred services', function (): void {
         ->and($provides)->toContain(BasisStreamProvisioner::class)
         ->and($provides)->toContain(Client::class)
         ->and($provides)->toContain(IdempotencyStoreContract::class)
-        ->and($provides)->toContain(NatsMetricsContract::class);
+        ->and($provides)->toContain(NatsMetricsContract::class)
+        ->and($provides)->toContain(NatsBasisConfigurationValidator::class)
+        ->and($provides)->toContain(SubjectAclChecker::class);
 });
 
 it('resolves IdempotencyStoreContract as cache-backed store', function (): void {
