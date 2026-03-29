@@ -12,6 +12,8 @@ use LaravelNats\Connection\ConnectionManager;
 use LaravelNats\Exceptions\PublishException;
 use LaravelNats\Observability\Contracts\NatsMetricsContract;
 use LaravelNats\Publisher\Contracts\NatsPublisherContract;
+use LaravelNats\Security\Exceptions\SubjectNotAllowedException;
+use LaravelNats\Security\SubjectAclChecker;
 use LaravelNats\Support\CorrelationHeaders;
 use LaravelNats\Support\IdempotencyHeaders;
 use LaravelNats\Support\MessageEnvelope;
