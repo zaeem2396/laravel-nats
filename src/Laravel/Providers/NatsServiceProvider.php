@@ -111,6 +111,8 @@ class NatsServiceProvider extends ServiceProvider implements DeferrableProvider
             Client::class,
             IdempotencyStoreContract::class,
             NatsMetricsContract::class,
+            NatsBasisConfigurationValidator::class,
+            SubjectAclChecker::class,
         ];
     }
 
