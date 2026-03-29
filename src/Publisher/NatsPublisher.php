@@ -44,6 +44,8 @@ final class NatsPublisher implements NatsPublisherContract
         $t0 = microtime(true);
 
         try {
+            $this->subjectAcl->assertPublishAllowed($subject);
+
             $version = (string) $this->config->get('nats_basis.envelope_version', 'v1');
             $data = $payload;
             $idempotencyKey = null;
