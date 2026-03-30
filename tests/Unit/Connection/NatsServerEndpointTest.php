@@ -12,3 +12,11 @@ it('parses host:port', function (): void {
         ->and($e->port)->toBe(4333);
 });
 
+it('parses nats url', function (): void {
+    $e = NatsServerEndpoint::parse('nats://example.com:4223');
+
+    expect($e)->not->toBeNull()
+        ->and($e->host)->toBe('example.com')
+        ->and($e->port)->toBe(4223);
+});
+
