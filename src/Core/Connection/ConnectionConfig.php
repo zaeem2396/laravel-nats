@@ -227,7 +227,7 @@ final class ConnectionConfig implements ConnectionConfigInterface
             'lang' => 'php',
             'version' => '0.1.0', // Package version
             'protocol' => 1,
-            'echo' => true, // Receive own messages
+            'echo' => $this->echo,
         ];
 
         // Add authentication if configured
