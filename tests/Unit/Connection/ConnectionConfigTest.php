@@ -206,4 +206,12 @@ describe('toConnectArray', function (): void {
 
         expect($connectArray)->toHaveKey('tls_required', true);
     });
+
+    it('includes echo option', function (): void {
+        $config = new ConnectionConfig(echo: false);
+
+        $connectArray = $config->toConnectArray();
+
+        expect($connectArray)->toHaveKey('echo', false);
+    });
 });
