@@ -6,14 +6,18 @@ namespace LaravelNats\Laravel;
 
 use Basis\Nats\Client;
 use Basis\Nats\Message\Msg;
+use Basis\Nats\Message\Payload;
 use Basis\Nats\Stream\Stream;
 use Illuminate\Contracts\Config\Repository;
 use InvalidArgumentException;
 use LaravelNats\Connection\ConnectionManager;
+use LaravelNats\Exceptions\NatsNoRespondersException;
+use LaravelNats\Exceptions\NatsRequestTimeoutException;
 use LaravelNats\JetStream\BasisJetStreamManager;
 use LaravelNats\JetStream\BasisJetStreamPublisher;
 use LaravelNats\JetStream\BasisStreamProvisioner;
 use LaravelNats\JetStream\PullConsumerBatch;
+use LaravelNats\Laravel\Internal\BasisRequestState;
 use LaravelNats\Publisher\Contracts\NatsPublisherContract;
 use LaravelNats\Subscriber\Contracts\NatsSubscriberContract;
 use LaravelNats\Subscriber\InboundMessage;
@@ -38,13 +42,27 @@ final class NatsV2Gateway
 
     /**
      * @param array<string, mixed> $payload
-     * @param array<string, string|int|float|bool|null> $headers Values are normalized to strings when publishing
+     * @param array<string, mixed> $headers Scalars become single HPUB header lines; list<string> repeats a name (ADR-4 multi-value)
      */
     public function publish(string $subject, array $payload, array $headers = [], ?string $connection = null): void
     {
         $normalized = [];
         foreach ($headers as $key => $value) {
             if (! is_string($key) || $key === '') {
+                continue;
+            }
+            if (is_array($value)) {
+                $list = [];
+                foreach ($value as $item) {
+                    if ($item === null) {
+                        continue;
+                    }
+                    $list[] = is_string($item) ? $item : (string) $item;
+                }
+                if ($list !== []) {
+                    $normalized[$key] = $list;
+                }
+
                 continue;
             }
             if ($value === null) {
@@ -56,6 +74,62 @@ final class NatsV2Gateway
         }
 
         $this->publisher->publish($subject, $payload, $normalized, $connection);
+    }
+
+    /**
+     * Synchronous request/reply using the basis client. When the server returns header Status-Code 503 (no responders),
+     * {@see NatsNoRespondersException} is thrown. Enable no-responder headers on the server/account where applicable.
+     *
+     * @throws NatsNoRespondersException
+     * @throws NatsRequestTimeoutException
+     */
+    public function request(
+        string $subject,
+        mixed $payload,
+        float $timeoutSeconds = 5.0,
+        ?string $connection = null,
+    ): Payload {
+        $client = $this->connections->connection($connection);
+        $state = new BasisRequestState();
+
+        $client->request($subject, $payload, function (Payload $replyPayload, ?string $replyTo) use ($subject, $state): void {
+            $code = $replyPayload->getHeader('Status-Code');
+            if ($code === '503') {
+                $state->error = new NatsNoRespondersException($subject);
+            } else {
+                $state->payload = $replyPayload;
+            }
+            $state->done = true;
+        });
+
+        $deadline = microtime(true) + max(0.001, $timeoutSeconds);
+        while (! $state->done && microtime(true) < $deadline) {
+            $client->process(0.05);
+        }
+
+        if ($state->error !== null) {
+            throw $state->error;
+        }
+
+        if (! $state->done || $state->payload === null) {
+            throw new NatsRequestTimeoutException($subject, $timeoutSeconds);
+        }
+
+        return $state->payload;
+    }
+
+    /**
+     * Process inbound messages for a bounded time, then disconnect (graceful shutdown helper; not wire-level DRAIN).
+     */
+    public function drainConnection(float $maxProcessSeconds = 2.0, ?string $connection = null): void
+    {
+        $client = $this->connections->connection($connection);
+        $until = microtime(true) + max(0.0, $maxProcessSeconds);
+        while (microtime(true) < $until) {
+            $client->process(0.05);
+        }
+
+        $this->disconnect($connection);
     }
 
     /**
