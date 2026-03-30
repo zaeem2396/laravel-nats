@@ -16,7 +16,7 @@ final class NatsServerEndpoint
     }
 
     /**
-     * Parses "host:port", "nats://host:port", or "tls://host:port".
+     * Parses "host:port", "[ipv6]:port", "nats://host:port", or "tls://host:port".
      */
     public static function parse(string $raw): ?self
     {
@@ -31,9 +31,16 @@ final class NatsServerEndpoint
                 return null;
             }
             $host = (string) $parts['host'];
+            if (str_starts_with($host, '[') && str_ends_with($host, ']')) {
+                $host = substr($host, 1, -1);
+            }
             $port = isset($parts['port']) ? (int) $parts['port'] : 4222;
 
             return new self($host, $port);
+        }
+
+        if (str_starts_with($raw, '[')) {
+            return self::parseBracketedEndpoint($raw);
         }
 
         if (! str_contains($raw, ':')) {
@@ -48,6 +55,43 @@ final class NatsServerEndpoint
         $host = trim(substr($raw, 0, $pos));
         $portStr = trim(substr($raw, $pos + 1));
         if ($host === '' || $portStr === '' || ! ctype_digit($portStr)) {
+            return null;
+        }
+
+        $port = (int) $portStr;
+        if ($port < 1 || $port > 65535) {
+            return null;
+        }
+
+        return new self($host, $port);
+    }
+
+    /**
+     * Parses "[ipv6]:port" or "[ipv6]" (default port). Avoids strrpos on colon-delimited IPv6 literals.
+     */
+    private static function parseBracketedEndpoint(string $raw): ?self
+    {
+        $close = strpos($raw, ']');
+        if ($close === false) {
+            return null;
+        }
+
+        $host = trim(substr($raw, 1, $close - 1));
+        if ($host === '') {
+            return null;
+        }
+
+        $rest = trim(substr($raw, $close + 1));
+        if ($rest === '') {
+            return new self($host, 4222);
+        }
+
+        if (! str_starts_with($rest, ':')) {
+            return null;
+        }
+
+        $portStr = trim(substr($rest, 1));
+        if ($portStr === '' || ! ctype_digit($portStr)) {
             return null;
         }
 
