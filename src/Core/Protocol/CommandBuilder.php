@@ -173,7 +173,7 @@ final class CommandBuilder
     /**
      * Build the headers block for HPUB.
      *
-     * @param array<string, string> $headers The headers to format
+     * @param array<string, string|list<string>> $headers The headers to format
      *
      * @return string The formatted header block
      */
