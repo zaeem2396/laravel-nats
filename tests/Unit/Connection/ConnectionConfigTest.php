@@ -125,6 +125,14 @@ describe('fromArray', function (): void {
         expect($config->getPingInterval())->toBe(60.0)
             ->and($config->getMaxPingsOut())->toBe(3);
     });
+
+    it('parses echo flag', function (): void {
+        $config = ConnectionConfig::fromArray([
+            'echo' => false,
+        ]);
+
+        expect($config->isEchoEnabled())->toBeFalse();
+    });
 });
 
 describe('local factory', function (): void {
