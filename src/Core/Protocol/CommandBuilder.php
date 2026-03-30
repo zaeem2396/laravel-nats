@@ -74,7 +74,7 @@ final class CommandBuilder
      *
      * @param string $subject The subject to publish to
      * @param string $payload The message payload
-     * @param array<string, string> $headers Message headers
+     * @param array<string, string|list<string>> $headers Message headers (multi-value = repeated lines per ADR-4)
      * @param string|null $replyTo Optional reply-to subject
      *
      * @return string The complete HPUB command
