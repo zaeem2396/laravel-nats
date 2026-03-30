@@ -123,6 +123,18 @@ describe('HPUB command', function (): void {
 
         expect($command)->toContain('HPUB api.request _INBOX.reply456');
     });
+
+    it('builds HPUB with multi-value header lines', function (): void {
+        $command = $this->builder->publishWithHeaders(
+            'MORNING.MENU',
+            'Yum!',
+            ['BREAKFAST' => ['donut', 'eggs']],
+        );
+
+        expect($command)->toContain('BREAKFAST: donut')
+            ->and($command)->toContain('BREAKFAST: eggs')
+            ->and($command)->toContain('Yum!');
+    });
 });
 
 describe('SUB command', function (): void {
