@@ -182,7 +182,15 @@ final class CommandBuilder
         $lines = ['NATS/1.0'];
 
         foreach ($headers as $key => $value) {
-            $lines[] = sprintf('%s: %s', $key, $value);
+            if (is_array($value)) {
+                foreach ($value as $one) {
+                    $lines[] = sprintf('%s: %s', $key, (string) $one);
+                }
+
+                continue;
+            }
+
+            $lines[] = sprintf('%s: %s', $key, (string) $value);
         }
 
         // Empty line at end to separate from payload
