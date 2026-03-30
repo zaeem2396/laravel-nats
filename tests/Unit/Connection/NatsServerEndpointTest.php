@@ -25,3 +25,9 @@ it('returns null for invalid port token', function (): void {
         ->and(NatsServerEndpoint::parse('host:notaport'))->toBeNull();
 });
 
+it('defaults port when host has no colon', function (): void {
+    $e = NatsServerEndpoint::parse('localhost');
+
+    expect($e)->not->toBeNull()
+        ->and($e->port)->toBe(4222);
+});
