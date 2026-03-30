@@ -26,6 +26,8 @@ use LaravelNats\JetStream\BasisJetStreamManager;
  * @method static void jetStreamPublish(string $stream, string $subject, array $payload, bool $useEnvelope = true, bool $waitForAck = true, array $headers = [], string|null $connection = null)
  * @method static list<Msg> jetStreamPull(string $stream, string $consumer, int|null $batch = null, float|null $expiresSeconds = null, string|null $connection = null)
  * @method static Stream jetStreamProvisionPreset(string $presetKey, bool $createIfNotExists = true, string|null $connection = null)
+ * @method static \Basis\Nats\Message\Payload request(string $subject, mixed $payload, float $timeoutSeconds = 5.0, string|null $connection = null)
+ * @method static void drainConnection(float $maxProcessSeconds = 2.0, string|null $connection = null)
  *
  * @see \LaravelNats\Laravel\NatsV2Gateway
  */
