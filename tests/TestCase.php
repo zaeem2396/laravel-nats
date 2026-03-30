@@ -124,7 +124,13 @@ abstract class TestCase extends BaseTestCase
     {
         $host = getenv('NATS_HOST') ?: 'localhost';
         $port = (int) (getenv('NATS_PORT') ?: '4222');
-        $socket = @fsockopen($host, $port, $errno, $errstr, 1);
+        $previous = error_reporting(0);
+
+        try {
+            $socket = fsockopen($host, $port, $errno, $errstr, 1);
+        } finally {
+            error_reporting($previous);
+        }
 
         if ($socket !== false) {
             fclose($socket);
@@ -145,7 +151,13 @@ abstract class TestCase extends BaseTestCase
      */
     protected function isNatsAvailable(): bool
     {
-        $socket = @fsockopen($this->natsHost, $this->natsPort, $errno, $errstr, 1);
+        $previous = error_reporting(0);
+
+        try {
+            $socket = fsockopen($this->natsHost, $this->natsPort, $errno, $errstr, 1);
+        } finally {
+            error_reporting($previous);
+        }
 
         if ($socket !== false) {
             fclose($socket);

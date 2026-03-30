@@ -77,8 +77,15 @@ final class NatsV2Gateway
     }
 
     /**
-     * Synchronous request/reply using the basis client. When the server returns header Status-Code 503 (no responders),
-     * {@see NatsNoRespondersException} is thrown. Enable no-responder headers on the server/account where applicable.
+     * Synchronous request/reply using the basis client.
+     *
+     * Wraps {@see Client::request(string $name, mixed $payload, callable $handler)} (third argument is the reply
+     * callback, not a timeout). The basis client runs an initial {@see Client::process()} using the configured
+     * connection timeout; this gateway then polls {@see Client::process()} until the callback fires or
+     * $timeoutSeconds is exceeded.
+     *
+     * When the server returns header Status-Code 503 (no responders), {@see NatsNoRespondersException} is thrown.
+     * Enable no-responder headers on the server/account where applicable.
      *
      * @throws NatsNoRespondersException
      * @throws NatsRequestTimeoutException

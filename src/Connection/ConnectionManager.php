@@ -144,14 +144,29 @@ final class ConnectionManager
                     connection: null,
                 );
 
-                if (count($endpoints) > 1) {
-                    try {
-                        if (! $client->ping()) {
-                            continue;
-                        }
-                    } catch (Throwable) {
+                try {
+                    if (! $client->ping()) {
+                        $lastThrowable = new InvalidArgumentException(
+                            sprintf(
+                                'NATS ping failed for connection [%s] at %s',
+                                $name,
+                                $endpoint->toKey(),
+                            ),
+                        );
+                        $client->disconnect();
+
                         continue;
                     }
+                } catch (Throwable $pingThrowable) {
+                    $lastThrowable = $pingThrowable;
+
+                    try {
+                        $client->disconnect();
+                    } catch (Throwable) {
+                        // ignore disconnect errors after failed ping
+                    }
+
+                    continue;
                 }
 
                 $this->mergeInfoConnectUrls($name, $client, $c);

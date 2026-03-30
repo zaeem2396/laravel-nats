@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-use Basis\Nats\Client;
 use Illuminate\Config\Repository;
 use LaravelNats\Connection\ConnectionManager;
 use Psr\Log\LoggerInterface;
@@ -50,5 +49,30 @@ it('accepts an optional PSR-3 logger for the basis client', function (): void {
 
     $manager = new ConnectionManager($config, $logger);
 
-    expect($manager->connection('default'))->toBeInstanceOf(Client::class);
+    expect($manager->getDefaultConnection())->toBe('default');
+});
+
+it('fails resolving a single endpoint when ping does not succeed', function (): void {
+    set_error_handler(static fn (): bool => true);
+
+    try {
+        $config = new Repository([
+            'nats_basis' => [
+                'default' => 'default',
+                'connections' => [
+                    'default' => [
+                        'host' => '127.0.0.1',
+                        'port' => 65534,
+                        'timeout' => 0.15,
+                    ],
+                ],
+            ],
+        ]);
+
+        $manager = new ConnectionManager($config);
+
+        expect(fn () => $manager->connection('default'))->toThrow(InvalidArgumentException::class);
+    } finally {
+        restore_error_handler();
+    }
 });
