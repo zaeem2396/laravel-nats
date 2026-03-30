@@ -15,6 +15,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - (none)
 
+## [1.5.0] - 2026-03-29
+
+### Added
+
+- **Security & config hardening (v2.6):** `NatsBasisConfigurationValidator` with optional boot validation (`nats_basis.security.validate_on_boot` / `NATS_BASIS_VALIDATE_CONFIG`); production TLS guard (`nats_basis.security.tls.require_in_production` / `NATS_TLS_REQUIRE_IN_PRODUCTION`); `SubjectAclChecker` and `SubjectPrefixMatcher` with `nats_basis.acl` (`NATS_ACL_ENABLED`, `NATS_ACL_PUBLISH_PREFIXES`, `NATS_ACL_SUBSCRIBE_PREFIXES`) enforced in `NatsPublisher`, `NatsBasisSubscriber`, and `BasisJetStreamPublisher`; `SubjectNotAllowedException`, `NatsConfigurationException`; Artisan `nats:v2:config:validate`. See [docs/v2/SECURITY.md](docs/v2/SECURITY.md).
+
 ## [1.4.0] - 2026-03-29
 
 First release after **1.3.0** on Packagist: bundles NatsV2 JetStream on the basis client, **`nats_basis`** queue driver, idempotency, and observability (metrics hooks, redaction, **`nats:ping`**).

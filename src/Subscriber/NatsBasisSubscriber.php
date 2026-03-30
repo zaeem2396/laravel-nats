@@ -10,6 +10,7 @@ use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher;
 use LaravelNats\Connection\ConnectionManager;
 use LaravelNats\Laravel\Events\NatsInboundMessageReceived;
+use LaravelNats\Security\SubjectAclChecker;
 use LaravelNats\Subscriber\Contracts\NatsSubscriberContract;
 use LaravelNats\Subscriber\Exceptions\SubscriptionConflictException;
 use LaravelNats\Subscriber\Exceptions\SubscriptionNotFoundException;
@@ -30,6 +31,7 @@ final class NatsBasisSubscriber implements NatsSubscriberContract
         private readonly ConnectionManager $connections,
         private readonly Repository $config,
         private readonly SubjectValidator $subjects,
+        private readonly SubjectAclChecker $subjectAcl,
         private readonly Container $container,
         private readonly ?Dispatcher $events = null,
     ) {
@@ -38,6 +40,7 @@ final class NatsBasisSubscriber implements NatsSubscriberContract
     public function subscribe(string $subject, callable $handler, ?string $queueGroup = null, ?string $connection = null): string
     {
         $this->subjects->validate($subject);
+        $this->subjectAcl->assertSubscribeAllowed($subject);
 
         $connName = $connection ?? $this->connections->getDefaultConnection();
         $key = $this->subscriptionKey($connName, $subject, $queueGroup);

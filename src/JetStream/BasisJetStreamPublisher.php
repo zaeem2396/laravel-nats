@@ -8,6 +8,8 @@ use Illuminate\Contracts\Config\Repository;
 use JsonException;
 use LaravelNats\Connection\ConnectionManager;
 use LaravelNats\Exceptions\PublishException;
+use LaravelNats\Security\Exceptions\SubjectNotAllowedException;
+use LaravelNats\Security\SubjectAclChecker;
 use LaravelNats\Support\MessageEnvelope;
 
 /**
@@ -18,6 +20,7 @@ final class BasisJetStreamPublisher
     public function __construct(
         private readonly ConnectionManager $connections,
         private readonly Repository $config,
+        private readonly SubjectAclChecker $subjectAcl,
     ) {
     }
 
@@ -39,6 +42,8 @@ final class BasisJetStreamPublisher
         unset($headers);
 
         try {
+            $this->subjectAcl->assertPublishAllowed($subject);
+
             $manager = new BasisJetStreamManager($this->connections, $connection);
             $stream = $manager->stream($streamName, $connection);
             if ($useEnvelope) {
@@ -75,6 +80,10 @@ final class BasisJetStreamPublisher
             );
         } catch (\Throwable $e) {
             if ($e instanceof PublishException) {
+                throw $e;
+            }
+
+            if ($e instanceof SubjectNotAllowedException) {
                 throw $e;
             }
 

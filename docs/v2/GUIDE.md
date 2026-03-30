@@ -19,6 +19,7 @@ The v2 stack is a **Laravel wrapper** around [basis-company/nats](https://packag
 11. JetStream (NatsV2)
 12. Idempotency — [IDEMPOTENCY.md](IDEMPOTENCY.md)
 13. Observability — [OBSERVABILITY.md](OBSERVABILITY.md) (package 1.4.0+)
+14. Security & ACL — [SECURITY.md](SECURITY.md) (package 1.5.0+)
 
 ## Config
 
@@ -33,6 +34,10 @@ The v2 stack is a **Laravel wrapper** around [basis-company/nats](https://packag
 | `NATS_V2_JS_PULL_BATCH` / `NATS_V2_JS_PULL_EXPIRES` | Defaults for `NatsV2::jetStreamPull()` (see [JETSTREAM.md](JETSTREAM.md)) |
 | `NATS_OBSERVABILITY_METRICS` / `NATS_OBSERVABILITY_PUBLISH_LATENCY_MS` | Optional publish counters and latency histogram via `NatsMetricsContract` ([OBSERVABILITY.md](OBSERVABILITY.md)) |
 | `NATS_REDACT_KEY_SUBSTRINGS` | Comma-separated key substrings redacted when logging envelope `data` |
+| `NATS_BASIS_VALIDATE_CONFIG` | When `true`, validate `nats_basis.connections` on app boot ([SECURITY.md](SECURITY.md)) |
+| `NATS_TLS_REQUIRE_IN_PRODUCTION` | When `true`, require TLS material (or `tlsHandshakeFirst`) for each connection in `production` ([SECURITY.md](SECURITY.md)) |
+| `NATS_ACL_ENABLED` | Optional publish/subscribe subject allowlists ([SECURITY.md](SECURITY.md)) |
+| `NATS_ACL_PUBLISH_PREFIXES` / `NATS_ACL_SUBSCRIBE_PREFIXES` | Comma-separated prefix rules when ACL is enabled |
 
 TLS file paths: `NATS_TLS_KEY`, `NATS_TLS_CERT`, `NATS_TLS_CA`.
 

@@ -35,6 +35,7 @@ use LaravelNats\Laravel\Console\Commands\NatsV2JetStreamProvisionCommand;
 use LaravelNats\Laravel\Console\Commands\NatsV2JetStreamPullCommand;
 use LaravelNats\Laravel\Console\Commands\NatsV2JetStreamStreamsCommand;
 use LaravelNats\Laravel\Console\Commands\NatsV2ListenCommand;
+use LaravelNats\Laravel\Console\Commands\NatsValidateConfigCommand;
 use LaravelNats\Laravel\Console\Commands\NatsWorkCommand;
 use LaravelNats\Laravel\NatsManager;
 use LaravelNats\Laravel\NatsV2Gateway;
@@ -44,6 +45,8 @@ use LaravelNats\Observability\Contracts\NatsMetricsContract;
 use LaravelNats\Observability\NullNatsMetrics;
 use LaravelNats\Publisher\Contracts\NatsPublisherContract;
 use LaravelNats\Publisher\NatsPublisher;
+use LaravelNats\Security\NatsBasisConfigurationValidator;
+use LaravelNats\Security\SubjectAclChecker;
 use LaravelNats\Subscriber\Contracts\NatsSubscriberContract;
 use LaravelNats\Subscriber\NatsBasisSubscriber;
 use LaravelNats\Subscriber\SubjectValidator;
@@ -81,6 +84,7 @@ class NatsServiceProvider extends ServiceProvider implements DeferrableProvider
         $this->publishConfig();
         $this->registerQueueDriver();
         $this->registerJetStreamCommands();
+        $this->bootNatsBasisSecurity();
     }
 
     /**
@@ -107,6 +111,8 @@ class NatsServiceProvider extends ServiceProvider implements DeferrableProvider
             Client::class,
             IdempotencyStoreContract::class,
             NatsMetricsContract::class,
+            NatsBasisConfigurationValidator::class,
+            SubjectAclChecker::class,
         ];
     }
 
@@ -126,6 +132,7 @@ class NatsServiceProvider extends ServiceProvider implements DeferrableProvider
         $this->commands([
             NatsWorkCommand::class,
             NatsPingCommand::class,
+            NatsValidateConfigCommand::class,
             NatsV2ListenCommand::class,
             NatsV2JetStreamInfoCommand::class,
             NatsV2JetStreamStreamsCommand::class,
@@ -178,6 +185,12 @@ class NatsServiceProvider extends ServiceProvider implements DeferrableProvider
             return new ConnectionManager($config, $logger);
         });
 
+        $this->app->singleton(NatsBasisConfigurationValidator::class, static fn () => new NatsBasisConfigurationValidator());
+
+        $this->app->singleton(SubjectAclChecker::class, function ($app) {
+            return new SubjectAclChecker($app->make('config'));
+        });
+
         $this->app->singleton(NatsMetricsContract::class, static fn () => new NullNatsMetrics());
 
         $this->app->singleton(NatsPublisher::class, function ($app) {
@@ -185,6 +198,7 @@ class NatsServiceProvider extends ServiceProvider implements DeferrableProvider
                 $app->make(ConnectionManager::class),
                 $app->make('config'),
                 $app->make(NatsMetricsContract::class),
+                $app->make(SubjectAclChecker::class),
             );
         });
 
@@ -224,6 +238,7 @@ class NatsServiceProvider extends ServiceProvider implements DeferrableProvider
                 $app->make(ConnectionManager::class),
                 $app->make('config'),
                 $app->make(SubjectValidator::class),
+                $app->make(SubjectAclChecker::class),
                 $app,
                 $app->bound('events') ? $app->make('events') : null,
             );
@@ -235,6 +250,7 @@ class NatsServiceProvider extends ServiceProvider implements DeferrableProvider
             return new BasisJetStreamPublisher(
                 $app->make(ConnectionManager::class),
                 $app->make('config'),
+                $app->make(SubjectAclChecker::class),
             );
         });
 
@@ -300,5 +316,16 @@ class NatsServiceProvider extends ServiceProvider implements DeferrableProvider
                 return new BasisNatsConnector();
             });
         });
+    }
+
+    /**
+     * Optional fail-fast validation for `nats_basis` (see `nats_basis.security.validate_on_boot`).
+     */
+    protected function bootNatsBasisSecurity(): void
+    {
+        $this->app->make(NatsBasisConfigurationValidator::class)->validate(
+            $this->app->make('config'),
+            $this->app,
+        );
     }
 }

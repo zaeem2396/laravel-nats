@@ -4,6 +4,8 @@
 
 The legacy **`nats`** driver ( **`LaravelNats\Core\Client`** ) is unchanged.
 
+**Security (1.5.0+):** Package **subject ACL** (`NATS_ACL_*`) applies to **`NatsPublisher`** / **`NatsBasisSubscriber`** / **`BasisJetStreamPublisher`**, **not** to this driver’s internal **`Basis\Nats\Client::publish`** calls. Enforce queue subjects with **NATS server** auth and safe **`nats_basis.queue.prefix`**. See [SECURITY.md](SECURITY.md).
+
 ## When to use which driver
 
 | Driver | Wire client | Use when |

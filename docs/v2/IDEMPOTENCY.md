@@ -2,6 +2,8 @@
 
 Optional **idempotency keys** let subscribers skip duplicate work when the same logical event is delivered more than once (retries, at-least-once consumers, or producer retries).
 
+**Related (1.5.0+):** Optional subject ACL and publish validation are documented in [SECURITY.md](SECURITY.md).
+
 ## Publish: envelope + header
 
 1. **Payload field** — include `idempotency_key` next to your application fields when calling **`NatsV2::publish()`** or **`NatsV2::jetStreamPublish()`** (with envelope). The publisher **strips** it from `data` and places it on the envelope root and as an HPUB header (default **`Nats-Idempotency-Key`**).

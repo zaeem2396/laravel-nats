@@ -2,6 +2,8 @@
 
 This release adds **optional publish metrics** (`NatsMetricsContract`), **HTTP correlation context** for application logs, **redaction helpers** for envelope `data` when logging inbound messages, and a **`nats:ping`** Artisan command for readiness checks.
 
+**Related:** [SECURITY.md](SECURITY.md) (1.5.0+) for boot validation, TLS production checks, and optional subject ACL alongside operational hardening.
+
 ## Metrics
 
 When **`nats_basis.observability.metrics_enabled`** is `true` (`NATS_OBSERVABILITY_METRICS`), `NatsPublisher` increments:

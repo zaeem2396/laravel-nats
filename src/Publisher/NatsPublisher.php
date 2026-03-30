@@ -12,6 +12,8 @@ use LaravelNats\Connection\ConnectionManager;
 use LaravelNats\Exceptions\PublishException;
 use LaravelNats\Observability\Contracts\NatsMetricsContract;
 use LaravelNats\Publisher\Contracts\NatsPublisherContract;
+use LaravelNats\Security\Exceptions\SubjectNotAllowedException;
+use LaravelNats\Security\SubjectAclChecker;
 use LaravelNats\Support\CorrelationHeaders;
 use LaravelNats\Support\IdempotencyHeaders;
 use LaravelNats\Support\MessageEnvelope;
@@ -28,6 +30,7 @@ final class NatsPublisher implements NatsPublisherContract
         private readonly ConnectionManager $connections,
         private readonly Repository $config,
         private readonly NatsMetricsContract $metrics,
+        private readonly SubjectAclChecker $subjectAcl,
     ) {
     }
 
@@ -41,6 +44,8 @@ final class NatsPublisher implements NatsPublisherContract
         $t0 = microtime(true);
 
         try {
+            $this->subjectAcl->assertPublishAllowed($subject);
+
             $version = (string) $this->config->get('nats_basis.envelope_version', 'v1');
             $data = $payload;
             $idempotencyKey = null;
@@ -83,6 +88,12 @@ final class NatsPublisher implements NatsPublisherContract
             );
         } catch (\Throwable $e) {
             if ($e instanceof PublishException) {
+                $this->recordPublishOutcome(false, $connection, (microtime(true) - $t0) * 1000.0);
+
+                throw $e;
+            }
+
+            if ($e instanceof SubjectNotAllowedException) {
                 throw $e;
             }
 
