@@ -114,6 +114,7 @@ final class ConnectionConfig implements ConnectionConfigInterface
             pedantic: (bool) ($config['pedantic'] ?? false),
             pingInterval: (float) ($config['ping_interval'] ?? self::DEFAULT_PING_INTERVAL),
             maxPingsOut: (int) ($config['max_pings_out'] ?? self::DEFAULT_MAX_PINGS_OUT),
+            echo: filter_var($config['echo'] ?? true, FILTER_VALIDATE_BOOL),
         );
     }
 
