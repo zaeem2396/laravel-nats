@@ -56,6 +56,7 @@ final class ConnectionConfig implements ConnectionConfigInterface
      * @param bool $pedantic Enable pedantic mode
      * @param float $pingInterval Ping interval in seconds
      * @param int $maxPingsOut Max pings without pong
+     * @param bool $echo When true, CONNECT sets echo so the client receives its own messages on matching subs
      */
     public function __construct(
         private readonly string $host = 'localhost',
@@ -71,6 +72,7 @@ final class ConnectionConfig implements ConnectionConfigInterface
         private readonly bool $pedantic = false,
         private readonly float $pingInterval = self::DEFAULT_PING_INTERVAL,
         private readonly int $maxPingsOut = self::DEFAULT_MAX_PINGS_OUT,
+        private readonly bool $echo = true,
     ) {
     }
 
