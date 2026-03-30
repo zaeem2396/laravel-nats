@@ -233,6 +233,16 @@ return [
             'pedantic' => filter_var(env('NATS_PEDANTIC', false), FILTER_VALIDATE_BOOL),
             'lang' => env('NATS_CLIENT_LANG', 'php'),
             'version' => env('NATS_CLIENT_VERSION', 'laravel-nats'),
+
+            /*
+            | Optional seed peers for bootstrap failover ("host:port" or URL), comma-separated via env.
+            | merge_info_connect_urls: after a successful connect, merge INFO connect_urls into the pool (issues one ping).
+            */
+            'servers' => array_values(array_filter(array_map(
+                static fn (string $s): string => trim($s),
+                explode(',', (string) env('NATS_BASIS_SERVERS', '')),
+            ))),
+            'merge_info_connect_urls' => filter_var(env('NATS_MERGE_INFO_CONNECT_URLS', false), FILTER_VALIDATE_BOOL),
         ],
 
     ],

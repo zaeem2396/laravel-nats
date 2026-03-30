@@ -33,7 +33,8 @@ describe('constructor defaults', function (): void {
             ->and($config->isTlsEnabled())->toBeFalse()
             ->and($config->getClientName())->toBe('laravel-nats')
             ->and($config->isVerbose())->toBeFalse()
-            ->and($config->isPedantic())->toBeFalse();
+            ->and($config->isPedantic())->toBeFalse()
+            ->and($config->isEchoEnabled())->toBeTrue();
     });
 });
 
@@ -124,6 +125,14 @@ describe('fromArray', function (): void {
         expect($config->getPingInterval())->toBe(60.0)
             ->and($config->getMaxPingsOut())->toBe(3);
     });
+
+    it('parses echo flag', function (): void {
+        $config = ConnectionConfig::fromArray([
+            'echo' => false,
+        ]);
+
+        expect($config->isEchoEnabled())->toBeFalse();
+    });
 });
 
 describe('local factory', function (): void {
@@ -196,5 +205,13 @@ describe('toConnectArray', function (): void {
         $connectArray = $config->toConnectArray();
 
         expect($connectArray)->toHaveKey('tls_required', true);
+    });
+
+    it('includes echo option', function (): void {
+        $config = new ConnectionConfig(echo: false);
+
+        $connectArray = $config->toConnectArray();
+
+        expect($connectArray)->toHaveKey('echo', false);
     });
 });

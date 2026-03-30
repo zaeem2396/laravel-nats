@@ -56,6 +56,7 @@ final class ConnectionConfig implements ConnectionConfigInterface
      * @param bool $pedantic Enable pedantic mode
      * @param float $pingInterval Ping interval in seconds
      * @param int $maxPingsOut Max pings without pong
+     * @param bool $echo When true, CONNECT sets echo so the client receives its own messages on matching subs
      */
     public function __construct(
         private readonly string $host = 'localhost',
@@ -71,6 +72,7 @@ final class ConnectionConfig implements ConnectionConfigInterface
         private readonly bool $pedantic = false,
         private readonly float $pingInterval = self::DEFAULT_PING_INTERVAL,
         private readonly int $maxPingsOut = self::DEFAULT_MAX_PINGS_OUT,
+        private readonly bool $echo = true,
     ) {
     }
 
@@ -112,6 +114,7 @@ final class ConnectionConfig implements ConnectionConfigInterface
             pedantic: (bool) ($config['pedantic'] ?? false),
             pingInterval: (float) ($config['ping_interval'] ?? self::DEFAULT_PING_INTERVAL),
             maxPingsOut: (int) ($config['max_pings_out'] ?? self::DEFAULT_MAX_PINGS_OUT),
+            echo: filter_var($config['echo'] ?? true, FILTER_VALIDATE_BOOL),
         );
     }
 
@@ -190,6 +193,11 @@ final class ConnectionConfig implements ConnectionConfigInterface
         return $this->maxPingsOut;
     }
 
+    public function isEchoEnabled(): bool
+    {
+        return $this->echo;
+    }
+
     /**
      * Get the full server address.
      *
@@ -219,7 +227,7 @@ final class ConnectionConfig implements ConnectionConfigInterface
             'lang' => 'php',
             'version' => '0.1.0', // Package version
             'protocol' => 1,
-            'echo' => true, // Receive own messages
+            'echo' => $this->echo,
         ];
 
         // Add authentication if configured

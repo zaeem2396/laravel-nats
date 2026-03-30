@@ -74,7 +74,7 @@ final class CommandBuilder
      *
      * @param string $subject The subject to publish to
      * @param string $payload The message payload
-     * @param array<string, string> $headers Message headers
+     * @param array<string, string|list<string>> $headers Message headers (multi-value = repeated lines per ADR-4)
      * @param string|null $replyTo Optional reply-to subject
      *
      * @return string The complete HPUB command
@@ -173,7 +173,7 @@ final class CommandBuilder
     /**
      * Build the headers block for HPUB.
      *
-     * @param array<string, string> $headers The headers to format
+     * @param array<string, string|list<string>> $headers The headers to format
      *
      * @return string The formatted header block
      */
@@ -182,7 +182,15 @@ final class CommandBuilder
         $lines = ['NATS/1.0'];
 
         foreach ($headers as $key => $value) {
-            $lines[] = sprintf('%s: %s', $key, $value);
+            if (is_array($value)) {
+                foreach ($value as $one) {
+                    $lines[] = sprintf('%s: %s', $key, (string) $one);
+                }
+
+                continue;
+            }
+
+            $lines[] = sprintf('%s: %s', $key, (string) $value);
         }
 
         // Empty line at end to separate from payload

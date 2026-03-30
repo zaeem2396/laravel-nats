@@ -9,6 +9,7 @@ The **NatsV2** stack (package **1.3.0+** for pub/sub; **1.4.0+** for basis JetSt
 - [Idempotency](IDEMPOTENCY.md)
 - [Observability](OBSERVABILITY.md)
 - [Security & ACL](SECURITY.md) (1.5.0+)
+- [Client protocol features](CLIENT_FEATURES.md) (cluster seeds, request/no responders, headers, drain helper)
 - [Correlation headers](CORRELATION.md)
 - [Migration & upgrade strategy](MIGRATION.md)
 - [FAQ](FAQ.md)

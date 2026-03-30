@@ -7,9 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **NatsV2:** `ConnectionManager` always runs a ping after creating a basis client (including a single endpoint) so unreachable servers fail when the connection is resolved, not only when multiple seeds are configured.
+
 ### Added
 
-- (none)
+- **NatsV2:** optional bootstrap failover via `nats_basis.connections.*.servers` / `NATS_BASIS_SERVERS` and `merge_info_connect_urls` / `NATS_MERGE_INFO_CONNECT_URLS` (merging INFO `connect_urls` into the endpoint pool, uses ping when enabled).
+- **NatsV2:** `NatsV2::request()` / `NatsV2::drainConnection()` on the gateway; `NatsNoRespondersException` when reply headers contain Status-Code `503`; `NatsRequestTimeoutException` on wait timeout.
+- **NatsV2 publish:** multi-value NATS headers via `list<string>` per header name (`MultiHeaderPayload`, `PublishHeaderNormalizer`).
+- **Legacy:** configurable CONNECT `echo` via `config/nats.php` (`NATS_ECHO`); HPUB multi-value headers in `CommandBuilder`.
+- **Docs:** [docs/v2/CLIENT_FEATURES.md](docs/v2/CLIENT_FEATURES.md).
 
 ### Removed
 

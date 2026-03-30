@@ -20,6 +20,7 @@ The v2 stack is a **Laravel wrapper** around [basis-company/nats](https://packag
 12. Idempotency — [IDEMPOTENCY.md](IDEMPOTENCY.md)
 13. Observability — [OBSERVABILITY.md](OBSERVABILITY.md) (package 1.4.0+)
 14. Security & ACL — [SECURITY.md](SECURITY.md) (package 1.5.0+)
+15. Client features — [CLIENT_FEATURES.md](CLIENT_FEATURES.md) (cluster seeds, `request()`, multi-value headers, drain helper)
 
 ## Config
 

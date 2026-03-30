@@ -73,6 +73,9 @@ return [
             'client_name' => env('NATS_CLIENT_NAME', config('app.name', 'laravel') . '-nats'),
             'verbose' => (bool) env('NATS_VERBOSE', false),
             'pedantic' => (bool) env('NATS_PEDANTIC', false),
+
+            // CONNECT echo: receive your own messages on matching subscriptions (NATS 1.2+)
+            'echo' => filter_var(env('NATS_ECHO', true), FILTER_VALIDATE_BOOL),
         ],
 
         // Example: Secondary connection for different environment

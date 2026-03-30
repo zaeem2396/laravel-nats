@@ -119,4 +119,9 @@ interface ConnectionConfigInterface
      * @return array<string, mixed> The configuration as an associative array
      */
     public function toConnectArray(): array;
+
+    /**
+     * Whether the server should echo the connection's own published messages to matching subscriptions.
+     */
+    public function isEchoEnabled(): bool;
 }

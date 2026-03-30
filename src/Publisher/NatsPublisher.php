@@ -10,6 +10,7 @@ use Illuminate\Contracts\Config\Repository;
 use JsonException;
 use LaravelNats\Connection\ConnectionManager;
 use LaravelNats\Exceptions\PublishException;
+use LaravelNats\Message\MultiHeaderPayload;
 use LaravelNats\Observability\Contracts\NatsMetricsContract;
 use LaravelNats\Publisher\Contracts\NatsPublisherContract;
 use LaravelNats\Security\Exceptions\SubjectNotAllowedException;
@@ -17,6 +18,7 @@ use LaravelNats\Security\SubjectAclChecker;
 use LaravelNats\Support\CorrelationHeaders;
 use LaravelNats\Support\IdempotencyHeaders;
 use LaravelNats\Support\MessageEnvelope;
+use LaravelNats\Support\PublishHeaderNormalizer;
 use LogicException;
 
 /**
@@ -69,9 +71,10 @@ final class NatsPublisher implements NatsPublisherContract
                 throw new LogicException('NATS client is disconnected; cannot publish.');
             }
 
-            $merged = CorrelationHeaders::mergeForPublish($this->config, $this->normalizeHeaders($headers));
-            $merged = IdempotencyHeaders::mergeForPublish($this->config, $merged, $idempotencyKey);
-            $payloadMessage = new Payload($body, $merged);
+            $namedHeaders = $this->buildPublishNamedHeaders($headers, $idempotencyKey);
+            $payloadMessage = $namedHeaders === []
+                ? new Payload($body)
+                : new MultiHeaderPayload($body, $namedHeaders);
             $basisConnection->sendMessage(new Publish([
                 'subject' => $subject,
                 'payload' => $payloadMessage,
@@ -132,18 +135,26 @@ final class NatsPublisher implements NatsPublisherContract
     /**
      * @param array<string, mixed> $headers
      *
-     * @return array<string, string>
+     * @return array<string, list<string>>
      */
-    private function normalizeHeaders(array $headers): array
+    private function buildPublishNamedHeaders(array $headers, ?string $idempotencyKey): array
     {
-        $out = [];
-        foreach ($headers as $key => $value) {
-            if (! is_string($key) || $key === '') {
-                continue;
-            }
-            $out[$key] = is_string($value) ? $value : (string) $value;
+        $userNamed = PublishHeaderNormalizer::toNamedValues($headers);
+        $flat = [];
+        foreach ($userNamed as $key => $values) {
+            $flat[$key] = $values[0] ?? '';
         }
 
-        return $out;
+        $flat = CorrelationHeaders::mergeForPublish($this->config, $flat);
+        $flat = IdempotencyHeaders::mergeForPublish($this->config, $flat, $idempotencyKey);
+        $merged = PublishHeaderNormalizer::toNamedValues($flat);
+
+        foreach ($userNamed as $key => $values) {
+            if (count($values) > 1) {
+                $merged[$key] = $values;
+            }
+        }
+
+        return $merged;
     }
 }
