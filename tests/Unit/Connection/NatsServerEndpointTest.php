@@ -20,3 +20,8 @@ it('parses nats url', function (): void {
         ->and($e->port)->toBe(4223);
 });
 
+it('returns null for invalid port token', function (): void {
+    expect(NatsServerEndpoint::parse(''))->toBeNull()
+        ->and(NatsServerEndpoint::parse('host:notaport'))->toBeNull();
+});
+
