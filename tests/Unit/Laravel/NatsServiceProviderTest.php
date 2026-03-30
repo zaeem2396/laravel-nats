@@ -143,6 +143,13 @@ it('merges nats_basis.security and acl defaults from package', function (): void
         ->and($config->get('nats_basis.acl.allowed_subscribe_prefixes'))->toBe([]);
 });
 
+it('merges nats_basis connection cluster defaults from package', function (): void {
+    $config = $this->app->make('config');
+
+    expect($config->get('nats_basis.connections.default.servers'))->toBe([])
+        ->and($config->get('nats_basis.connections.default.merge_info_connect_urls'))->toBeFalse();
+});
+
 it('resolves security validator and ACL checker from container', function (): void {
     expect($this->app->make(NatsBasisConfigurationValidator::class))
         ->toBeInstanceOf(NatsBasisConfigurationValidator::class)
