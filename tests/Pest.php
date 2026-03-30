@@ -41,6 +41,7 @@ declare(strict_types=1);
 uses(LaravelNats\Tests\TestCase::class)->in(
     'Unit/Security/SubjectPrefixMatcherTest.php',
     'Unit/Security/SubjectAclCheckerTest.php',
+    'Unit/Message',
     'Unit/Connection',
     'Unit/Messaging',
     'Unit/Protocol',
