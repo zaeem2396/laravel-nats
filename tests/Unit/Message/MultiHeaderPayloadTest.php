@@ -16,3 +16,9 @@ it('renders multi-value headers per NATS HPUB example shape', function (): void 
         ->and($wire)->toContain("BREAKFAST: eggs\r\n")
         ->and($wire)->toEndWith('Yum!');
 });
+
+it('delegates to parent render when no named values', function (): void {
+    $p = new MultiHeaderPayload('hello');
+
+    expect($p->render())->toBe("5\r\nhello");
+});
