@@ -233,6 +233,14 @@ return [
             'pedantic' => filter_var(env('NATS_PEDANTIC', false), FILTER_VALIDATE_BOOL),
             'lang' => env('NATS_CLIENT_LANG', 'php'),
             'version' => env('NATS_CLIENT_VERSION', 'laravel-nats'),
+
+            /*
+            | Optional seed peers for bootstrap failover ("host:port" or URL), comma-separated via env.
+            */
+            'servers' => array_values(array_filter(array_map(
+                static fn (string $s): string => trim($s),
+                explode(',', (string) env('NATS_BASIS_SERVERS', '')),
+            ))),
         ],
 
     ],
