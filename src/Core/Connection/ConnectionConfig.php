@@ -193,6 +193,11 @@ final class ConnectionConfig implements ConnectionConfigInterface
         return $this->maxPingsOut;
     }
 
+    public function isEchoEnabled(): bool
+    {
+        return $this->echo;
+    }
+
     /**
      * Get the full server address.
      *
