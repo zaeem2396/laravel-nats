@@ -21,3 +21,6 @@ This page summarizes **connection and messaging behaviors** exposed or documente
 | **Multi-value HPUB headers** | `CommandBuilder::publishWithHeaders` accepts **`array<string, string\|list<string>>`**. |
 | **Reconnect** | `NatsManager::reconnect()` is **manual** (disconnect + new connection), not an automatic loop. |
 
+## See also
+
+- [GUIDE.md](GUIDE.md) · [MIGRATION.md](MIGRATION.md) · [SECURITY.md](SECURITY.md)
