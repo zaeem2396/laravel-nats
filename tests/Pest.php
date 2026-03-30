@@ -42,6 +42,7 @@ uses(LaravelNats\Tests\TestCase::class)->in(
     'Unit/Security/SubjectPrefixMatcherTest.php',
     'Unit/Security/SubjectAclCheckerTest.php',
     'Unit/Message',
+    'Unit/Exceptions',
     'Unit/Connection',
     'Unit/Messaging',
     'Unit/Protocol',
