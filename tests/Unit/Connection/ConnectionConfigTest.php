@@ -33,7 +33,8 @@ describe('constructor defaults', function (): void {
             ->and($config->isTlsEnabled())->toBeFalse()
             ->and($config->getClientName())->toBe('laravel-nats')
             ->and($config->isVerbose())->toBeFalse()
-            ->and($config->isPedantic())->toBeFalse();
+            ->and($config->isPedantic())->toBeFalse()
+            ->and($config->isEchoEnabled())->toBeTrue();
     });
 });
 
