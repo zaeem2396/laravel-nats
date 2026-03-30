@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **NatsV2:** `NatsV2::request()` / `NatsV2::drainConnection()` on the gateway; `NatsNoRespondersException` when reply headers contain Status-Code `503`; `NatsRequestTimeoutException` on wait timeout.
 - **NatsV2 publish:** multi-value NATS headers via `list<string>` per header name (`MultiHeaderPayload`, `PublishHeaderNormalizer`).
 - **Legacy:** configurable CONNECT `echo` via `config/nats.php` (`NATS_ECHO`); HPUB multi-value headers in `CommandBuilder`.
+- **Docs:** [docs/v2/CLIENT_FEATURES.md](docs/v2/CLIENT_FEATURES.md).
 
 ### Removed
 
