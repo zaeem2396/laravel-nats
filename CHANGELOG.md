@@ -7,27 +7,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Changed
-
-- **NatsV2:** `ConnectionManager` always runs a ping after creating a basis client (including a single endpoint) so unreachable servers fail when the connection is resolved, not only when multiple seeds are configured.
-
 ### Added
 
-- **NatsV2:** optional bootstrap failover via `nats_basis.connections.*.servers` / `NATS_BASIS_SERVERS` and `merge_info_connect_urls` / `NATS_MERGE_INFO_CONNECT_URLS` (merging INFO `connect_urls` into the endpoint pool, uses ping when enabled).
-- **NatsV2:** `NatsV2::request()` / `NatsV2::drainConnection()` on the gateway; `NatsNoRespondersException` when reply headers contain Status-Code `503`; `NatsRequestTimeoutException` on wait timeout.
-- **NatsV2 publish:** multi-value NATS headers via `list<string>` per header name (`MultiHeaderPayload`, `PublishHeaderNormalizer`).
-- **Legacy:** configurable CONNECT `echo` via `config/nats.php` (`NATS_ECHO`); HPUB multi-value headers in `CommandBuilder`.
-- **Docs:** [docs/v2/CLIENT_FEATURES.md](docs/v2/CLIENT_FEATURES.md).
+- (none)
 
 ### Removed
 
 - (none)
 
-## [1.5.0] - 2026-03-29
+## [1.5.0] - 2026-03-31
 
 ### Added
 
 - **Security & config hardening (v2.6):** `NatsBasisConfigurationValidator` with optional boot validation (`nats_basis.security.validate_on_boot` / `NATS_BASIS_VALIDATE_CONFIG`); production TLS guard (`nats_basis.security.tls.require_in_production` / `NATS_TLS_REQUIRE_IN_PRODUCTION`); `SubjectAclChecker` and `SubjectPrefixMatcher` with `nats_basis.acl` (`NATS_ACL_ENABLED`, `NATS_ACL_PUBLISH_PREFIXES`, `NATS_ACL_SUBSCRIBE_PREFIXES`) enforced in `NatsPublisher`, `NatsBasisSubscriber`, and `BasisJetStreamPublisher`; `SubjectNotAllowedException`, `NatsConfigurationException`; Artisan `nats:v2:config:validate`. See [docs/v2/SECURITY.md](docs/v2/SECURITY.md).
+- **NatsV2:** optional bootstrap failover via `nats_basis.connections.*.servers` / `NATS_BASIS_SERVERS` and `merge_info_connect_urls` / `NATS_MERGE_INFO_CONNECT_URLS` (merging INFO `connect_urls` into the endpoint pool; uses ping when enabled).
+- **NatsV2:** `NatsV2::request()` / `NatsV2::drainConnection()` on the gateway; `NatsNoRespondersException` when reply headers contain Status-Code `503`; `NatsRequestTimeoutException` on wait timeout.
+- **NatsV2 publish:** multi-value NATS headers via `list<string>` per header name (`MultiHeaderPayload`, `PublishHeaderNormalizer`).
+- **Docs:** [docs/v2/CLIENT_FEATURES.md](docs/v2/CLIENT_FEATURES.md).
+
+### Changed
+
+- **NatsV2:** `ConnectionManager` always runs a ping after creating a basis client (including a single endpoint) so unreachable servers fail when the connection is resolved, not only when multiple seeds are configured.
+- **Legacy:** configurable CONNECT `echo` via `config/nats.php` (`NATS_ECHO`); HPUB multi-value headers in `CommandBuilder`.
 
 ## [1.4.0] - 2026-03-29
 
@@ -260,6 +261,21 @@ Run `composer update zaeem2396/laravel-nats` to upgrade.
 
 Run `composer update zaeem2396/laravel-nats` to upgrade.
 
+### From 1.4.0 to 1.5.0
+
+- **Security & ACL:** optional boot-time config validation, TLS expectations in production, optional subject ACL for v2 publish/subscribe/JetStream publish, and **`php artisan nats:v2:config:validate`** — [docs/v2/SECURITY.md](docs/v2/SECURITY.md).
+- **NatsV2:** server list failover / INFO merge, **`request()`** / **`drainConnection()`**, multi-value publish headers; **Legacy:** `NATS_ECHO` and HPUB multi-value headers — [docs/v2/CLIENT_FEATURES.md](docs/v2/CLIENT_FEATURES.md).
+
+```json
+{
+    "require": {
+        "zaeem2396/laravel-nats": "^1.5"
+    }
+}
+```
+
+Run `composer update zaeem2396/laravel-nats` to upgrade.
+
 ### From 1.0.0 to 1.1.0
 
 - **PHP:** Minimum PHP is now 8.2 (was 8.1). Ensure your environment meets this requirement.
@@ -294,7 +310,8 @@ Run `composer update zaeem2396/laravel-nats` to upgrade.
 
 ---
 
-[Unreleased]: https://github.com/zaeem2396/laravel-nats/compare/v1.4.0...HEAD
+[Unreleased]: https://github.com/zaeem2396/laravel-nats/compare/v1.5.0...HEAD
+[1.5.0]: https://github.com/zaeem2396/laravel-nats/compare/v1.4.0...v1.5.0
 [1.4.0]: https://github.com/zaeem2396/laravel-nats/compare/v1.3.0...v1.4.0
 [1.3.0]: https://github.com/zaeem2396/laravel-nats/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/zaeem2396/laravel-nats/compare/v1.1.1...v1.2.0
