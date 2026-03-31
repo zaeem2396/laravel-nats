@@ -46,3 +46,7 @@ psalm.xml
 # Docker
 docker-compose.override.yml
 
+# Docs (local / optional; not tracked)
+docs/v2/
+docs/ROADMAP_V2_NATSPHP.md
+
