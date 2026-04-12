@@ -27,6 +27,8 @@ composer require zaeem2396/laravel-nats
 - **v1.4.0+** (first release after **1.3.0** on Packagist) for **`NatsV2::jetstream()`**, **`jetStreamPublish`** / **`jetStreamPull`**, stream presets, **`nats:v2:jetstream:*`** commands ([docs/v2/JETSTREAM.md](docs/v2/JETSTREAM.md)), the **`nats_basis`** queue driver ([docs/v2/QUEUE.md](docs/v2/QUEUE.md)), optional **idempotency** ([docs/v2/IDEMPOTENCY.md](docs/v2/IDEMPOTENCY.md)), and **observability** ([docs/v2/OBSERVABILITY.md](docs/v2/OBSERVABILITY.md)).
 - **v1.5.0+** for **config validation** on boot, **TLS** expectations in production, optional **subject ACL** for v2 publish/subscribe/JetStream publish, and **`php artisan nats:v2:config:validate`** ([docs/v2/SECURITY.md](docs/v2/SECURITY.md)).
 
+**Roadmap:** version themes for the basis stack live in [docs/ROADMAP_V2_NATSPHP.md](docs/ROADMAP_V2_NATSPHP.md) (v2.6 security ships in **1.5.0**).
+
 The service provider is auto-discovered. To publish configuration (includes **`nats_basis`** for v2):
 
 ```bash
@@ -45,6 +47,8 @@ NATS_PASSWORD=
 NATS_TOKEN=
 # v2 basis client (`NatsV2`): password env is NATS_PASS (see docs/v2/MIGRATION.md)
 # NATS_PASS=
+# NATS_BASIS_VALIDATE_CONFIG=false
+# NATS_TLS_REQUIRE_IN_PRODUCTION=false
 ```
 
 ### NatsV2 foundation ([basis-company/nats](https://github.com/basis-company/nats.php), package **1.3.0+**)
@@ -400,7 +404,7 @@ NATS_TOKEN=my-secret-token
 
 ## Testing
 
-v2 testing details: [docs/v2/GUIDE.md](docs/v2/GUIDE.md).
+v2 testing details: [docs/v2/GUIDE.md](docs/v2/GUIDE.md). For **v2.6** production checks (TLS guard, optional ACL, `nats:v2:config:validate`), see [docs/v2/SECURITY.md](docs/v2/SECURITY.md).
 
 
 This package uses [Pest PHP](https://pestphp.com/) for testing.
@@ -450,6 +454,12 @@ docker run -d --name nats -p 4222:4222 -p 8222:8222 nats:2.10
 docker compose up -d
 ```
 
+### TLS or production guard failures (v2.6)
+
+**Symptom:** `NatsConfigurationException` on boot in `production` after upgrading to **1.5.0+**.
+
+**What to check:** set CA/client TLS files on each `nats_basis` connection or disable `NATS_TLS_REQUIRE_IN_PRODUCTION` until TLS is wired. See [docs/v2/SECURITY.md](docs/v2/SECURITY.md).
+
 ### Authentication Failed
 
 **Error:** `Authorization Violation`
@@ -491,6 +501,7 @@ NATS has a default maximum message size of 1MB. For larger payloads:
 This package follows [Semantic Versioning](https://semver.org/). After v1.0.0:
 
 - **Stable API:** Classes in the `LaravelNats\Laravel` namespace
+- **Security helpers (1.5.0+):** `LaravelNats\Security\NatsBasisConfigurationValidator`, `SubjectAclChecker`, and related exceptions are part of the supported v2 surface for apps that opt in ([docs/v2/SECURITY.md](docs/v2/SECURITY.md)).
   - `Nats` facade
   - `NatsManager`
   - `NatsQueue`, `NatsJob`, `NatsConnector`
@@ -708,7 +719,7 @@ For release notes and version history, see [CHANGELOG.md](CHANGELOG.md).
 
 ## Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+Contributions are welcome. Before opening a pull request, run **`composer test`**, **`composer format:check`**, and **`composer analyse`** so CI stays green.
 
 ## License
 

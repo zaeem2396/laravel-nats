@@ -23,3 +23,11 @@
 **Validate config or enforce subject allowlists?** From **1.5.0+**, see [SECURITY.md](SECURITY.md): optional boot validation (`NATS_BASIS_VALIDATE_CONFIG`), TLS expectations in production (`NATS_TLS_REQUIRE_IN_PRODUCTION`), optional ACL for **`NatsV2`** publish / subscribe / JetStream publish paths, and **`nats:v2:config:validate`**. Subject ACL does **not** wrap the **`nats_basis`** queue driver’s internal publishes.
 
 **Overhead?** One JSON encode and UUID per publish; negligible vs network.
+
+## See also
+
+- [Roadmap](../ROADMAP_V2_NATSPHP.md)
+- [SECURITY.md](SECURITY.md)
+
+**`tlsHandshakeFirst` vs CA files in production?** The TLS guard accepts **`tlsHandshakeFirst`** when your topology requires TLS before other negotiation, but you should still terminate on trusted infrastructure. Details: [SECURITY.md](SECURITY.md).
+

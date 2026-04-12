@@ -72,7 +72,7 @@ String values; sent as HPUB when non-empty. **Request-ID / correlation:** [CORRE
 
 ## Ops
 
-Tune `timeout`, protect secrets, use process managers for workers.
+Tune `timeout`, protect secrets, and use process managers for workers. From **1.5.0+**, optionally enable **`NATS_BASIS_VALIDATE_CONFIG`** for boot-time checks and run **`php artisan nats:v2:config:validate`** in CI; see [SECURITY.md](SECURITY.md). Indicative release themes: [ROADMAP_V2_NATSPHP.md](../ROADMAP_V2_NATSPHP.md).
 
 ## Dual stack
 
@@ -80,7 +80,7 @@ Legacy publish = raw JSON body; v2 = envelope. Migrate per subject.
 
 ## Migration strategy
 
-Legacy **`Nats`** / **`NatsManager`** / **`Core\Client`** are **soft-deprecated** for new work as of **1.3.0**; **`NatsV2`** is the supported path for new **publish** and **subscribe** code on the basis client. **JetStream** on the basis client, the **`nats_basis`** queue driver, idempotency, and observability ship together from **1.4.0+** ([JETSTREAM.md](JETSTREAM.md), [QUEUE.md](QUEUE.md), [IDEMPOTENCY.md](IDEMPOTENCY.md), [OBSERVABILITY.md](OBSERVABILITY.md)); the legacy **`Nats::jetstream()`** and **`nats`** queue driver remain supported. **No silent removals** in upcoming minor releases.
+Legacy **`Nats`** / **`NatsManager`** / **`Core\Client`** are **soft-deprecated** for new work as of **1.3.0**; **`NatsV2`** is the supported path for new **publish** and **subscribe** code on the basis client. **JetStream** on the basis client, the **`nats_basis`** queue driver, idempotency, and observability ship together from **1.4.0+** ([JETSTREAM.md](JETSTREAM.md), [QUEUE.md](QUEUE.md), [IDEMPOTENCY.md](IDEMPOTENCY.md), [OBSERVABILITY.md](OBSERVABILITY.md)); **1.5.0+** adds validation, TLS production guard, and optional ACL ([SECURITY.md](SECURITY.md)); the legacy **`Nats::jetstream()`** and **`nats`** queue driver remain supported. **No silent removals** in upcoming minor releases.
 
 **Full policy, config mapping (`nats.php` ↔ `nats_basis.php`), facade table, and per-minor testing checklist:** [MIGRATION.md](MIGRATION.md).
 
@@ -98,7 +98,7 @@ From **package 1.4.0+**, use **`NatsV2::jetstream()`** for **`Basis\Nats\Api`**,
 
 ## See also
 
-[Migration](MIGRATION.md) - [Subscriber](SUBSCRIBER.md) - [JetStream](JETSTREAM.md)
+[Migration](MIGRATION.md) - [Subscriber](SUBSCRIBER.md) - [JetStream](JETSTREAM.md) - [Security](SECURITY.md)
 
 ### Security
 

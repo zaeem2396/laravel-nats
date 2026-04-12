@@ -6,3 +6,7 @@ NatsV2::subscribe('orders.created', function (InboundMessage $m): void {
     $data = $env['data'] ?? null;
 });
 ```
+
+---
+
+**v2.6:** Envelope publishers still require allowed publish prefixes when ACL is on ([SECURITY.md](../SECURITY.md)).

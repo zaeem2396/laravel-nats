@@ -15,3 +15,7 @@ $info = NatsV2::jetstream()->accountInfo();
 ```
 
 See [JETSTREAM.md](../JETSTREAM.md) for publish, pull, and presets.
+
+---
+
+**v2.6:** JetStream publish helpers honor publish ACLs; queue internals are documented separately ([SECURITY.md](../SECURITY.md)).

@@ -7,6 +7,7 @@ declare(strict_types=1);
  *
  * @see docs/v2/GUIDE.md
  * @see docs/v2/MIGRATION.md
+ * @see docs/v2/SECURITY.md
  */
 return [
 
@@ -173,6 +174,7 @@ return [
     | validate_on_boot: fail fast on bad host/port/timeout (and optional TLS rules in production).
     | tls.require_in_production: when APP_ENV=production, each connection must set TLS material
     | or tlsHandshakeFirst. See docs/v2/SECURITY.md.
+    | Artisan: `php artisan nats:v2:config:validate` runs the same validator with force=true.
     |
     */
     'security' => [
@@ -190,6 +192,7 @@ return [
     | Not a substitute for NATS server authorization. When enabled, publish/subscribe subjects
     | must match allowed_publish_prefixes / allowed_subscribe_prefixes (prefix or exact; trailing
     | dot means prefix). Empty list when enabled denies all. See docs/v2/SECURITY.md.
+    | Env keys: NATS_ACL_ENABLED, NATS_ACL_PUBLISH_PREFIXES, NATS_ACL_SUBSCRIBE_PREFIXES (comma-separated lists).
     |
     */
     'acl' => [
@@ -210,6 +213,8 @@ return [
     |--------------------------------------------------------------------------
     |
     | Each entry maps to Basis\Nats\Configuration constructor options.
+    |
+    | NatsBasisConfigurationValidator checks host/port/timeout (and TLS rules when enabled).
     |
     */
     'connections' => [

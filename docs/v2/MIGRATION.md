@@ -93,6 +93,7 @@ Consumers should read application data from **`data`**. Roll back publishers to 
 ## Security & config hardening (1.5.0+)
 
 - [ ] Read [SECURITY.md](SECURITY.md): boot validation, TLS production guard, optional subject ACL.
+- [ ] When using **`NATS_TLS_REQUIRE_IN_PRODUCTION`**, confirm each connection sets **`tlsCaFile`** or client cert material, or **`tlsHandshakeFirst`** when required by your broker (see [SECURITY.md](SECURITY.md)).
 - [ ] If you enable **`NATS_ACL_ENABLED`**, set **`NATS_ACL_PUBLISH_PREFIXES`** / **`NATS_ACL_SUBSCRIBE_PREFIXES`**; remember **queue** traffic uses the client directly—ACL applies to **`NatsPublisher`**, **`NatsBasisSubscriber`**, and **`BasisJetStreamPublisher`**, not **`nats_basis`** queue internals.
 - [ ] Add **`php artisan nats:v2:config:validate`** to CI if you want forced checks without **`validate_on_boot`**.
 
@@ -100,3 +101,4 @@ Consumers should read application data from **`data`**. Roll back publishers to 
 
 - [GUIDE](GUIDE.md) - day-to-day v2 usage (wrapper on **basis-company/nats**)  
 - [FAQ](FAQ.md)
+- [Roadmap](../ROADMAP_V2_NATSPHP.md) — indicative v2.x themes and status

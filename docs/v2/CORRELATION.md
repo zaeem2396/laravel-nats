@@ -45,3 +45,4 @@ The basis **JetStream** publish path in this package is **body-first**; use **`N
 - [SUBSCRIBER.md](SUBSCRIBER.md) - inbound middleware list
 - [IDEMPOTENCY.md](IDEMPOTENCY.md) - `Nats-Idempotency-Key` and subscriber deduplication
 - [OBSERVABILITY.md](OBSERVABILITY.md) - correlation context helper for HTTP logging
+- [SECURITY.md](SECURITY.md) - TLS and ACL defaults for production HPUB paths
