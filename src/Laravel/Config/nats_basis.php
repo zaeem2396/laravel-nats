@@ -174,6 +174,7 @@ return [
     | validate_on_boot: fail fast on bad host/port/timeout (and optional TLS rules in production).
     | tls.require_in_production: when APP_ENV=production, each connection must set TLS material
     | or tlsHandshakeFirst. See docs/v2/SECURITY.md.
+    | Artisan: `php artisan nats:v2:config:validate` runs the same validator with force=true.
     |
     */
     'security' => [
