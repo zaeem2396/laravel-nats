@@ -192,6 +192,7 @@ return [
     | Not a substitute for NATS server authorization. When enabled, publish/subscribe subjects
     | must match allowed_publish_prefixes / allowed_subscribe_prefixes (prefix or exact; trailing
     | dot means prefix). Empty list when enabled denies all. See docs/v2/SECURITY.md.
+    | Env keys: NATS_ACL_ENABLED, NATS_ACL_PUBLISH_PREFIXES, NATS_ACL_SUBSCRIBE_PREFIXES (comma-separated lists).
     |
     */
     'acl' => [
