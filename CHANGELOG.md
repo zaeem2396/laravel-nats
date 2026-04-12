@@ -318,7 +318,7 @@ Run `composer update zaeem2396/laravel-nats` to upgrade.
 
 ---
 
-[Unreleased]: https://github.com/zaeem2396/laravel-nats/compare/v1.5.1...HEAD
+[Unreleased]: https://github.com/zaeem2396/laravel-nats/compare/v1.5.0...HEAD
 [1.5.1]: https://github.com/zaeem2396/laravel-nats/compare/v1.5.0...v1.5.1
 [1.5.0]: https://github.com/zaeem2396/laravel-nats/compare/v1.4.0...v1.5.0
 [1.4.0]: https://github.com/zaeem2396/laravel-nats/compare/v1.3.0...v1.4.0
