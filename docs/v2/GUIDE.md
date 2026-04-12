@@ -98,7 +98,7 @@ From **package 1.4.0+**, use **`NatsV2::jetstream()`** for **`Basis\Nats\Api`**,
 
 ## See also
 
-[Migration](MIGRATION.md) - [Subscriber](SUBSCRIBER.md) - [JetStream](JETSTREAM.md)
+[Migration](MIGRATION.md) - [Subscriber](SUBSCRIBER.md) - [JetStream](JETSTREAM.md) - [Security](SECURITY.md)
 
 ### Security
 
