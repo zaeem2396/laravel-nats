@@ -11,6 +11,7 @@ This page summarizes **connection and messaging behaviors** exposed or documente
 | **Synchronous request + no responders** | `NatsV2::request($subject, $payload, $timeout, $connection?)` waits for a reply; if the reply payload has header **Status-Code `503`**, `LaravelNats\Exceptions\NatsNoRespondersException` is thrown. Timeouts raise `LaravelNats\Exceptions\NatsRequestTimeoutException`. Enable server/account **no responders** behavior per NATS docs for best results. |
 | **Graceful shutdown helper** | `NatsV2::drainConnection($seconds, $connection?)` runs `process()` for a bounded time, then **disconnects**. This is an **application-level** drain (flush inbound work briefly), not a separate wire opcode. |
 | **Multi-value HPUB headers** | Publish with `headers` as `list<string>` per key (e.g. `['X-Trace' => ['a', 'b']]`) to emit repeated header lines per ADR-4. Implementation: `LaravelNats\Message\MultiHeaderPayload`. |
+| **Config validation (v2.6)** | `php artisan nats:v2:config:validate` and optional `NATS_BASIS_VALIDATE_CONFIG` run `NatsBasisConfigurationValidator` before traffic. See [SECURITY.md](SECURITY.md). |
 | **CONNECT `echo` / `no_responders`** | The basis client’s CONNECT JSON is built by **basis-company/nats**; this package does not patch those flags today. Use **legacy** `config/nats.php` `echo` if you need an explicit CONNECT echo toggle on the native client. |
 
 ## Legacy `LaravelNats\Core\Client`
