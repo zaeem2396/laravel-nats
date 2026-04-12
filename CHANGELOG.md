@@ -15,11 +15,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - (none)
 
+## [1.5.1] - 2026-04-12
+
 ### Documentation
 
 - Roadmap: mark v2.6 as completed in the summary table and bump the internal doc version ([docs/ROADMAP_V2_NATSPHP.md](docs/ROADMAP_V2_NATSPHP.md)).
 - Cross-link the v2 documentation index and README to the roadmap and clarify the **1.5.0** ↔ v2.6 mapping ([docs/v2/README.md](docs/v2/README.md)).
 - Sweep v2 guides (subscriber, queue, JetStream, FAQ, observability) with consistent "see also" pointers to [docs/v2/SECURITY.md](docs/v2/SECURITY.md) and the roadmap.
+
 ## [1.5.0] - 2026-03-31
 
 ### Added
@@ -315,7 +318,8 @@ Run `composer update zaeem2396/laravel-nats` to upgrade.
 
 ---
 
-[Unreleased]: https://github.com/zaeem2396/laravel-nats/compare/v1.5.0...HEAD
+[Unreleased]: https://github.com/zaeem2396/laravel-nats/compare/v1.5.1...HEAD
+[1.5.1]: https://github.com/zaeem2396/laravel-nats/compare/v1.5.0...v1.5.1
 [1.5.0]: https://github.com/zaeem2396/laravel-nats/compare/v1.4.0...v1.5.0
 [1.4.0]: https://github.com/zaeem2396/laravel-nats/compare/v1.3.0...v1.4.0
 [1.3.0]: https://github.com/zaeem2396/laravel-nats/compare/v1.2.0...v1.3.0
