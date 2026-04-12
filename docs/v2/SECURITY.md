@@ -109,4 +109,5 @@ Exit code is non-zero when validation fails.
 - [QUEUE.md](QUEUE.md) — queue driver (server auth still primary)
 - [OBSERVABILITY.md](OBSERVABILITY.md) — metrics and health
 - [CLIENT_FEATURES.md](CLIENT_FEATURES.md) — clustering seeds, request/reply, headers
+- [IDEMPOTENCY.md](IDEMPOTENCY.md) — publish keys and subscriber deduplication
 - [FAQ.md](FAQ.md)
