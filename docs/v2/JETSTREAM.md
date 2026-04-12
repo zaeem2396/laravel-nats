@@ -8,6 +8,7 @@ JetStream on the **v2 stack** uses **`Basis\Nats\Api`**, **`Stream`**, and **`Co
 
 - NATS Server with JetStream enabled, e.g. `docker run ... nats:2.10 --jetstream` (see server docs for your environment).
 - **`config/nats_basis.php`** merged (publish with `php artisan vendor:publish --tag=nats-config`).
+- Optional: run **`php artisan nats:v2:config:validate`** in CI to catch bad connection rows early ([SECURITY.md](SECURITY.md)).
 
 **Security (1.5.0+):** Optional subject ACL applies to **`jetStreamPublish`** via **`BasisJetStreamPublisher`**. See [SECURITY.md](SECURITY.md).
 
