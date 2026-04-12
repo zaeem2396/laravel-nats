@@ -711,7 +711,7 @@ For release notes and version history, see [CHANGELOG.md](CHANGELOG.md).
 
 ## Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+Contributions are welcome. Before opening a pull request, run **`composer test`**, **`composer format:check`**, and **`composer analyse`** so CI stays green.
 
 ## License
 
