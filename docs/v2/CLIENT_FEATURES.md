@@ -23,4 +23,4 @@ This page summarizes **connection and messaging behaviors** exposed or documente
 
 ## See also
 
-- [GUIDE.md](GUIDE.md) · [MIGRATION.md](MIGRATION.md) · [SECURITY.md](SECURITY.md)
+- [GUIDE.md](GUIDE.md) · [MIGRATION.md](MIGRATION.md) · [SECURITY.md](SECURITY.md) · [IDEMPOTENCY.md](IDEMPOTENCY.md)
