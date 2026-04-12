@@ -48,6 +48,8 @@ NATS_PASSWORD=
 NATS_TOKEN=
 # v2 basis client (`NatsV2`): password env is NATS_PASS (see docs/v2/MIGRATION.md)
 # NATS_PASS=
+# NATS_BASIS_VALIDATE_CONFIG=false
+# NATS_TLS_REQUIRE_IN_PRODUCTION=false
 ```
 
 ### NatsV2 foundation ([basis-company/nats](https://github.com/basis-company/nats.php), package **1.3.0+**)
