@@ -15,6 +15,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - (none)
 
+### Documentation
+
+- Roadmap: mark v2.6 as completed in the summary table and bump the internal doc version ([docs/ROADMAP_V2_NATSPHP.md](docs/ROADMAP_V2_NATSPHP.md)).
 ## [1.5.0] - 2026-03-31
 
 ### Added
