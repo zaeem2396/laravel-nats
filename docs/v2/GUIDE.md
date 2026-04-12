@@ -72,7 +72,7 @@ String values; sent as HPUB when non-empty. **Request-ID / correlation:** [CORRE
 
 ## Ops
 
-Tune `timeout`, protect secrets, use process managers for workers.
+Tune `timeout`, protect secrets, and use process managers for workers. From **1.5.0+**, optionally enable **`NATS_BASIS_VALIDATE_CONFIG`** for boot-time checks and run **`php artisan nats:v2:config:validate`** in CI; see [SECURITY.md](SECURITY.md). Indicative release themes: [ROADMAP_V2_NATSPHP.md](../ROADMAP_V2_NATSPHP.md).
 
 ## Dual stack
 
