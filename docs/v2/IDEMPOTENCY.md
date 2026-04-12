@@ -78,3 +78,4 @@ Avoid keys longer than your cache backend allows; the package hashes keys for th
 - [GUIDE.md](GUIDE.md) — envelope shape
 - [CORRELATION.md](CORRELATION.md) — other NATS headers
 - [Roadmap](../ROADMAP_V2_NATSPHP.md)
+- [SECURITY.md](SECURITY.md) — ACL interaction with publish paths
