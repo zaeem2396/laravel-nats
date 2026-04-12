@@ -25,7 +25,10 @@ composer require zaeem2396/laravel-nats
 - **v1.1.1+** for Phase 4 queue/worker commands (`nats:work`, `nats:consume`).
 - **v1.3.0+** for **`NatsV2::publish`** / **`NatsV2::subscribe`**, `ConnectionManager`, JSON envelope (`config/nats_basis.php`), **`InboundMessage`**, and **`nats:v2:listen`**.
 - **v1.4.0+** (first release after **1.3.0** on Packagist) for **`NatsV2::jetstream()`**, **`jetStreamPublish`** / **`jetStreamPull`**, stream presets, **`nats:v2:jetstream:*`** commands ([docs/v2/JETSTREAM.md](docs/v2/JETSTREAM.md)), the **`nats_basis`** queue driver ([docs/v2/QUEUE.md](docs/v2/QUEUE.md)), optional **idempotency** ([docs/v2/IDEMPOTENCY.md](docs/v2/IDEMPOTENCY.md)), and **observability** ([docs/v2/OBSERVABILITY.md](docs/v2/OBSERVABILITY.md)).
-- **v1.5.0+** for **config validation** on boot, **TLS** expectations in production, optional **subject ACL** for v2 publish/subscribe/JetStream publish, and **`php artisan nats:v2:config:validate`** ([docs/v2/SECURITY.md](docs/v2/SECURITY.md)).
+- **v1.5.0+** for **config validation** on boot
+
+**Roadmap:** version themes for the basis stack live in [docs/ROADMAP_V2_NATSPHP.md](docs/ROADMAP_V2_NATSPHP.md) (v2.6 security ships in **1.5.0**).
+, **TLS** expectations in production, optional **subject ACL** for v2 publish/subscribe/JetStream publish, and **`php artisan nats:v2:config:validate`** ([docs/v2/SECURITY.md](docs/v2/SECURITY.md)).
 
 The service provider is auto-discovered. To publish configuration (includes **`nats_basis`** for v2):
 
