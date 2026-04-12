@@ -455,6 +455,12 @@ docker run -d --name nats -p 4222:4222 -p 8222:8222 nats:2.10
 docker compose up -d
 ```
 
+### TLS or production guard failures (v2.6)
+
+**Symptom:** `NatsConfigurationException` on boot in `production` after upgrading to **1.5.0+**.
+
+**What to check:** set CA/client TLS files on each `nats_basis` connection or disable `NATS_TLS_REQUIRE_IN_PRODUCTION` until TLS is wired. See [docs/v2/SECURITY.md](docs/v2/SECURITY.md).
+
 ### Authentication Failed
 
 **Error:** `Authorization Violation`
