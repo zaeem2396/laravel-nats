@@ -78,6 +78,7 @@ For production, prefer a **dedicated** health port or internal-only route; keep 
 
 ## See also
 
+- [SECURITY.md](SECURITY.md) — boot validation, TLS, ACLs
 - [CORRELATION.md](CORRELATION.md) — HPUB headers and subscriber IDs  
 - [SUBSCRIBER.md](SUBSCRIBER.md) — middleware registration  
 - [GUIDE.md](GUIDE.md) — config overview  
