@@ -100,3 +100,4 @@ Consumers should read application data from **`data`**. Roll back publishers to 
 
 - [GUIDE](GUIDE.md) - day-to-day v2 usage (wrapper on **basis-company/nats**)  
 - [FAQ](FAQ.md)
+- [Roadmap](../ROADMAP_V2_NATSPHP.md) — indicative v2.x themes and status
