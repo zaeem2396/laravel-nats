@@ -82,3 +82,4 @@ For production, prefer a **dedicated** health port or internal-only route; keep 
 - [CORRELATION.md](CORRELATION.md) — HPUB headers and subscriber IDs  
 - [SUBSCRIBER.md](SUBSCRIBER.md) — middleware registration  
 - [GUIDE.md](GUIDE.md) — config overview  
+- [Roadmap](../ROADMAP_V2_NATSPHP.md) — v2.5 vs v2.6 scope
