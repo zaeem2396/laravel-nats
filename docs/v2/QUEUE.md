@@ -107,3 +107,4 @@ stopwaitsecs=3600
 - [MIGRATION.md](MIGRATION.md) — dual stack and moving queue workers to **`nats_basis`**
 - [GUIDE.md](GUIDE.md) — **`NatsV2`** and **`ConnectionManager`**
 - [README](README.md) — v2 doc index
+- [Roadmap](../ROADMAP_V2_NATSPHP.md) — security vs queue driver boundaries
