@@ -1,6 +1,6 @@
 # Observability (v2.5, package 1.4.0+)
 
-This release adds **optional publish metrics** (`NatsMetricsContract`), **HTTP correlation context** for application logs, **redaction helpers** for envelope `data` when logging inbound messages, and a **`nats:ping`** Artisan command for readiness checks.
+This release adds **optional publish metrics** (`NatsMetricsContract`), **HTTP correlation context** for application logs, **redaction helpers** for envelope `data` when logging inbound messages, and a **`nats:ping`** Artisan command for readiness checks. Pair redaction and metrics with the **v2.6** TLS and ACL guidance in [SECURITY.md](SECURITY.md) for production rollouts.
 
 **Related:** [SECURITY.md](SECURITY.md) (1.5.0+) for boot validation, TLS production checks, and optional subject ACL alongside operational hardening.
 
