@@ -76,3 +76,4 @@ All support **`--connection=`** for named basis connections.
 
 - [GUIDE.md](GUIDE.md) - config and dual stack
 - [MIGRATION.md](MIGRATION.md) - legacy JetStream vs NatsV2
+- [Roadmap](../ROADMAP_V2_NATSPHP.md) — JetStream milestones
