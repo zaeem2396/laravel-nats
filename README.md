@@ -403,7 +403,7 @@ NATS_TOKEN=my-secret-token
 
 ## Testing
 
-v2 testing details: [docs/v2/GUIDE.md](docs/v2/GUIDE.md).
+v2 testing details: [docs/v2/GUIDE.md](docs/v2/GUIDE.md). For **v2.6** production checks (TLS guard, optional ACL, `nats:v2:config:validate`), see [docs/v2/SECURITY.md](docs/v2/SECURITY.md).
 
 
 This package uses [Pest PHP](https://pestphp.com/) for testing.
