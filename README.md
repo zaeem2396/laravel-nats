@@ -502,6 +502,7 @@ NATS has a default maximum message size of 1MB. For larger payloads:
 This package follows [Semantic Versioning](https://semver.org/). After v1.0.0:
 
 - **Stable API:** Classes in the `LaravelNats\Laravel` namespace
+- **Security helpers (1.5.0+):** `LaravelNats\Security\NatsBasisConfigurationValidator`, `SubjectAclChecker`, and related exceptions are part of the supported v2 surface for apps that opt in ([docs/v2/SECURITY.md](docs/v2/SECURITY.md)).
   - `Nats` facade
   - `NatsManager`
   - `NatsQueue`, `NatsJob`, `NatsConnector`
