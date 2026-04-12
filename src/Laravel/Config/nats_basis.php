@@ -214,6 +214,8 @@ return [
     |
     | Each entry maps to Basis\Nats\Configuration constructor options.
     |
+    | NatsBasisConfigurationValidator checks host/port/timeout (and TLS rules when enabled).
+    |
     */
     'connections' => [
 
