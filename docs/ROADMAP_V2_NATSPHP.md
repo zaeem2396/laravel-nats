@@ -157,6 +157,8 @@
 | v2.6 | Security, TLS, ACLs | Completed |
 | v2.7 | Advanced headers, clustering, optional outbox | Planned |
 
+*Indicative schedule only; ship order may change with maintainer capacity.*
+
 ---
 
 *Document version: 2.0 - v2.6 summary aligned with shipped package 1.5.0; v2.2–v2.5 shipped as package 1.4.0.*
