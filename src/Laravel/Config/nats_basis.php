@@ -7,6 +7,7 @@ declare(strict_types=1);
  *
  * @see docs/v2/GUIDE.md
  * @see docs/v2/MIGRATION.md
+ * @see docs/v2/SECURITY.md
  */
 return [
 
