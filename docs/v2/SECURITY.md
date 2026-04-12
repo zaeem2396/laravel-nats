@@ -108,4 +108,5 @@ Exit code is non-zero when validation fails.
 - [JETSTREAM.md](JETSTREAM.md) — JetStream publish (ACL applies)
 - [QUEUE.md](QUEUE.md) — queue driver (server auth still primary)
 - [OBSERVABILITY.md](OBSERVABILITY.md) — metrics and health
+- [CLIENT_FEATURES.md](CLIENT_FEATURES.md) — clustering seeds, request/reply, headers
 - [FAQ.md](FAQ.md)
