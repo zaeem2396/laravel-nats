@@ -154,7 +154,7 @@
 | v2.3 | Queue driver + DLQ + retry/backoff | Completed |
 | v2.4 | Idempotency | Completed |
 | v2.5 | Metrics, logging, health | Completed |
-| v2.6 | Security, TLS, ACLs | Planned |
+| v2.6 | Security, TLS, ACLs | Completed |
 | v2.7 | Advanced headers, clustering, optional outbox | Planned |
 
 ---
