@@ -89,3 +89,4 @@ Use a real NATS server (Docker in CI). Subscribe, publish with `NatsV2::publish`
 - [GUIDE](GUIDE.md) - publish and config  
 - [MIGRATION](MIGRATION.md) - dual stack with legacy `Nats::subscribe`  
 - [FAQ](FAQ.md)
+- [Roadmap](../ROADMAP_V2_NATSPHP.md) — v2.x themes including security (v2.6)
