@@ -71,6 +71,8 @@ Failed jobs are still recorded via Laravel’s **`failed_jobs`** pipeline when c
 
 ## Workers and process managers
 
+Consider running **`php artisan nats:v2:config:validate`** in deploy pipelines so bad `nats_basis` connection rows fail before workers start ([SECURITY.md](SECURITY.md)).
+
 Use the same commands as for the legacy NATS queue:
 
 ```bash
