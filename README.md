@@ -149,6 +149,14 @@ php artisan queue:work nats_basis --queue=default --tries=3
 
 Queue guide: [`docs/v2/QUEUE.md`](docs/v2/QUEUE.md)
 
+## Legacy Command References
+
+For teams still using legacy stack workflows:
+
+- `nats:work` and `nats:consume` command behavior is documented in the package changelog and historical README history.
+- Legacy JetStream stream/consumer CLI command set remains available while migration is in progress.
+- Plan migration paths with [`docs/v2/MIGRATION.md`](docs/v2/MIGRATION.md) and track scope via [`docs/ROADMAP_V2_NATSPHP.md`](docs/ROADMAP_V2_NATSPHP.md).
+
 ## Security And Production Checks
 
 For hardened environments (1.5.0+):
