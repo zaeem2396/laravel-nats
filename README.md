@@ -4,722 +4,207 @@
 [![Static Analysis](https://github.com/zaeem2396/laravel-nats/actions/workflows/static-analysis.yml/badge.svg)](https://github.com/zaeem2396/laravel-nats/actions/workflows/static-analysis.yml)
 [![Code Style](https://github.com/zaeem2396/laravel-nats/actions/workflows/code-style.yml/badge.svg)](https://github.com/zaeem2396/laravel-nats/actions/workflows/code-style.yml)
 
-A native NATS integration for Laravel that feels like home. Publish, subscribe, and request/reply with a familiar, expressive API.
+Laravel wrapper for NATS with two tracks:
 
-> **NatsV2** (basis stack, **package 1.3.0+** pub/sub; **1.4.0+** JetStream on the basis client, **`nats_basis`** queue driver, optional **idempotency**, and **observability** including **`nats:ping`**; **1.5.0+** **security** validation, TLS production guard, optional **subject ACL**, **`nats:v2:config:validate`**; **1.5.1** documentation-only changelog for roadmap alignment and cross-links): Laravel **wrapper** on [basis-company/nats](https://github.com/basis-company/nats.php). **Docs:** [Guide](docs/v2/GUIDE.md) · [Subscriber](docs/v2/SUBSCRIBER.md) · [JetStream](docs/v2/JETSTREAM.md) · [Queue](docs/v2/QUEUE.md) · [Idempotency](docs/v2/IDEMPOTENCY.md) · [Observability](docs/v2/OBSERVABILITY.md) · [Security](docs/v2/SECURITY.md) · [FAQ](docs/v2/FAQ.md) · [Migration](docs/v2/MIGRATION.md). The **legacy** `Nats` facade API for subscribe, queue, and JetStream is also documented in this README.
+- **Recommended:** `NatsV2` on [`basis-company/nats`](https://github.com/basis-company/nats.php)
+- **Supported legacy track:** `Nats` facade + legacy queue/JetStream APIs
 
-## Requirements
+## Quick Navigation
 
-- PHP 8.2+ (required for package and basis-company/nats)
-- Laravel 10.x, 11.x, or 12.x
+- [What to use](#what-to-use)
+- [Install](#install)
+- [5-minute quickstart (natsv2)](#5-minute-quickstart-natsv2)
+- [Documentation index](#documentation-index)
+- [Queue usage](#queue-usage)
+- [Security and production checks](#security-and-production-checks)
+- [Testing and quality checks](#testing-and-quality-checks)
+- [Troubleshooting](#troubleshooting)
+- [Contributing](#contributing)
+
+## What To Use
+
+### NatsV2 (recommended)
+
+Use `NatsV2` for new code:
+
+- `NatsV2::publish` / `NatsV2::subscribe`
+- basis-client JetStream helpers
+- `nats_basis` queue driver
+- optional idempotency, observability, and security controls
+
+### Legacy (still supported)
+
+Use legacy `Nats` APIs only when you must keep existing workloads unchanged. Migration guide: [`docs/v2/MIGRATION.md`](docs/v2/MIGRATION.md).
+
+## Install
+
+Requirements:
+
+- PHP 8.2+
+- Laravel 10.x / 11.x / 12.x
 - NATS Server 2.x
-
-## Installation
 
 ```bash
 composer require zaeem2396/laravel-nats
-```
-
-- **v1.1.1+** for Phase 4 queue/worker commands (`nats:work`, `nats:consume`).
-- **v1.3.0+** for **`NatsV2::publish`** / **`NatsV2::subscribe`**, `ConnectionManager`, JSON envelope (`config/nats_basis.php`), **`InboundMessage`**, and **`nats:v2:listen`**.
-- **v1.4.0+** (first release after **1.3.0** on Packagist) for **`NatsV2::jetstream()`**, **`jetStreamPublish`** / **`jetStreamPull`**, stream presets, **`nats:v2:jetstream:*`** commands ([docs/v2/JETSTREAM.md](docs/v2/JETSTREAM.md)), the **`nats_basis`** queue driver ([docs/v2/QUEUE.md](docs/v2/QUEUE.md)), optional **idempotency** ([docs/v2/IDEMPOTENCY.md](docs/v2/IDEMPOTENCY.md)), and **observability** ([docs/v2/OBSERVABILITY.md](docs/v2/OBSERVABILITY.md)).
-- **v1.5.0+** for **config validation** on boot, **TLS** expectations in production, optional **subject ACL** for v2 publish/subscribe/JetStream publish, and **`php artisan nats:v2:config:validate`** ([docs/v2/SECURITY.md](docs/v2/SECURITY.md)).
-
-**Roadmap:** version themes for the basis stack live in [docs/ROADMAP_V2_NATSPHP.md](docs/ROADMAP_V2_NATSPHP.md) (v2.6 security ships in **1.5.0**).
-
-The service provider is auto-discovered. To publish configuration (includes **`nats_basis`** for v2):
-
-```bash
 php artisan vendor:publish --tag=nats-config
 ```
 
-## Configuration
+Version map:
 
-Configure your NATS connection in `config/nats.php` or via environment variables:
+- **1.3.0+**: `NatsV2` publish/subscribe foundation
+- **1.4.0+**: basis JetStream + `nats_basis` queue + idempotency + observability
+- **1.5.0+**: config validation, TLS production guard, optional ACL
+- **1.5.1**: documentation refresh (navigation + cross-links)
+
+Roadmap: [`docs/ROADMAP_V2_NATSPHP.md`](docs/ROADMAP_V2_NATSPHP.md)
+
+## 5-Minute Quickstart (NatsV2)
+
+### 1) Configure env
 
 ```env
-NATS_HOST=localhost
+NATS_HOST=127.0.0.1
 NATS_PORT=4222
 NATS_USER=
-NATS_PASSWORD=
+NATS_PASS=
 NATS_TOKEN=
-# v2 basis client (`NatsV2`): password env is NATS_PASS (see docs/v2/MIGRATION.md)
-# NATS_PASS=
-# NATS_BASIS_VALIDATE_CONFIG=false
-# NATS_TLS_REQUIRE_IN_PRODUCTION=false
+NATS_BASIS_VALIDATE_CONFIG=false
+NATS_TLS_REQUIRE_IN_PRODUCTION=false
 ```
 
-### NatsV2 foundation ([basis-company/nats](https://github.com/basis-company/nats.php), package **1.3.0+**)
-
-Full write-up: [docs/v2/GUIDE.md](docs/v2/GUIDE.md), [FAQ](docs/v2/FAQ.md).
-
-**NatsV2** adds a **Laravel wrapper** on **basis-company/nats**: configuration, `NatsV2`, and the JSON envelope live in this package; the dependency handles the wire protocol. Settings go in `config/nats_basis.php` (merged automatically; publish with `nats-config` to get the file on disk).
-
-**Envelope** (JSON body): `{ "id": "<uuid>", "type": "<subject>", "version": "v1", "data": { ... } }`
+### 2) Publish
 
 ```php
 use LaravelNats\Laravel\Facades\NatsV2;
 
-NatsV2::publish('orders.created', ['order_id' => 123], ['X-Request-Id' => 'abc']);
-// Underlying: Basis\Nats\Client - use NatsV2::connection() for advanced APIs.
+NatsV2::publish('orders.created', ['order_id' => 123], ['X-Request-Id' => 'req-1']);
 ```
 
-### NatsV2 JetStream (basis client, package **1.4.0+**)
-
-Use **`NatsV2::jetstream()`** for **`Basis\Nats\Api`**, synchronous stream publish with optional envelope, one-shot pull batches, config presets, and CLI helpers. See **[docs/v2/JETSTREAM.md](docs/v2/JETSTREAM.md)** (legacy **`Nats::jetstream()`** remains on the native client).
-
-### Multiple Connections
+### 3) Subscribe
 
 ```php
-// config/nats.php
-'connections' => [
-    'default' => [
-        'host' => env('NATS_HOST', 'localhost'),
-        'port' => (int) env('NATS_PORT', 4222),
-    ],
-    'secondary' => [
-        'host' => env('NATS_SECONDARY_HOST', 'nats-2.example.com'),
-        'port' => 4222,
-    ],
-],
-```
+use LaravelNats\Laravel\Facades\NatsV2;
+use LaravelNats\Subscriber\InboundMessage;
 
-## Quick Start
-
-### Publishing Messages
-
-```php
-use LaravelNats\Laravel\Facades\Nats;
-
-// Publish with array payload (auto-serialized to JSON)
-Nats::publish('orders.created', [
-    'order_id' => 123,
-    'customer' => 'John Doe',
-]);
-
-// Publish to a specific connection
-Nats::connection('secondary')->publish('events', $data);
-```
-
-### Subscribing to Messages
-
-```php
-use LaravelNats\Laravel\Facades\Nats;
-
-// Subscribe to a subject
-Nats::subscribe('orders.*', function ($message) {
-    $payload = $message->getDecodedPayload();
-    logger('Order received', $payload);
+NatsV2::subscribe('orders.created', function (InboundMessage $message): void {
+    $payload = $message->envelopePayload();
+    logger()->info('Order received', (array) $payload);
 });
 
-// Process incoming messages
-Nats::process(1.0); // Wait up to 1 second for messages
-```
-
-### Queue Groups (Load Balancing)
-
-```php
-// Messages are distributed across subscribers in the same queue group
-Nats::subscribe('orders.process', function ($message) {
-    // Process order
-}, 'order-workers');
-```
-
-### Request/Reply
-
-```php
-use LaravelNats\Laravel\Facades\Nats;
-
-// Send a request and wait for a reply
-$reply = Nats::request('users.get', ['id' => 42], timeout: 5.0);
-$user = $reply->getDecodedPayload();
-```
-
-### Wildcards
-
-NATS supports two wildcards for subscriptions:
-
-- `*` matches a single token: `orders.*` matches `orders.created`, `orders.updated`
-- `>` matches one or more tokens: `orders.>` matches `orders.created`, `orders.us.created`
-
-```php
-Nats::subscribe('logs.>', function ($message) {
-    // Receives all log messages
-});
-```
-
-## Queue Driver
-
-Use NATS as a Laravel queue backend. Two drivers are available:
-
-- **`nats`** — legacy `LaravelNats\Core\Client` (connection options in `config/queue.php` as below).
-- **`nats_basis`** — **`Basis\Nats\Client`** via **`ConnectionManager`** (package **1.4.0+**); configure `config/queue.php` + `config/nats_basis.php`. Full reference: [docs/v2/QUEUE.md](docs/v2/QUEUE.md).
-
-### Configuration
-
-Add the NATS connection to your `config/queue.php`:
-
-```php
-'connections' => [
-    // ... other connections ...
-
-    'nats' => [
-        'driver' => 'nats',
-        'host' => env('NATS_HOST', 'localhost'),
-        'port' => env('NATS_PORT', 4222),
-        'user' => env('NATS_USER'),
-        'password' => env('NATS_PASSWORD'),
-        'token' => env('NATS_TOKEN'),
-        'queue' => env('NATS_QUEUE', 'default'),
-        'retry_after' => 60,
-    ],
-],
-```
-
-### Usage
-
-```php
-// Dispatch a job to the NATS queue
-dispatch(new ProcessOrder($order))->onConnection('nats');
-
-// Or set NATS as default in .env
-// QUEUE_CONNECTION=nats
-```
-
-### Job Lifecycle & Retry
-
-Configure retry behavior on your jobs:
-
-```php
-class ProcessOrder implements ShouldQueue
-{
-    use InteractsWithQueue;
-
-    public $tries = 5;           // Maximum attempts
-    public $backoff = [10, 30, 60]; // Linear backoff: 10s, 30s, 60s delays
-    
-    // Or use exponential backoff
-    // public $backoff = 60;     // Fixed 60s delay between retries
+while (true) {
+    NatsV2::process(null, 1.0);
 }
 ```
 
-The queue driver supports:
-- **Configurable max attempts** (`$tries` or `maxTries`)
-- **Linear backoff** (array of delays)
-- **Fixed delay** (integer delay)
-- **Retry deadlines** (`retryUntil`)
-- **Exception limits** (`maxExceptions`)
+## Documentation Index
 
-### Failed Jobs
+### Start here
 
-Failed jobs are automatically stored in Laravel's `failed_jobs` table when:
-- Maximum attempts are exceeded
-- An exception is thrown during job execution
-- The job explicitly calls `$this->fail($exception)`
+- [`docs/v2/README.md`](docs/v2/README.md)
+- [`docs/v2/GUIDE.md`](docs/v2/GUIDE.md)
+- [`docs/v2/FAQ.md`](docs/v2/FAQ.md)
 
-#### Handling Failed Jobs
+### Core feature guides
 
-```php
-class ProcessOrder implements ShouldQueue
-{
-    use InteractsWithQueue;
+- Subscriber: [`docs/v2/SUBSCRIBER.md`](docs/v2/SUBSCRIBER.md)
+- JetStream (v2): [`docs/v2/JETSTREAM.md`](docs/v2/JETSTREAM.md)
+- Queue (`nats_basis`): [`docs/v2/QUEUE.md`](docs/v2/QUEUE.md)
+- Migration: [`docs/v2/MIGRATION.md`](docs/v2/MIGRATION.md)
 
-    public function failed(Throwable $exception): void
-    {
-        // Handle the failure
-        logger()->error('Order processing failed', [
-            'order_id' => $this->orderId,
-            'exception' => $exception->getMessage(),
-        ]);
-    }
-}
-```
+### Production and operations
 
-#### Dead Letter Queue (DLQ)
+- Security + ACL: [`docs/v2/SECURITY.md`](docs/v2/SECURITY.md)
+- Observability: [`docs/v2/OBSERVABILITY.md`](docs/v2/OBSERVABILITY.md)
+- Correlation headers: [`docs/v2/CORRELATION.md`](docs/v2/CORRELATION.md)
+- Idempotency: [`docs/v2/IDEMPOTENCY.md`](docs/v2/IDEMPOTENCY.md)
+- Client protocol features: [`docs/v2/CLIENT_FEATURES.md`](docs/v2/CLIENT_FEATURES.md)
 
-Configure a Dead Letter Queue to route failed jobs to a separate NATS subject:
+### Examples
 
-```php
-// config/queue.php
-'nats' => [
-    'driver' => 'nats',
-    'host' => env('NATS_HOST', 'localhost'),
-    'port' => env('NATS_PORT', 4222),
-    'queue' => env('NATS_QUEUE', 'default'),
-    'retry_after' => 60,
-    'dead_letter_queue' => env('NATS_QUEUE_DLQ', 'failed'), // Optional
-],
-```
+- Example index: [`docs/v2/examples/README.md`](docs/v2/examples/README.md)
 
-When a job fails, it will be:
-1. Stored in the `failed_jobs` database table
-2. Routed to the DLQ subject (if configured) with enhanced metadata:
-   - Original queue name
-   - Failure exception message
-   - Failure timestamp
-   - Stack trace
+## Queue Usage
 
-You can subscribe to the DLQ to process failed jobs:
+Two queue drivers are available:
 
-```php
-use LaravelNats\Laravel\Facades\Nats;
+- **`nats`**: legacy driver on `LaravelNats\Core\Client`
+- **`nats_basis`**: recommended driver on `Basis\Nats\Client`
 
-Nats::subscribe('laravel.queue.failed', function ($message) {
-    $payload = $message->getDecodedPayload();
-    
-    // Process failed job
-    logger()->error('Failed job received', [
-        'original_queue' => $payload['original_queue'],
-        'failure_message' => $payload['failure_message'],
-    ]);
-});
-```
-
-#### Delayed Jobs (JetStream)
-
-Delayed jobs require **JetStream** to be enabled on your NATS server. When enabled, jobs dispatched with `later()` are stored in a JetStream stream and delivered to the queue when due.
-
-**1. Enable delayed jobs** in your queue connection or in `config/nats.php`:
-
-```php
-// config/queue.php – enable on the connection
-'nats' => [
-    'driver' => 'nats',
-    'host' => env('NATS_HOST', 'localhost'),
-    'port' => env('NATS_PORT', 4222),
-    'queue' => env('NATS_QUEUE', 'default'),
-    'retry_after' => 60,
-    'delayed' => [
-        'enabled' => true,
-        'stream' => env('NATS_QUEUE_DELAYED_STREAM', 'laravel_delayed'),
-        'subject_prefix' => env('NATS_QUEUE_DELAYED_SUBJECT_PREFIX', 'laravel.delayed.'),
-        'consumer' => env('NATS_QUEUE_DELAYED_CONSUMER', 'laravel_delayed_worker'),
-    ],
-],
-```
-
-Defaults for `stream`, `subject_prefix`, and `consumer` are also defined under `queue.delayed` in `config/nats.php` (or via `NATS_QUEUE_DELAYED_*` env vars).
-
-**2. Use `later()`** to schedule jobs:
-
-```php
-use Illuminate\Support\Facades\Queue;
-
-// Run job in 5 minutes
-Queue::connection('nats')->later(now()->addMinutes(5), new SendReminder($user));
-
-// Or with a delay in seconds
-Queue::connection('nats')->later(60, new ProcessOrder($order));
-```
-
-When delayed is enabled, the connector automatically ensures the JetStream delay stream and durable consumer exist at connect time. A delay processor (or worker) consumes from the delay stream and pushes jobs to the main queue when they are due.
-
-### Running Queue Workers
-
-You can use either Laravel's standard `queue:work` or the package's dedicated **`nats:work`** command (Phase 4.1), which defaults to the NATS connection and supports a PID file for process management:
+Use with Laravel worker:
 
 ```bash
-# Dedicated NATS worker (Phase 4.1) - defaults to connection "nats", queue "default"
-php artisan nats:work
-
-# With PID file for process managers (Supervisor, systemd)
-php artisan nats:work --pidfile=/var/run/nats-worker.pid
-
-# Process one job and exit
-php artisan nats:work --once
+php artisan queue:work nats_basis --queue=default --tries=3
 ```
 
-Or use Laravel's standard queue worker:
+Queue guide: [`docs/v2/QUEUE.md`](docs/v2/QUEUE.md)
+
+## Security And Production Checks
+
+For hardened environments (1.5.0+):
+
+- optional boot validation: `NATS_BASIS_VALIDATE_CONFIG=true`
+- optional TLS requirement in production: `NATS_TLS_REQUIRE_IN_PRODUCTION=true`
+- optional publish/subscribe ACL: `NATS_ACL_*`
+- explicit validator command: `php artisan nats:v2:config:validate`
+
+Full details: [`docs/v2/SECURITY.md`](docs/v2/SECURITY.md)
+
+## Testing And Quality Checks
 
 ```bash
-# Start a queue worker
-php artisan queue:work nats
-
-# Process jobs from a specific queue
-php artisan queue:work nats --queue=high,default
-
-# Set maximum job attempts
-php artisan queue:work nats --tries=3
-
-# Set job timeout
-php artisan queue:work nats --timeout=60
-
-# Set memory limit
-php artisan queue:work nats --memory=128
-```
-
-**Supported Worker Options (queue:work and nats:work):**
-- `--queue` - Specify which queues to process
-- `--tries` - Maximum number of attempts for a job
-- `--timeout` - Seconds a child process can run
-- `--memory` - Memory limit in megabytes
-- `--sleep` - Seconds to sleep when no job available
-- `--once` - Process a single job and exit
-- **nats:work only:** `--connection`, `--name`, `--pidfile`, `--stop-when-empty`. Graceful shutdown via SIGTERM/SIGINT (Laravel Worker).
-
-### Subject-based consumer (Phase 4.2)
-
-Consume messages from NATS subjects (with optional queue group and handler class):
-
-```bash
-# Consume a subject (messages printed to console)
-php artisan nats:consume "orders.*"
-
-# With queue group for load balancing
-php artisan nats:consume "events.>" --queue=workers
-
-# Dispatch each message to a handler class (must implement MessageHandlerInterface)
-php artisan nats:consume "notifications.email" --handler=App\\Handlers\\EmailNotificationHandler
-
-# Multiple subjects (comma-separated in --subjects=)
-php artisan nats:consume "alerts" --subjects="alerts.critical,alerts.info"
-```
-
-Implement a handler by creating a class that implements `LaravelNats\Contracts\Messaging\MessageHandlerInterface` (define `handle(MessageInterface $message): void`) and pass it with `--handler=YourClass`. The handler is resolved from the Laravel container (dependency injection supported).
-
-**nats:consume options:** `--connection=` (NATS connection name), `--queue=` (queue group for load balancing), `--handler=` (class implementing `MessageHandlerInterface`), `--subjects=` (comma-separated additional subjects). Supports wildcards `*` (single token) and `>` (one or more tokens). Use Ctrl+C for graceful shutdown.
-
-### Current Limitations
-
-- **Delayed jobs:** Require JetStream; enable via `queue.delayed.enabled` (see [Delayed Jobs (JetStream)](#delayed-jobs-jetstream)).
-- **Queue size:** Returns 0 (NATS Core doesn't track queue size)
-- **Priority queues:** Not supported in NATS Core
-
-## Authentication
-
-### Username/Password
-
-```env
-NATS_USER=myuser
-NATS_PASSWORD=mypassword
-```
-
-### Token
-
-```env
-NATS_TOKEN=my-secret-token
-```
-
-## Testing
-
-v2 testing details: [docs/v2/GUIDE.md](docs/v2/GUIDE.md). For **v2.6** production checks (TLS guard, optional ACL, `nats:v2:config:validate`), see [docs/v2/SECURITY.md](docs/v2/SECURITY.md).
-
-
-This package uses [Pest PHP](https://pestphp.com/) for testing.
-
-### Running Tests
-
-```bash
-# Start the NATS server (requires Docker; from package root)
+# Optional local NATS
 docker compose up -d
 
-# Run all tests
+# Test suite
 composer test
 
-# Run with coverage
-composer test:coverage
-```
-
-### Static Analysis
-
-```bash
+# Static analysis
 composer analyse
-```
 
-### Code Style
-
-```bash
-# Check code style
+# Style check
 composer format:check
-
-# Fix code style
-composer format
 ```
 
 ## Troubleshooting
 
-### Connection Refused
+### Connection refused
 
-**Error:** `Connection to localhost:4222 refused`
-
-**Solution:** Ensure the NATS server is running:
+Start NATS locally:
 
 ```bash
-# Using Docker
-docker run -d --name nats -p 4222:4222 -p 8222:8222 nats:2.10
-
-# Or from this package's compose file
 docker compose up -d
 ```
 
-### TLS or production guard failures (v2.6)
+### Authorization violation
 
-**Symptom:** `NatsConfigurationException` on boot in `production` after upgrading to **1.5.0+**.
+Verify `.env` credentials and server auth mode (`NATS_USER`/`NATS_PASS` vs `NATS_TOKEN`).
 
-**What to check:** set CA/client TLS files on each `nats_basis` connection or disable `NATS_TLS_REQUIRE_IN_PRODUCTION` until TLS is wired. See [docs/v2/SECURITY.md](docs/v2/SECURITY.md).
+### Production TLS/config errors
 
-### Authentication Failed
+If you get `NatsConfigurationException`, validate your `nats_basis` connection rows:
 
-**Error:** `Authorization Violation`
+```bash
+php artisan nats:v2:config:validate
+```
 
-**Solutions:**
-1. Verify credentials in your `.env` file match the NATS server configuration
-2. Check if using token auth vs. username/password auth
-3. Ensure the NATS server is configured for the authentication method you're using
-
-### Queue Jobs Not Processing
-
-**Possible causes:**
-
-1. **Worker not running:** Start the queue worker:
-   ```bash
-   php artisan queue:work nats
-   ```
-
-2. **Wrong queue name:** Ensure your job is dispatched to the correct queue:
-   ```php
-   dispatch(new MyJob())->onQueue('high');
-   ```
-   Then process that queue:
-   ```bash
-   php artisan queue:work nats --queue=high
-   ```
-
-3. **NATS connection issues:** Check NATS server logs for errors
-
-### Message Size Limits
-
-NATS has a default maximum message size of 1MB. For larger payloads:
-
-1. Store the data externally (S3, database) and pass a reference
-2. Configure NATS server with a higher `max_payload` setting
+Then confirm TLS values in [`docs/v2/SECURITY.md`](docs/v2/SECURITY.md).
 
 ## API Stability
 
-This package follows [Semantic Versioning](https://semver.org/). After v1.0.0:
+Public Laravel-facing APIs are stable under semver. Internal implementation classes (especially under core internals) may evolve.
 
-- **Stable API:** Classes in the `LaravelNats\Laravel` namespace
-- **Security helpers (1.5.0+):** `LaravelNats\Security\NatsBasisConfigurationValidator`, `SubjectAclChecker`, and related exceptions are part of the supported v2 surface for apps that opt in ([docs/v2/SECURITY.md](docs/v2/SECURITY.md)).
-  - `Nats` facade
-  - `NatsManager`
-  - `NatsQueue`, `NatsJob`, `NatsConnector`
-  - Configuration structure
-
-- **Internal API:** Classes in the `LaravelNats\Core` namespace
-  - May change in minor versions
-  - Use the facade for stability
-
-## JetStream Support
-
-JetStream is NATS's persistence and streaming layer. This package provides access to JetStream functionality.
-
-### Prerequisites
-
-Ensure your NATS server has JetStream enabled:
-
-```bash
-# Docker example
-docker run -d --name nats -p 4222:4222 -p 8222:8222 nats:2.10 --jetstream
-```
-
-### Basic Usage
-
-```php
-use LaravelNats\Laravel\Facades\Nats;
-
-// Get JetStream client
-$js = Nats::jetstream();
-
-// Check if JetStream is available
-if ($js->isAvailable()) {
-    // Use JetStream features
-}
-
-// Get account information (memory, storage, streams, consumers, limits)
-$accountInfo = $js->getAccountInfo();
-```
-
-### Configuration
-
-Configure JetStream in `config/nats.php`:
-
-```php
-'jetstream' => [
-    'domain' => env('NATS_JETSTREAM_DOMAIN'),  // Optional: for multi-tenancy
-    'timeout' => (float) env('NATS_JETSTREAM_TIMEOUT', 5.0),
-],
-```
-
-### Domain Support
-
-For multi-tenant setups, you can use JetStream domains:
-
-```php
-$js = Nats::jetstream(null, new \LaravelNats\Core\JetStream\JetStreamConfig('my-domain'));
-```
-
-### Stream Management
-
-Create and manage JetStream streams:
-
-```php
-use LaravelNats\Core\JetStream\StreamConfig;
-use LaravelNats\Laravel\Facades\Nats;
-
-$js = Nats::jetstream();
-
-// Create a stream
-$config = new StreamConfig('my-stream', ['events.>'])
-    ->withDescription('Event stream')
-    ->withMaxMessages(10000)
-    ->withMaxBytes(104857600) // 100MB
-    ->withStorage(StreamConfig::STORAGE_FILE);
-
-$info = $js->createStream($config);
-
-// List streams (paged)
-$result = $js->listStreams(offset: 0);
-// $result has: total, offset, limit, streams
-
-// Get stream information
-$info = $js->getStreamInfo('my-stream');
-echo $info->getMessageCount(); // Number of messages
-echo $info->getByteCount();    // Total bytes stored
-
-// Update stream configuration
-$updated = $config->withMaxMessages(20000);
-$info = $js->updateStream($updated);
-
-// Purge all messages
-$js->purgeStream('my-stream');
-
-// Delete stream
-$js->deleteStream('my-stream');
-```
-
-### Stream Operations
-
-Get and delete individual messages:
-
-```php
-// Get message by sequence number
-$message = $js->getMessage('my-stream', 123);
-
-// Delete message by sequence number
-$js->deleteMessage('my-stream', 123);
-```
-
-### Consumer Management
-
-Create and manage durable consumers on a stream:
-
-```php
-use LaravelNats\Core\JetStream\ConsumerConfig;
-use LaravelNats\Laravel\Facades\Nats;
-
-$js = Nats::jetstream();
-
-// Create a durable consumer
-$config = (new ConsumerConfig('my-consumer'))
-    ->withFilterSubject('events.>')
-    ->withDeliverPolicy(ConsumerConfig::DELIVER_NEW)
-    ->withAckPolicy(ConsumerConfig::ACK_EXPLICIT);
-
-$info = $js->createConsumer('my-stream', 'my-consumer', $config);
-
-// Get consumer information
-$info = $js->getConsumerInfo('my-stream', 'my-consumer');
-echo $info->getNumPending();   // Messages awaiting delivery
-echo $info->getNumAckPending(); // Messages awaiting ack
-
-// List consumers (paged)
-$result = $js->listConsumers('my-stream', offset: 0);
-foreach ($result['consumers'] as $consumer) {
-    echo $consumer->getName();
-}
-// $result has: total, offset, limit, consumers
-
-// Delete a consumer
-$js->deleteConsumer('my-stream', 'my-consumer');
-```
-
-### Pull consumer and acknowledgements
-
-Consume messages from a pull consumer and acknowledge them:
-
-```php
-use LaravelNats\Core\JetStream\ConsumerConfig;
-use LaravelNats\Core\JetStream\JetStreamConsumedMessage;
-use LaravelNats\Laravel\Facades\Nats;
-
-$js = Nats::jetstream();
-
-// Create a pull consumer (no deliver_subject) with explicit ack
-$config = (new ConsumerConfig('my-consumer'))
-    ->withAckPolicy(ConsumerConfig::ACK_EXPLICIT)
-    ->withDeliverPolicy(ConsumerConfig::DELIVER_ALL);
-$js->createConsumer('my-stream', 'my-consumer', $config);
-
-// Fetch next message (returns null when no_wait and no message)
-$msg = $js->fetchNextMessage('my-stream', 'my-consumer', timeout: 5.0, noWait: true);
-
-if ($msg instanceof JetStreamConsumedMessage) {
-    echo $msg->getPayload();
-    $js->ack($msg);           // Positive ack
-    // $js->nak($msg);        // Redeliver
-    // $js->nak($msg, 30_000_000_000);  // Redeliver after 30s (nanoseconds)
-    // $js->term($msg);       // Terminate (do not redeliver)
-    // $js->inProgress($msg); // Extend ack wait (work in progress)
-}
-```
-
-### Artisan Commands (JetStream and Worker)
-
-**Subject-based consumer (Phase 4.2 - Subject-Based Consumer):**
-
-```bash
-php artisan nats:consume {subject} [--connection=] [--queue=] [--handler=] [--subjects=]
-```
-
-**Queue worker (Phase 4.1):** `php artisan nats:work [--connection=nats] [--queue=default] [--pidfile=] ...`
-
-Manage streams and consumers from the CLI:
-
-```bash
-# Streams
-php artisan nats:stream:list [--connection=] [--offset=0]
-php artisan nats:stream:info {stream} [--connection=]
-php artisan nats:stream:create {name} {subjects*} [--connection=] [--description=] [--storage=file|memory] [--retention=limits|interest|workqueue]
-php artisan nats:stream:update {stream} [--connection=] [--description=] [--storage=] [--retention=] [--max-messages=] [--max-bytes=] [--max-age=]
-php artisan nats:stream:purge {stream} [--connection=] [--force]
-php artisan nats:stream:delete {stream} [--connection=] [--force]
-
-# Consumers
-php artisan nats:consumer:list {stream} [--connection=] [--offset=0]
-php artisan nats:consumer:info {stream} {consumer} [--connection=]
-php artisan nats:consumer:create {stream} {name} [--connection=] [--filter-subject=] [--deliver-policy=all|last|new] [--ack-policy=none|all|explicit]
-php artisan nats:consumer:delete {stream} {consumer} [--connection=] [--force]
-
-# JetStream account
-php artisan nats:jetstream:status [--connection=] [--json]
-```
-
-Use `--connection=` to target a non-default NATS connection from `config/nats.php`. For subject-based consumption (Phase 4.2), see [Subject-based consumer](#subject-based-consumer-phase-42).
-
-## Summary of Phase 4 Commands
-
-| Command | Phase | Purpose |
-|---------|-------|---------|
-| `nats:work` | 4.1 | NATS queue worker (PID file, signals) |
-| `nats:consume {subject}` | 4.2 | Subject-based consumer (handler, queue group, wildcards) |
-
-For release notes and version history, see [CHANGELOG.md](CHANGELOG.md).
+See release notes: [`CHANGELOG.md`](CHANGELOG.md)
 
 ## Contributing
 
-Contributions are welcome. Before opening a pull request, run **`composer test`**, **`composer format:check`**, and **`composer analyse`** so CI stays green.
+Before opening a PR, run:
+
+```bash
+composer test
+composer format:check
+composer analyse
+```
 
 ## License
 
-The MIT License (MIT). Please see [License File](LICENSE) for more information.
-
+MIT. See [`LICENSE`](LICENSE).
