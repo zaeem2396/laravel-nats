@@ -98,6 +98,17 @@ while (true) {
 
 ## Documentation Index
 
+### By use case
+
+| If you want to... | Go here |
+|---|---|
+| Publish/subscribe on v2 quickly | [`docs/v2/GUIDE.md`](docs/v2/GUIDE.md) |
+| Build long-running consumers | [`docs/v2/SUBSCRIBER.md`](docs/v2/SUBSCRIBER.md) |
+| Run queue workers on basis client | [`docs/v2/QUEUE.md`](docs/v2/QUEUE.md) |
+| Work with JetStream streams/consumers | [`docs/v2/JETSTREAM.md`](docs/v2/JETSTREAM.md) |
+| Harden config and subject access | [`docs/v2/SECURITY.md`](docs/v2/SECURITY.md) |
+| Move from legacy APIs to v2 | [`docs/v2/MIGRATION.md`](docs/v2/MIGRATION.md) |
+
 ### Start here
 
 - [`docs/v2/README.md`](docs/v2/README.md)
