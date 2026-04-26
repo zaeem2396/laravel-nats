@@ -98,6 +98,8 @@ while (true) {
 
 ## Documentation Index
 
+Prefer this canonical map for quick navigation: [`docs/INDEX.md`](docs/INDEX.md).
+
 ### By use case
 
 | If you want to... | Go here |
