@@ -13,6 +13,7 @@ Laravel wrapper for NATS with two tracks and an index-first docs experience:
 
 - [What to use](#what-to-use)
 - [Install](#install)
+- [Docker setup (local NATS)](#docker-setup-local-nats)
 - [5-minute quickstart (natsv2)](#5-minute-quickstart-natsv2)
 - [Documentation index](#documentation-index)
 - [Queue usage](#queue-usage)
@@ -58,6 +59,35 @@ Version map:
 - **1.5.1**: documentation refresh (navigation + cross-links)
 
 Roadmap: [`docs/ROADMAP_V2_NATSPHP.md`](docs/ROADMAP_V2_NATSPHP.md)
+
+## Docker Setup (Local NATS)
+
+### Start NATS with project compose file
+
+```bash
+docker compose up -d
+```
+
+This starts a local NATS server using the repository's `docker-compose.yml`.
+
+### Verify container is running
+
+```bash
+docker compose ps
+```
+
+### Match your `.env` to local Docker defaults
+
+```env
+NATS_HOST=127.0.0.1
+NATS_PORT=4222
+```
+
+### Stop services when done
+
+```bash
+docker compose down
+```
 
 ## 5-Minute Quickstart (NatsV2)
 
