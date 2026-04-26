@@ -4,7 +4,7 @@
 [![Static Analysis](https://github.com/zaeem2396/laravel-nats/actions/workflows/static-analysis.yml/badge.svg)](https://github.com/zaeem2396/laravel-nats/actions/workflows/static-analysis.yml)
 [![Code Style](https://github.com/zaeem2396/laravel-nats/actions/workflows/code-style.yml/badge.svg)](https://github.com/zaeem2396/laravel-nats/actions/workflows/code-style.yml)
 
-Laravel wrapper for NATS with two tracks:
+Laravel wrapper for NATS with two tracks and an index-first docs experience:
 
 - **Recommended:** `NatsV2` on [`basis-company/nats`](https://github.com/basis-company/nats.php)
 - **Supported legacy track:** `Nats` facade + legacy queue/JetStream APIs
@@ -156,8 +156,8 @@ Queue guide: [`docs/v2/QUEUE.md`](docs/v2/QUEUE.md)
 
 For teams still using legacy stack workflows:
 
-- `nats:work` and `nats:consume` command behavior is documented in the package changelog and historical README history.
-- Legacy JetStream stream/consumer CLI command set remains available while migration is in progress.
+- Queue and consumer runtime references: check [`docs/v2/QUEUE.md`](docs/v2/QUEUE.md) and [`docs/v2/MIGRATION.md`](docs/v2/MIGRATION.md) for current behavior and migration-safe usage.
+- Legacy JetStream stream/consumer workflows remain available while migration is in progress.
 - Plan migration paths with [`docs/v2/MIGRATION.md`](docs/v2/MIGRATION.md) and track scope via [`docs/ROADMAP_V2_NATSPHP.md`](docs/ROADMAP_V2_NATSPHP.md).
 
 ## Security And Production Checks
