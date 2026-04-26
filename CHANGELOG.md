@@ -15,6 +15,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - (none)
 
+### Documentation
+
+- (none)
+
+## [1.5.2] - 2026-04-26
+
+### Documentation
+
+- Refactor `README.md` into an index-first quick-access layout with clearer entry points, reduced scroll depth, and explicit doc routing.
+- Remove README logo banner and add a dedicated Docker local setup section (`docker compose up -d`, env defaults, verification, and shutdown).
+- Add canonical docs map [`docs/INDEX.md`](docs/INDEX.md) and align README navigation to v2 guides, migration, security, and roadmap pages.
+
 ## [1.5.1] - 2026-04-12
 
 ### Documentation
@@ -318,7 +330,8 @@ Run `composer update zaeem2396/laravel-nats` to upgrade.
 
 ---
 
-[Unreleased]: https://github.com/zaeem2396/laravel-nats/compare/v1.5.0...HEAD
+[Unreleased]: https://github.com/zaeem2396/laravel-nats/compare/v1.5.2...HEAD
+[1.5.2]: https://github.com/zaeem2396/laravel-nats/compare/v1.5.1...v1.5.2
 [1.5.1]: https://github.com/zaeem2396/laravel-nats/compare/v1.5.0...v1.5.1
 [1.5.0]: https://github.com/zaeem2396/laravel-nats/compare/v1.4.0...v1.5.0
 [1.4.0]: https://github.com/zaeem2396/laravel-nats/compare/v1.3.0...v1.4.0
