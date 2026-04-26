@@ -16,6 +16,7 @@ Laravel wrapper for NATS with two tracks:
 - [5-minute quickstart (natsv2)](#5-minute-quickstart-natsv2)
 - [Documentation index](#documentation-index)
 - [Queue usage](#queue-usage)
+- [Legacy command references](#legacy-command-references)
 - [Security and production checks](#security-and-production-checks)
 - [Testing and quality checks](#testing-and-quality-checks)
 - [Troubleshooting](#troubleshooting)
@@ -185,6 +186,8 @@ composer analyse
 # Style check
 composer format:check
 ```
+
+For release prep, run these checks before tagging and ensure `CHANGELOG.md` reflects the release scope.
 
 ## Troubleshooting
 
