@@ -49,3 +49,17 @@ it('returns null when there is no match', function (): void {
     expect($selector->select(null, 'orders.created'))->toBeNull()
         ->and($selector->select(null, null))->toBeNull();
 });
+
+it('reports whether prefix rules are configured', function (): void {
+    $empty = new ConnectionSelector(new Repository([]));
+    $configured = new ConnectionSelector(new Repository([
+        'nats_basis' => [
+            'connection_selection' => [
+                'subject_prefixes' => ['orders.' => 'orders'],
+            ],
+        ],
+    ]));
+
+    expect($empty->hasRules())->toBeFalse()
+        ->and($configured->hasRules())->toBeTrue();
+});

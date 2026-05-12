@@ -44,6 +44,11 @@ final class ConnectionSelector
         return $bestConnection;
     }
 
+    public function hasRules(): bool
+    {
+        return $this->subjectPrefixRules() !== [];
+    }
+
     /**
      * @return array<string, string>
      */
