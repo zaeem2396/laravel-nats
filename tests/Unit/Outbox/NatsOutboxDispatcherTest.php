@@ -38,6 +38,21 @@ it('marks failures and can continue processing', function (): void {
         ->and($store->failed)->toBe(['1']);
 });
 
+it('stops on the first failure by default', function (): void {
+    $messages = [
+        new NatsOutboxMessage('1', 'orders.fail', ['id' => 1]),
+        new NatsOutboxMessage('2', 'orders.ok', ['id' => 2]),
+    ];
+    $store = new InMemoryOutboxStore($messages);
+    $publisher = new RecordingOutboxPublisher(failSubject: 'orders.fail');
+
+    $result = (new NatsOutboxDispatcher($publisher))->dispatch($store);
+
+    expect($result->publishedIds)->toBe([])
+        ->and($result->failedIds)->toBe(['1'])
+        ->and($store->published)->toBe([]);
+});
+
 final class RecordingOutboxPublisher implements NatsPublisherContract
 {
     /**
