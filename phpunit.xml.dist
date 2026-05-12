@@ -34,31 +34,17 @@ Run tests with: vendor/bin/pest
         <testsuite name="Unit">
             <directory>tests/Unit</directory>
         </testsuite>
-        
+
         <!-- Feature tests: May use Laravel application context -->
         <testsuite name="Feature">
             <directory>tests/Feature</directory>
         </testsuite>
-        
+
         <!-- Integration tests: Require running NATS server -->
         <testsuite name="Integration">
             <directory>tests/Integration</directory>
         </testsuite>
     </testsuites>
-
-    <!-- Code Coverage Configuration -->
-    <coverage>
-        <report>
-            <html outputDirectory="coverage/html"/>
-            <clover outputFile="coverage/clover.xml"/>
-        </report>
-        <include>
-            <directory suffix=".php">src</directory>
-        </include>
-        <exclude>
-            <directory>src/Laravel/Config</directory>
-        </exclude>
-    </coverage>
 
     <!-- Environment Variables for Testing -->
     <php>
@@ -66,5 +52,13 @@ Run tests with: vendor/bin/pest
         <env name="NATS_PORT" value="4222"/>
         <env name="APP_ENV" value="testing"/>
     </php>
-</phpunit>
 
+    <source>
+        <include>
+            <directory suffix=".php">src</directory>
+        </include>
+        <exclude>
+            <directory>src/Laravel/Config</directory>
+        </exclude>
+    </source>
+</phpunit>

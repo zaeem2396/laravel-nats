@@ -44,6 +44,24 @@ describe('BasisNatsConnector', function (): void {
         expect($queue->getMaxInFlightLimit())->toBe(10);
     });
 
+    it('implements Laravel 13 queue size introspection methods', function (): void {
+        $connector = new BasisNatsConnector();
+        $queue = $connector->connect([
+            'queue' => 'default',
+            'max_in_flight' => 10,
+        ]);
+
+        $ref = new \ReflectionProperty(BasisNatsQueue::class, 'inFlight');
+        $ref->setAccessible(true);
+        $ref->setValue($queue, 2);
+
+        expect($queue->size())->toBe(0)
+            ->and($queue->pendingSize())->toBe(0)
+            ->and($queue->delayedSize())->toBe(0)
+            ->and($queue->reservedSize())->toBe(2)
+            ->and($queue->creationTimeOfOldestPendingJob())->toBeNull();
+    });
+
     it('treats zero max_in_flight as unlimited', function (): void {
         $connector = new BasisNatsConnector();
         $queue = $connector->connect([
