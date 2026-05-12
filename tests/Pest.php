@@ -52,6 +52,7 @@ uses(LaravelNats\Tests\TestCase::class)->in(
     'Unit/Idempotency',
     'Unit/Support',
     'Unit/Observability',
+    'Unit/Outbox',
     'Unit/Subscriber',
 );
 
