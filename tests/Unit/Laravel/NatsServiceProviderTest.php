@@ -125,6 +125,14 @@ it('merges nats_basis.correlation defaults from package', function (): void {
         ->and($config->get('nats_basis.correlation.correlation_id_header'))->toBe('Nats-Correlation-Id');
 });
 
+it('merges nats_basis trace context defaults from package', function (): void {
+    $config = $this->app->make('config');
+
+    expect($config->get('nats_basis.trace_context.inject_on_publish'))->toBeFalse()
+        ->and($config->get('nats_basis.trace_context.traceparent_header'))->toBe('traceparent')
+        ->and($config->get('nats_basis.trace_context.tracestate_header'))->toBe('tracestate');
+});
+
 it('merges nats_basis.observability defaults from package', function (): void {
     $config = $this->app->make('config');
 

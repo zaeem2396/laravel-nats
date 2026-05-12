@@ -47,6 +47,22 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Trace context headers (v2.7)
+    |--------------------------------------------------------------------------
+    |
+    | When inject_on_publish is true, valid W3C traceparent and optional
+    | tracestate headers are copied from the current HTTP request unless the
+    | publish call already supplied them.
+    |
+    */
+    'trace_context' => [
+        'inject_on_publish' => filter_var(env('NATS_TRACE_CONTEXT_INJECT', false), FILTER_VALIDATE_BOOL),
+        'traceparent_header' => env('NATS_TRACEPARENT_HEADER', 'traceparent'),
+        'tracestate_header' => env('NATS_TRACESTATE_HEADER', 'tracestate'),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Observability (v2.5) — metrics hooks, envelope redaction, health ping
     |--------------------------------------------------------------------------
     |
