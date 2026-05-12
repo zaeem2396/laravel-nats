@@ -17,3 +17,7 @@ it('selects a configured connection through the facade root', function (): void 
     expect(NatsV2::selectConnection('orders.created'))->toBe('orders')
         ->and(NatsV2::selectConnection('billing.created'))->toBeNull();
 });
+
+it('exposes the outbox dispatch helper on the facade root', function (): void {
+    expect(method_exists(NatsV2::getFacadeRoot(), 'dispatchOutbox'))->toBeTrue();
+});
