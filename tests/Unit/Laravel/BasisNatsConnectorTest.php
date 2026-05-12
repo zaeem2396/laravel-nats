@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 use LaravelNats\Laravel\Queue\BasisNatsConnector;
 use LaravelNats\Laravel\Queue\BasisNatsQueue;
-use ReflectionProperty;
 
 describe('BasisNatsConnector', function (): void {
     it('returns BasisNatsQueue with connection config', function (): void {
@@ -62,7 +61,7 @@ describe('BasisNatsConnector', function (): void {
             'max_in_flight' => 1,
         ]);
 
-        $ref = new ReflectionProperty(BasisNatsQueue::class, 'inFlight');
+        $ref = new \ReflectionProperty(BasisNatsQueue::class, 'inFlight');
         $ref->setAccessible(true);
         $ref->setValue($queue, 1);
 
@@ -76,7 +75,7 @@ describe('BasisNatsConnector', function (): void {
             'max_in_flight' => 5,
         ]);
 
-        $ref = new ReflectionProperty(BasisNatsQueue::class, 'inFlight');
+        $ref = new \ReflectionProperty(BasisNatsQueue::class, 'inFlight');
         $ref->setAccessible(true);
         $ref->setValue($queue, 2);
 
