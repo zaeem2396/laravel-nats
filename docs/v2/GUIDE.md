@@ -21,6 +21,7 @@ The v2 stack is a **Laravel wrapper** around [basis-company/nats](https://packag
 13. Observability — [OBSERVABILITY.md](OBSERVABILITY.md) (package 1.4.0+)
 14. Security & ACL — [SECURITY.md](SECURITY.md) (package 1.5.0+)
 15. Client features — [CLIENT_FEATURES.md](CLIENT_FEATURES.md) (cluster seeds, `request()`, multi-value headers, drain helper)
+16. Advanced features — [TRACE_CONTEXT.md](TRACE_CONTEXT.md), [CONNECTION_SELECTION.md](CONNECTION_SELECTION.md), [OUTBOX.md](OUTBOX.md)
 
 ## Config
 
@@ -39,6 +40,9 @@ The v2 stack is a **Laravel wrapper** around [basis-company/nats](https://packag
 | `NATS_TLS_REQUIRE_IN_PRODUCTION` | When `true`, require TLS material (or `tlsHandshakeFirst`) for each connection in `production` ([SECURITY.md](SECURITY.md)) |
 | `NATS_ACL_ENABLED` | Optional publish/subscribe subject allowlists ([SECURITY.md](SECURITY.md)) |
 | `NATS_ACL_PUBLISH_PREFIXES` / `NATS_ACL_SUBSCRIBE_PREFIXES` | Comma-separated prefix rules when ACL is enabled |
+| `NATS_TRACE_CONTEXT_INJECT` | Copy valid W3C trace headers from the current HTTP request ([TRACE_CONTEXT.md](TRACE_CONTEXT.md)) |
+| `NATS_CONNECTION_SUBJECT_PREFIXES` | Subject-prefix to connection map, e.g. `orders.:orders` ([CONNECTION_SELECTION.md](CONNECTION_SELECTION.md)) |
+| `NATS_OUTBOX_BATCH_SIZE` / `NATS_OUTBOX_STOP_ON_FAILURE` | Defaults for `NatsV2::dispatchOutbox()` ([OUTBOX.md](OUTBOX.md)) |
 
 TLS file paths: `NATS_TLS_KEY`, `NATS_TLS_CERT`, `NATS_TLS_CA`.
 
@@ -64,7 +68,7 @@ Configure `nats_basis.connections.{name}`.
 
 ## Headers
 
-String values; sent as HPUB when non-empty. **Request-ID / correlation:** [CORRELATION.md](CORRELATION.md).
+String values; sent as HPUB when non-empty. **Request-ID / correlation:** [CORRELATION.md](CORRELATION.md). **Trace context:** [TRACE_CONTEXT.md](TRACE_CONTEXT.md). Use `NatsHeaderBag` for fluent header construction.
 
 ## Errors
 
