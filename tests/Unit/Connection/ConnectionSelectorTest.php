@@ -35,6 +35,21 @@ it('selects the longest matching subject prefix', function (): void {
         ->and($selector->select(null, 'orders.us.created'))->toBe('orders');
 });
 
+it('offers a subject-first selector helper', function (): void {
+    $selector = new ConnectionSelector(new Repository([
+        'nats_basis' => [
+            'connection_selection' => [
+                'subject_prefixes' => [
+                    'events.' => 'events',
+                ],
+            ],
+        ],
+    ]));
+
+    expect($selector->selectForSubject('events.created'))->toBe('events')
+        ->and($selector->selectForSubject('events.created', 'explicit'))->toBe('explicit');
+});
+
 it('returns null when there is no match', function (): void {
     $selector = new ConnectionSelector(new Repository([
         'nats_basis' => [

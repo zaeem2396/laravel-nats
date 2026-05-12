@@ -44,6 +44,11 @@ final class ConnectionSelector
         return $bestConnection;
     }
 
+    public function selectForSubject(string $subject, ?string $explicit = null): ?string
+    {
+        return $this->select($explicit, $subject);
+    }
+
     public function hasRules(): bool
     {
         return $this->subjectPrefixRules() !== [];
