@@ -75,6 +75,19 @@ final class NatsHeaderBag
         return $this->with($name, $value);
     }
 
+    public function withTraceContext(
+        string $traceparent,
+        ?string $tracestate = null,
+        string $traceparentName = TraceContextHeaders::TRACEPARENT,
+        string $tracestateName = TraceContextHeaders::TRACESTATE,
+    ): self {
+        $bag = $this->withTraceParent($traceparent, $traceparentName);
+
+        return $tracestate !== null && $tracestate !== ''
+            ? $bag->withTraceState($tracestate, $tracestateName)
+            : $bag;
+    }
+
     public function withIdempotencyKey(string $value, string $name = IdempotencyHeaders::DEFAULT_HEADER): self
     {
         return $this->with($name, $value);

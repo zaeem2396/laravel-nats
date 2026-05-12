@@ -35,3 +35,17 @@ it('validates traceparent values', function (): void {
 
     expect(fn () => NatsHeaderBag::make()->withTraceParent('bad'))->toThrow(InvalidArgumentException::class);
 });
+
+it('builds trace context as a pair', function (): void {
+    $headers = NatsHeaderBag::make()
+        ->withTraceContext(
+            '00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01',
+            'rojo=00f067aa0ba902b7',
+        )
+        ->toArray();
+
+    expect($headers)->toBe([
+        'traceparent' => '00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01',
+        'tracestate' => 'rojo=00f067aa0ba902b7',
+    ]);
+});
