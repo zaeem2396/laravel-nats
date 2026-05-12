@@ -133,6 +133,12 @@ it('merges nats_basis trace context defaults from package', function (): void {
         ->and($config->get('nats_basis.trace_context.tracestate_header'))->toBe('tracestate');
 });
 
+it('merges nats_basis connection selection defaults from package', function (): void {
+    $config = $this->app->make('config');
+
+    expect($config->get('nats_basis.connection_selection.subject_prefixes'))->toBe([]);
+});
+
 it('merges nats_basis.observability defaults from package', function (): void {
     $config = $this->app->make('config');
 

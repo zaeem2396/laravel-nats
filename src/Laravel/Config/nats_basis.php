@@ -63,6 +63,33 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Connection selection (v2.7)
+    |--------------------------------------------------------------------------
+    |
+    | Optional subject prefix routing for NatsV2 methods that accept a connection
+    | argument. Explicit method arguments still win. Env format:
+    | NATS_CONNECTION_SUBJECT_PREFIXES="orders.:orders,billing.:billing"
+    |
+    */
+    'connection_selection' => [
+        'subject_prefixes' => (static function (): array {
+            $out = [];
+            foreach (array_filter(array_map(
+                static fn (string $s): string => trim($s),
+                explode(',', (string) env('NATS_CONNECTION_SUBJECT_PREFIXES', '')),
+            )) as $entry) {
+                $parts = array_map(trim(...), explode(':', $entry, 2));
+                if (count($parts) === 2 && $parts[0] !== '' && $parts[1] !== '') {
+                    $out[$parts[0]] = $parts[1];
+                }
+            }
+
+            return $out;
+        })(),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Observability (v2.5) — metrics hooks, envelope redaction, health ping
     |--------------------------------------------------------------------------
     |
