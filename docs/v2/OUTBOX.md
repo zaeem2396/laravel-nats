@@ -49,6 +49,7 @@ $result = NatsV2::dispatchOutbox(app(DatabaseNatsOutboxStore::class));
 logger()->info('NATS outbox drained', [
     'published' => $result->published(),
     'failed' => $result->failed(),
+    'succeeded' => $result->succeeded(),
 ]);
 ```
 
