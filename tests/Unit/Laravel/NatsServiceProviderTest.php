@@ -147,6 +147,13 @@ it('merges nats_basis connection selection defaults from package', function (): 
     expect($config->get('nats_basis.connection_selection.subject_prefixes'))->toBe([]);
 });
 
+it('merges nats_basis outbox defaults from package', function (): void {
+    $config = $this->app->make('config');
+
+    expect($config->get('nats_basis.outbox.batch_size'))->toBe(100)
+        ->and($config->get('nats_basis.outbox.stop_on_failure'))->toBeTrue();
+});
+
 it('merges nats_basis.observability defaults from package', function (): void {
     $config = $this->app->make('config');
 

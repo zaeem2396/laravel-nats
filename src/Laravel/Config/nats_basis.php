@@ -90,6 +90,21 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Outbox recipe (v2.7)
+    |--------------------------------------------------------------------------
+    |
+    | NatsOutboxDispatcher is storage-agnostic; applications own the database
+    | table and implement NatsOutboxStoreContract. These defaults are intended
+    | for scheduler/command code that drains a custom store in batches.
+    |
+    */
+    'outbox' => [
+        'batch_size' => (int) env('NATS_OUTBOX_BATCH_SIZE', 100),
+        'stop_on_failure' => filter_var(env('NATS_OUTBOX_STOP_ON_FAILURE', true), FILTER_VALIDATE_BOOL),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Observability (v2.5) — metrics hooks, envelope redaction, health ping
     |--------------------------------------------------------------------------
     |
