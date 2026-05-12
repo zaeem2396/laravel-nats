@@ -9,5 +9,7 @@ it('counts dispatch outcomes', function (): void {
 
     expect($result->attempted())->toBe(3)
         ->and($result->published())->toBe(2)
-        ->and($result->failed())->toBe(1);
+        ->and($result->failed())->toBe(1)
+        ->and($result->succeeded())->toBeFalse()
+        ->and((new NatsOutboxDispatchResult(['a'], []))->succeeded())->toBeTrue();
 });

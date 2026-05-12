@@ -33,4 +33,9 @@ final class NatsOutboxDispatchResult
     {
         return count($this->failedIds);
     }
+
+    public function succeeded(): bool
+    {
+        return $this->failedIds === [];
+    }
 }
