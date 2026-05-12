@@ -19,6 +19,9 @@ use LaravelNats\JetStream\BasisJetStreamPublisher;
 use LaravelNats\JetStream\BasisStreamProvisioner;
 use LaravelNats\JetStream\PullConsumerBatch;
 use LaravelNats\Laravel\Internal\BasisRequestState;
+use LaravelNats\Outbox\Contracts\NatsOutboxStoreContract;
+use LaravelNats\Outbox\NatsOutboxDispatcher;
+use LaravelNats\Outbox\NatsOutboxDispatchResult;
 use LaravelNats\Publisher\Contracts\NatsPublisherContract;
 use LaravelNats\Subscriber\Contracts\NatsSubscriberContract;
 use LaravelNats\Subscriber\InboundMessage;
@@ -39,6 +42,7 @@ final class NatsV2Gateway
         private readonly BasisStreamProvisioner $streamProvisioner,
         private readonly Repository $config,
         private readonly ConnectionSelector $connectionSelector,
+        private readonly NatsOutboxDispatcher $outboxDispatcher,
     ) {
     }
 
@@ -172,6 +176,17 @@ final class NatsV2Gateway
     public function selectConnection(?string $subject = null, ?string $explicit = null): ?string
     {
         return $this->connectionSelector->select($explicit, $subject);
+    }
+
+    public function dispatchOutbox(
+        NatsOutboxStoreContract $store,
+        ?int $limit = null,
+        ?bool $stopOnFailure = null,
+    ): NatsOutboxDispatchResult {
+        $limit ??= (int) $this->config->get('nats_basis.outbox.batch_size', 100);
+        $stopOnFailure ??= filter_var($this->config->get('nats_basis.outbox.stop_on_failure', true), FILTER_VALIDATE_BOOL);
+
+        return $this->outboxDispatcher->dispatch($store, $limit, $stopOnFailure);
     }
 
     public function ping(?string $connection = null): bool

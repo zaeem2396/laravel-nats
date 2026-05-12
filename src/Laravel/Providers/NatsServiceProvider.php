@@ -287,6 +287,7 @@ class NatsServiceProvider extends ServiceProvider implements DeferrableProvider
                 $app->make(BasisStreamProvisioner::class),
                 $app->make('config'),
                 $app->make(ConnectionSelector::class),
+                $app->make(NatsOutboxDispatcher::class),
             );
         });
 
