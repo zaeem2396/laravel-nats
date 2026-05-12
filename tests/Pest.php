@@ -71,6 +71,7 @@ uses(LaravelNats\Tests\LaravelTestCase::class)->in(
     'Unit/Laravel/NatsPingCommandRegisteredTest.php',
     'Unit/Laravel/NatsValidateConfigCommandRegisteredTest.php',
     'Unit/Laravel/RedactedEnvelopeLogInboundMiddlewareTest.php',
+    'Unit/Laravel/TraceContextHeadersTest.php',
     'Unit/Security/NatsBasisConfigurationValidatorTest.php',
 );
 
