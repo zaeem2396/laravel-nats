@@ -50,7 +50,7 @@ final class CorrelationHeaders
 
         $out = $headers;
 
-        if (! self::hasHeaderKey($out, $requestIdHeader)) {
+        if (! NatsHeaders::has($out, $requestIdHeader)) {
             $rid = self::firstRequestHeader($request, [
                 $requestIdHeader,
                 'X-Request-ID',
@@ -64,7 +64,7 @@ final class CorrelationHeaders
             }
         }
 
-        if (! self::hasHeaderKey($out, $correlationHeader)) {
+        if (! NatsHeaders::has($out, $correlationHeader)) {
             $cid = self::firstRequestHeader($request, [
                 $correlationHeader,
                 'X-Correlation-Id',
@@ -76,20 +76,6 @@ final class CorrelationHeaders
         }
 
         return $out;
-    }
-
-    /**
-     * @param array<string, string> $headers
-     */
-    private static function hasHeaderKey(array $headers, string $name): bool
-    {
-        foreach ($headers as $k => $_) {
-            if (strcasecmp((string) $k, $name) === 0) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     /**

@@ -31,27 +31,6 @@ final class IdempotencyHeaders
             $name = self::DEFAULT_HEADER;
         }
 
-        if (self::hasHeaderKey($headers, $name)) {
-            return $headers;
-        }
-
-        $out = $headers;
-        $out[$name] = $idempotencyKey;
-
-        return $out;
-    }
-
-    /**
-     * @param array<string, string> $headers
-     */
-    private static function hasHeaderKey(array $headers, string $name): bool
-    {
-        foreach ($headers as $k => $_) {
-            if (strcasecmp((string) $k, $name) === 0) {
-                return true;
-            }
-        }
-
-        return false;
+        return NatsHeaders::putIfMissing($headers, $name, $idempotencyKey);
     }
 }
