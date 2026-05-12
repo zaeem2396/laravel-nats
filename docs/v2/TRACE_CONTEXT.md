@@ -18,8 +18,10 @@ When enabled, `NatsPublisher` copies a valid `traceparent` and optional `tracest
 use LaravelNats\Support\NatsHeaderBag;
 
 $headers = NatsHeaderBag::make()
-    ->withTraceParent('00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01')
-    ->withTraceState('rojo=00f067aa0ba902b7')
+    ->withTraceContext(
+        '00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01',
+        'rojo=00f067aa0ba902b7',
+    )
     ->toArray();
 
 NatsV2::publish('orders.created', ['order_id' => 123], $headers);
