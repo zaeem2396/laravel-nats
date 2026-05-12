@@ -15,6 +15,7 @@ use LaravelNats\Laravel\NatsV2Gateway;
 use LaravelNats\Laravel\Providers\NatsServiceProvider;
 use LaravelNats\Observability\Contracts\NatsMetricsContract;
 use LaravelNats\Observability\NullNatsMetrics;
+use LaravelNats\Outbox\NatsOutboxDispatcher;
 use LaravelNats\Publisher\Contracts\NatsPublisherContract;
 use LaravelNats\Publisher\NatsPublisher;
 use LaravelNats\Security\NatsBasisConfigurationValidator;
@@ -58,7 +59,8 @@ it('provides deferred services', function (): void {
         ->and($provides)->toContain(IdempotencyStoreContract::class)
         ->and($provides)->toContain(NatsMetricsContract::class)
         ->and($provides)->toContain(NatsBasisConfigurationValidator::class)
-        ->and($provides)->toContain(SubjectAclChecker::class);
+        ->and($provides)->toContain(SubjectAclChecker::class)
+        ->and($provides)->toContain(NatsOutboxDispatcher::class);
 });
 
 it('resolves IdempotencyStoreContract as cache-backed store', function (): void {
@@ -181,4 +183,8 @@ it('resolves NatsMetricsContract as null implementation by default', function ()
     $metrics = $this->app->make(NatsMetricsContract::class);
 
     expect($metrics)->toBeInstanceOf(NullNatsMetrics::class);
+});
+
+it('resolves the outbox dispatcher from container', function (): void {
+    expect($this->app->make(NatsOutboxDispatcher::class))->toBeInstanceOf(NatsOutboxDispatcher::class);
 });

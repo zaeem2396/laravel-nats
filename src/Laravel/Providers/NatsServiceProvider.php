@@ -44,6 +44,7 @@ use LaravelNats\Laravel\Queue\BasisNatsConnector;
 use LaravelNats\Laravel\Queue\NatsConnector;
 use LaravelNats\Observability\Contracts\NatsMetricsContract;
 use LaravelNats\Observability\NullNatsMetrics;
+use LaravelNats\Outbox\NatsOutboxDispatcher;
 use LaravelNats\Publisher\Contracts\NatsPublisherContract;
 use LaravelNats\Publisher\NatsPublisher;
 use LaravelNats\Security\NatsBasisConfigurationValidator;
@@ -115,6 +116,7 @@ class NatsServiceProvider extends ServiceProvider implements DeferrableProvider
             NatsMetricsContract::class,
             NatsBasisConfigurationValidator::class,
             SubjectAclChecker::class,
+            NatsOutboxDispatcher::class,
         ];
     }
 
@@ -209,6 +211,10 @@ class NatsServiceProvider extends ServiceProvider implements DeferrableProvider
         });
 
         $this->app->bind(NatsPublisherContract::class, NatsPublisher::class);
+
+        $this->app->singleton(NatsOutboxDispatcher::class, function ($app) {
+            return new NatsOutboxDispatcher($app->make(NatsPublisherContract::class));
+        });
 
         $this->app->singleton(IdempotencyStoreContract::class, function ($app) {
             $config = $app->make('config');
