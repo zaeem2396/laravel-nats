@@ -10,6 +10,7 @@ use Illuminate\Log\LogManager;
 use Illuminate\Queue\Worker;
 use Illuminate\Support\ServiceProvider;
 use LaravelNats\Connection\ConnectionManager;
+use LaravelNats\Connection\ConnectionSelector;
 use LaravelNats\Core\Client;
 use LaravelNats\Idempotency\CacheIdempotencyStore;
 use LaravelNats\Idempotency\Contracts\IdempotencyStoreContract;
@@ -100,6 +101,7 @@ class NatsServiceProvider extends ServiceProvider implements DeferrableProvider
             NatsManager::class,
             NatsV2Gateway::class,
             ConnectionManager::class,
+            ConnectionSelector::class,
             NatsPublisher::class,
             NatsPublisherContract::class,
             NatsSubscriberContract::class,
@@ -191,6 +193,10 @@ class NatsServiceProvider extends ServiceProvider implements DeferrableProvider
             return new SubjectAclChecker($app->make('config'));
         });
 
+        $this->app->singleton(ConnectionSelector::class, function ($app) {
+            return new ConnectionSelector($app->make('config'));
+        });
+
         $this->app->singleton(NatsMetricsContract::class, static fn () => new NullNatsMetrics());
 
         $this->app->singleton(NatsPublisher::class, function ($app) {
@@ -274,6 +280,7 @@ class NatsServiceProvider extends ServiceProvider implements DeferrableProvider
                 $app->make(PullConsumerBatch::class),
                 $app->make(BasisStreamProvisioner::class),
                 $app->make('config'),
+                $app->make(ConnectionSelector::class),
             );
         });
 

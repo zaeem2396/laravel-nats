@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use LaravelNats\Connection\ConnectionManager;
+use LaravelNats\Connection\ConnectionSelector;
 use LaravelNats\Core\Client;
 use LaravelNats\Idempotency\CacheIdempotencyStore;
 use LaravelNats\Idempotency\Contracts\IdempotencyStoreContract;
@@ -44,6 +45,7 @@ it('provides deferred services', function (): void {
         ->and($provides)->toContain(NatsManager::class)
         ->and($provides)->toContain(NatsV2Gateway::class)
         ->and($provides)->toContain(ConnectionManager::class)
+        ->and($provides)->toContain(ConnectionSelector::class)
         ->and($provides)->toContain(NatsPublisher::class)
         ->and($provides)->toContain(NatsPublisherContract::class)
         ->and($provides)->toContain(NatsSubscriberContract::class)
@@ -101,6 +103,10 @@ it('registers nats.v2 basis stack bindings', function (): void {
 
 it('resolves nats.v2 as NatsV2Gateway', function (): void {
     expect($this->app->make('nats.v2'))->toBeInstanceOf(NatsV2Gateway::class);
+});
+
+it('resolves connection selector from container', function (): void {
+    expect($this->app->make(ConnectionSelector::class))->toBeInstanceOf(ConnectionSelector::class);
 });
 
 it('merges nats_basis config from package', function (): void {

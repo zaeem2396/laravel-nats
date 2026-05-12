@@ -11,6 +11,7 @@ use Basis\Nats\Stream\Stream;
 use Illuminate\Contracts\Config\Repository;
 use InvalidArgumentException;
 use LaravelNats\Connection\ConnectionManager;
+use LaravelNats\Connection\ConnectionSelector;
 use LaravelNats\Exceptions\NatsNoRespondersException;
 use LaravelNats\Exceptions\NatsRequestTimeoutException;
 use LaravelNats\JetStream\BasisJetStreamManager;
@@ -37,6 +38,7 @@ final class NatsV2Gateway
         private readonly PullConsumerBatch $pullConsumerBatch,
         private readonly BasisStreamProvisioner $streamProvisioner,
         private readonly Repository $config,
+        private readonly ConnectionSelector $connectionSelector,
     ) {
     }
 
@@ -73,7 +75,7 @@ final class NatsV2Gateway
             $normalized[$key] = is_string($value) ? $value : (string) $value;
         }
 
-        $this->publisher->publish($subject, $payload, $normalized, $connection);
+        $this->publisher->publish($subject, $payload, $normalized, $this->selectConnection($subject, $connection));
     }
 
     /**
@@ -96,7 +98,7 @@ final class NatsV2Gateway
         float $timeoutSeconds = 5.0,
         ?string $connection = null,
     ): Payload {
-        $client = $this->connections->connection($connection);
+        $client = $this->connections->connection($this->selectConnection($subject, $connection));
         $state = new BasisRequestState();
 
         $client->request($subject, $payload, function (Payload $replyPayload, ?string $replyTo) use ($subject, $state): void {
@@ -144,7 +146,7 @@ final class NatsV2Gateway
      */
     public function subscribe(string $subject, callable $handler, ?string $queueGroup = null, ?string $connection = null): string
     {
-        return $this->subscriber->subscribe($subject, $handler, $queueGroup, $connection);
+        return $this->subscriber->subscribe($subject, $handler, $queueGroup, $this->selectConnection($subject, $connection));
     }
 
     public function unsubscribe(string $subscriptionId): void
@@ -165,6 +167,11 @@ final class NatsV2Gateway
     public function connection(?string $name = null): Client
     {
         return $this->connections->connection($name);
+    }
+
+    public function selectConnection(?string $subject = null, ?string $explicit = null): ?string
+    {
+        return $this->connectionSelector->select($explicit, $subject);
     }
 
     public function ping(?string $connection = null): bool
@@ -207,7 +214,7 @@ final class NatsV2Gateway
             $useEnvelope,
             $waitForAck,
             $headers,
-            $connection,
+            $this->selectConnection($subject, $connection),
         );
     }
 
