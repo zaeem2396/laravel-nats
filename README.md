@@ -43,8 +43,10 @@ Use legacy `Nats` APIs only when you must keep existing workloads unchanged. Mig
 Requirements:
 
 - PHP 8.2+
-- Laravel 10.x / 11.x / 12.x
+- Laravel 10.x / 11.x / 12.x / 13.x
 - NATS Server 2.x
+
+Laravel 13 applications require PHP 8.3+; the package minimum remains PHP 8.2 for Laravel 10-12.
 
 ```bash
 composer require zaeem2396/laravel-nats

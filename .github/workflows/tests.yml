@@ -7,7 +7,7 @@
 #
 # Matrix:
 # - PHP 8.2, 8.3, 8.4 (minimum PHP 8.2 for Pest/PHPUnit compatibility)
-# - Laravel 10, 11, 12
+# - Laravel 10, 11, 12, 13
 # ============================================================================
 
 name: Tests
@@ -78,6 +78,18 @@ jobs:
           - php: '8.4'
             laravel: '12.*'
             testbench: '10.*'
+            stability: prefer-stable
+
+          # Laravel 13 - PHP 8.3
+          - php: '8.3'
+            laravel: '13.*'
+            testbench: '11.*'
+            stability: prefer-stable
+
+          # Laravel 13 - PHP 8.4
+          - php: '8.4'
+            laravel: '13.*'
+            testbench: '11.*'
             stability: prefer-stable
 
     steps:

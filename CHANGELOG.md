@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - (none)
 
+### Changed
+
+- Support Laravel 13 by allowing `laravel/framework` **^13.0**, `orchestra/testbench` **^11.0**, and Pest 4 / Pest Laravel plugin 4 in development constraints; add Laravel 13 CI matrix entries.
+
 ### Removed
 
 - (none)
