@@ -7,6 +7,8 @@ namespace LaravelNats\Subscriber;
 use Basis\Nats\Message\Payload;
 use LaravelNats\Support\CorrelationHeaders;
 use LaravelNats\Support\IdempotencyHeaders;
+use LaravelNats\Support\NatsHeaders;
+use LaravelNats\Support\TraceContextHeaders;
 
 /**
  * Inbound NATS message for the v2 subscriber stack (decoupled from basis {@see Payload}).
@@ -94,7 +96,7 @@ final class InboundMessage
     public function idempotencyKey(?string $headerName = null): ?string
     {
         $name = $headerName ?? IdempotencyHeaders::DEFAULT_HEADER;
-        $fromHeader = $this->headerIgnoringCase($name);
+        $fromHeader = NatsHeaders::get($this->headers, $name);
         if ($fromHeader !== null && $fromHeader !== '') {
             return $fromHeader;
         }
@@ -114,19 +116,20 @@ final class InboundMessage
         return $trimmed !== '' ? $trimmed : null;
     }
 
+    public function traceParent(?string $headerName = null): ?string
+    {
+        $value = NatsHeaders::get($this->headers, $headerName ?? TraceContextHeaders::TRACEPARENT);
+
+        return is_string($value) && TraceContextHeaders::isValidTraceParent($value) ? $value : null;
+    }
+
+    public function traceState(?string $headerName = null): ?string
+    {
+        return NatsHeaders::get($this->headers, $headerName ?? TraceContextHeaders::TRACESTATE);
+    }
+
     private function headerIgnoringCase(string $name): ?string
     {
-        foreach ($this->headers as $key => $value) {
-            if (strcasecmp((string) $key, $name) !== 0) {
-                continue;
-            }
-            if (! is_string($value) || $value === '') {
-                return null;
-            }
-
-            return $value;
-        }
-
-        return null;
+        return NatsHeaders::get($this->headers, $name);
     }
 }

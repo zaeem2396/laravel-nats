@@ -19,6 +19,7 @@ use LaravelNats\Support\CorrelationHeaders;
 use LaravelNats\Support\IdempotencyHeaders;
 use LaravelNats\Support\MessageEnvelope;
 use LaravelNats\Support\PublishHeaderNormalizer;
+use LaravelNats\Support\TraceContextHeaders;
 use LogicException;
 
 /**
@@ -146,6 +147,7 @@ final class NatsPublisher implements NatsPublisherContract
         }
 
         $flat = CorrelationHeaders::mergeForPublish($this->config, $flat);
+        $flat = TraceContextHeaders::mergeForPublish($this->config, $flat);
         $flat = IdempotencyHeaders::mergeForPublish($this->config, $flat, $idempotencyKey);
         $merged = PublishHeaderNormalizer::toNamedValues($flat);
 
