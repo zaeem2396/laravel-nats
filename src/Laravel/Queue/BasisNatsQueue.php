@@ -71,6 +71,38 @@ class BasisNatsQueue extends Queue implements QueueContract, NatsJobQueueBridge
         return 0;
     }
 
+    /**
+     * @param string|null $queue
+     */
+    public function pendingSize($queue = null): int
+    {
+        return $this->size($queue);
+    }
+
+    /**
+     * @param string|null $queue
+     */
+    public function delayedSize($queue = null): int
+    {
+        return 0;
+    }
+
+    /**
+     * @param string|null $queue
+     */
+    public function reservedSize($queue = null): int
+    {
+        return $this->inFlight;
+    }
+
+    /**
+     * @param string|null $queue
+     */
+    public function creationTimeOfOldestPendingJob($queue = null): ?int
+    {
+        return null;
+    }
+
     public function push($job, $data = '', $queue = null): ?string
     {
         return $this->enqueueUsing(
