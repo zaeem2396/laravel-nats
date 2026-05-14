@@ -21,7 +21,7 @@ The v2 stack is a **Laravel wrapper** around [basis-company/nats](https://packag
 13. Observability — [OBSERVABILITY.md](OBSERVABILITY.md) (package 1.4.0+)
 14. Security & ACL — [SECURITY.md](SECURITY.md) (package 1.5.0+)
 15. Client features — [CLIENT_FEATURES.md](CLIENT_FEATURES.md) (cluster seeds, `request()`, multi-value headers, drain helper)
-16. Advanced features — [TRACE_CONTEXT.md](TRACE_CONTEXT.md), [CONNECTION_SELECTION.md](CONNECTION_SELECTION.md), [OUTBOX.md](OUTBOX.md)
+16. Advanced features — [TRACE_CONTEXT.md](TRACE_CONTEXT.md), [CONNECTION_SELECTION.md](CONNECTION_SELECTION.md), [OUTBOX.md](OUTBOX.md) (package 1.6.0+)
 
 ## Config
 
@@ -84,7 +84,7 @@ Legacy publish = raw JSON body; v2 = envelope. Migrate per subject.
 
 ## Migration strategy
 
-Legacy **`Nats`** / **`NatsManager`** / **`Core\Client`** are **soft-deprecated** for new work as of **1.3.0**; **`NatsV2`** is the supported path for new **publish** and **subscribe** code on the basis client. **JetStream** on the basis client, the **`nats_basis`** queue driver, idempotency, and observability ship together from **1.4.0+** ([JETSTREAM.md](JETSTREAM.md), [QUEUE.md](QUEUE.md), [IDEMPOTENCY.md](IDEMPOTENCY.md), [OBSERVABILITY.md](OBSERVABILITY.md)); **1.5.0+** adds validation, TLS production guard, and optional ACL ([SECURITY.md](SECURITY.md)); the legacy **`Nats::jetstream()`** and **`nats`** queue driver remain supported. **No silent removals** in upcoming minor releases.
+Legacy **`Nats`** / **`NatsManager`** / **`Core\Client`** are **soft-deprecated** for new work as of **1.3.0**; **`NatsV2`** is the supported path for new **publish** and **subscribe** code on the basis client. **JetStream** on the basis client, the **`nats_basis`** queue driver, idempotency, and observability ship together from **1.4.0+** ([JETSTREAM.md](JETSTREAM.md), [QUEUE.md](QUEUE.md), [IDEMPOTENCY.md](IDEMPOTENCY.md), [OBSERVABILITY.md](OBSERVABILITY.md)); **1.5.0+** adds validation, TLS production guard, and optional ACL ([SECURITY.md](SECURITY.md)); **1.6.0+** adds optional W3C trace context, subject-prefix connection selection, and the outbox dispatcher recipe ([TRACE_CONTEXT.md](TRACE_CONTEXT.md), [CONNECTION_SELECTION.md](CONNECTION_SELECTION.md), [OUTBOX.md](OUTBOX.md)); the legacy **`Nats::jetstream()`** and **`nats`** queue driver remain supported. **No silent removals** in upcoming minor releases.
 
 **Full policy, config mapping (`nats.php` ↔ `nats_basis.php`), facade table, and per-minor testing checklist:** [MIGRATION.md](MIGRATION.md).
 

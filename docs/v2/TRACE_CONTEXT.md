@@ -1,5 +1,7 @@
 # W3C Trace Context
 
+**Package 1.6.0+** (v2.7 advanced features).
+
 `NatsV2` can propagate lightweight W3C trace context from an active Laravel HTTP request into HPUB headers.
 
 ## Configure

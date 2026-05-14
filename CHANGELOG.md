@@ -9,6 +9,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- (none)
+
+### Changed
+
+- (none)
+
+### Removed
+
+- (none)
+
+### Documentation
+
+- (none)
+
+## [1.6.0] - 2026-05-13
+
+### Added
+
 - **NatsV2 v2.7 advanced features:** `NatsHeaderBag` and shared case-insensitive `NatsHeaders` helpers; optional W3C trace context propagation (`NATS_TRACE_CONTEXT_INJECT`) with `InboundMessage::traceParent()` / `traceState()`.
 - **NatsV2 connection selection:** subject-prefix routing via `nats_basis.connection_selection.subject_prefixes` / `NATS_CONNECTION_SUBJECT_PREFIXES` and `NatsV2::selectConnection()`.
 - **NatsV2 outbox recipe:** storage-agnostic `NatsOutboxMessage`, `NatsOutboxStoreContract`, `NatsOutboxDispatcher`, `NatsV2::dispatchOutbox()`, and `nats_basis.outbox` defaults.
@@ -16,6 +34,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Support Laravel 13 by allowing `laravel/framework` **^13.0**, `orchestra/testbench` **^11.0**, and Pest 4 / Pest Laravel plugin 4 in development constraints; add Laravel 13 CI matrix entries.
+- GitHub Actions test matrix runs **PHP 8.5** against Laravel **11**, **12**, and **13**.
 
 ### Removed
 
@@ -302,6 +321,21 @@ Run `composer update zaeem2396/laravel-nats` to upgrade.
 
 Run `composer update zaeem2396/laravel-nats` to upgrade.
 
+### From 1.5.2 to 1.6.0
+
+- **v2.7 advanced features:** optional W3C trace context on publish (`nats_basis.trace_context`, `NATS_TRACE_CONTEXT_INJECT`); subject-prefix routing to named connections (`nats_basis.connection_selection`, `NATS_CONNECTION_SUBJECT_PREFIXES`, `NatsV2::selectConnection()`); storage-agnostic transactional outbox helpers (`NatsOutboxMessage`, `NatsOutboxStoreContract`, `NatsOutboxDispatcher`, `NatsV2::dispatchOutbox()`, `nats_basis.outbox`). See [docs/v2/TRACE_CONTEXT.md](docs/v2/TRACE_CONTEXT.md), [docs/v2/CONNECTION_SELECTION.md](docs/v2/CONNECTION_SELECTION.md), [docs/v2/OUTBOX.md](docs/v2/OUTBOX.md), and [docs/v2/CLIENT_FEATURES.md](docs/v2/CLIENT_FEATURES.md).
+- **Laravel 13:** When your application is on Laravel 13, ensure `composer.json` allows **`laravel/framework` ^13** and matching **`orchestra/testbench` ^11** for package development; Laravel 13 requires **PHP 8.3+** in your app (this package still supports PHP **8.2+** for Laravel 10–12).
+
+```json
+{
+    "require": {
+        "zaeem2396/laravel-nats": "^1.6"
+    }
+}
+```
+
+Run `composer update zaeem2396/laravel-nats` to upgrade.
+
 ### From 1.0.0 to 1.1.0
 
 - **PHP:** Minimum PHP is now 8.2 (was 8.1). Ensure your environment meets this requirement.
@@ -336,7 +370,8 @@ Run `composer update zaeem2396/laravel-nats` to upgrade.
 
 ---
 
-[Unreleased]: https://github.com/zaeem2396/laravel-nats/compare/v1.5.2...HEAD
+[Unreleased]: https://github.com/zaeem2396/laravel-nats/compare/v1.6.0...HEAD
+[1.6.0]: https://github.com/zaeem2396/laravel-nats/compare/v1.5.2...v1.6.0
 [1.5.2]: https://github.com/zaeem2396/laravel-nats/compare/v1.5.1...v1.5.2
 [1.5.1]: https://github.com/zaeem2396/laravel-nats/compare/v1.5.0...v1.5.1
 [1.5.0]: https://github.com/zaeem2396/laravel-nats/compare/v1.4.0...v1.5.0

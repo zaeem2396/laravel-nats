@@ -59,6 +59,8 @@ Version map:
 - **1.4.0+**: basis JetStream + `nats_basis` queue + idempotency + observability
 - **1.5.0+**: config validation, TLS production guard, optional ACL
 - **1.5.1**: documentation refresh (navigation + cross-links)
+- **1.5.2**: README/docs index layout; Docker local NATS section; [`docs/INDEX.md`](docs/INDEX.md)
+- **1.6.0+**: v2.7 header helpers, optional W3C trace context, subject-prefix connection selection, outbox recipe; Laravel 13 supported in package dev constraints; CI tests PHP 8.5 on Laravel 11–13
 
 Roadmap: [`docs/ROADMAP_V2_NATSPHP.md`](docs/ROADMAP_V2_NATSPHP.md)
 

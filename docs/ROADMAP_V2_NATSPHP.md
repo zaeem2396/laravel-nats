@@ -136,7 +136,7 @@
 
 ## Version v2.7 - Advanced features
 
-**Shipped (next package after 1.5.2):** header helpers (`NatsHeaderBag`, shared case-insensitive `NatsHeaders`), lightweight W3C trace context propagation, subject-prefix connection selection, and a storage-agnostic outbox dispatcher/recipe.
+**Shipped (package 1.6.0):** header helpers (`NatsHeaderBag`, shared case-insensitive `NatsHeaders`), lightweight W3C trace context propagation, subject-prefix connection selection, and a storage-agnostic outbox dispatcher/recipe.
 
 | Area | Deliverable | Status |
 |------|-------------|--------|
@@ -163,6 +163,6 @@
 
 ---
 
-*Document version: 2.2 - v2.7 advanced features started after package 1.5.2. v2.2–v2.5 shipped as package 1.4.0; v2.6 shipped as package 1.5.0.*
+*Document version: 2.3 - v2.7 advanced features shipped in package **1.6.0**. v2.2–v2.5 shipped as package 1.4.0; v2.6 shipped as package 1.5.0.*
 
 **User docs:** [This roadmap](ROADMAP_V2_NATSPHP.md) · [docs/v2/README.md](v2/README.md) · [GUIDE](v2/GUIDE.md) · [SUBSCRIBER](v2/SUBSCRIBER.md) · [JETSTREAM](v2/JETSTREAM.md) · [QUEUE](v2/QUEUE.md) · [IDEMPOTENCY](v2/IDEMPOTENCY.md) · [OBSERVABILITY](v2/OBSERVABILITY.md) · [SECURITY](v2/SECURITY.md) · [CORRELATION](v2/CORRELATION.md) · [TRACE_CONTEXT](v2/TRACE_CONTEXT.md) · [CONNECTION_SELECTION](v2/CONNECTION_SELECTION.md) · [OUTBOX](v2/OUTBOX.md) · [MIGRATION](v2/MIGRATION.md)

@@ -1,6 +1,6 @@
 # Outbox Recipe
 
-The v2.7 outbox support is intentionally storage-agnostic. Your application owns the database table and transaction boundaries; this package provides DTOs and a dispatcher that publishes pending rows through `NatsPublisherContract`.
+From package **1.6.0** (v2.7), outbox support is intentionally storage-agnostic. Your application owns the database table and transaction boundaries; this package provides DTOs and a dispatcher that publishes pending rows through `NatsPublisherContract`.
 
 ## Pieces
 

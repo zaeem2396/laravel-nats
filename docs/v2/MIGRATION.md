@@ -40,6 +40,7 @@ Both are merged when the package boots; run `php artisan vendor:publish --tag=na
 | Idempotency (1.4.0+) | — | `nats_basis.idempotency.*` / `NATS_IDEMPOTENCY_*`; bind **`IdempotencyStoreContract`** for custom stores ([IDEMPOTENCY.md](IDEMPOTENCY.md)) |
 | Observability (1.4.0+) | — | `nats_basis.observability.*` / `NATS_OBSERVABILITY_*`, `NATS_REDACT_KEY_SUBSTRINGS`; **`NatsMetricsContract`**, **`nats:ping`** ([OBSERVABILITY.md](OBSERVABILITY.md)) |
 | Security / ACL (1.5.0+) | — | `nats_basis.security.*`, `nats_basis.acl.*`; **`NATS_BASIS_VALIDATE_CONFIG`**, **`NATS_TLS_REQUIRE_IN_PRODUCTION`**, **`NATS_ACL_*`**; Artisan **`nats:v2:config:validate`** ([SECURITY.md](SECURITY.md)) |
+| Trace context / connection selection / outbox (1.6.0+) | — | `nats_basis.trace_context.*` / **`NATS_TRACE_CONTEXT_INJECT`**; `nats_basis.connection_selection.subject_prefixes` / **`NATS_CONNECTION_SUBJECT_PREFIXES`**; `nats_basis.outbox.*` / **`NATS_OUTBOX_*`**; **`NatsV2::selectConnection()`**, **`NatsV2::dispatchOutbox()`** ([TRACE_CONTEXT.md](TRACE_CONTEXT.md), [CONNECTION_SELECTION.md](CONNECTION_SELECTION.md), [OUTBOX.md](OUTBOX.md)) |
 
 **Future unified config:** a later release may merge these into one file; until then, if you use **both** stacks, keep **both** configs consistent for shared connection names.
 
@@ -96,6 +97,12 @@ Consumers should read application data from **`data`**. Roll back publishers to 
 - [ ] When using **`NATS_TLS_REQUIRE_IN_PRODUCTION`**, confirm each connection sets **`tlsCaFile`** or client cert material, or **`tlsHandshakeFirst`** when required by your broker (see [SECURITY.md](SECURITY.md)).
 - [ ] If you enable **`NATS_ACL_ENABLED`**, set **`NATS_ACL_PUBLISH_PREFIXES`** / **`NATS_ACL_SUBSCRIBE_PREFIXES`**; remember **queue** traffic uses the client directly—ACL applies to **`NatsPublisher`**, **`NatsBasisSubscriber`**, and **`BasisJetStreamPublisher`**, not **`nats_basis`** queue internals.
 - [ ] Add **`php artisan nats:v2:config:validate`** to CI if you want forced checks without **`validate_on_boot`**.
+
+## Advanced features (1.6.0+)
+
+- [ ] Optional W3C **`traceparent`** / **`tracestate`** on publish from HTTP requests: [TRACE_CONTEXT.md](TRACE_CONTEXT.md).
+- [ ] Optional subject-prefix → named connection routing: [CONNECTION_SELECTION.md](CONNECTION_SELECTION.md).
+- [ ] Optional transactional outbox dispatcher (your storage implements **`NatsOutboxStoreContract`**): [OUTBOX.md](OUTBOX.md).
 
 ## See also
 
