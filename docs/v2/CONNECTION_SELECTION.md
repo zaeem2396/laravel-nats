@@ -1,6 +1,6 @@
 # Connection Selection
 
-`NatsV2` methods still accept an explicit `$connection` argument. In v2.7 you can also configure subject-prefix routing so common subjects automatically choose a named `nats_basis` connection.
+`NatsV2` methods still accept an explicit `$connection` argument. From package **1.6.0** (v2.7), you can also configure subject-prefix routing so common subjects automatically choose a named `nats_basis` connection.
 
 ## Configure
 

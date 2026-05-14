@@ -22,6 +22,8 @@
 
 **Validate config or enforce subject allowlists?** From **1.5.0+**, see [SECURITY.md](SECURITY.md): optional boot validation (`NATS_BASIS_VALIDATE_CONFIG`), TLS expectations in production (`NATS_TLS_REQUIRE_IN_PRODUCTION`), optional ACL for **`NatsV2`** publish / subscribe / JetStream publish paths, and **`nats:v2:config:validate`**. Subject ACL does **not** wrap the **`nats_basis`** queue driver’s internal publishes.
 
+**Trace context, connection routing, or transactional outbox?** From **1.6.0+**, see [TRACE_CONTEXT.md](TRACE_CONTEXT.md), [CONNECTION_SELECTION.md](CONNECTION_SELECTION.md), and [OUTBOX.md](OUTBOX.md).
+
 **Overhead?** One JSON encode and UUID per publish; negligible vs network.
 
 ## See also

@@ -47,7 +47,7 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Trace context headers (v2.7)
+    | Trace context headers (package 1.6.0 / v2.7)
     |--------------------------------------------------------------------------
     |
     | When inject_on_publish is true, valid W3C traceparent and optional
@@ -63,7 +63,7 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Connection selection (v2.7)
+    | Connection selection (package 1.6.0 / v2.7)
     |--------------------------------------------------------------------------
     |
     | Optional subject prefix routing for NatsV2 methods that accept a connection
@@ -90,7 +90,7 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Outbox recipe (v2.7)
+    | Outbox recipe (package 1.6.0 / v2.7)
     |--------------------------------------------------------------------------
     |
     | NatsOutboxDispatcher is storage-agnostic; applications own the database

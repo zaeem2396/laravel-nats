@@ -24,7 +24,7 @@ When **`nats_basis.correlation.inject_on_publish`** is **`true`**, and Laravel h
 
 Env toggles: **`NATS_CORRELATION_INJECT`**, **`NATS_REQUEST_ID_HEADER`**, **`NATS_CORRELATION_ID_HEADER`**, **`NATS_CORRELATION_GENERATE_REQUEST_ID`**.
 
-## Header helper
+## Header helper (1.6.0+)
 
 Use **`LaravelNats\Support\NatsHeaderBag`** when building common headers manually:
 
