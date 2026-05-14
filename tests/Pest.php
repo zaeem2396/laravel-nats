@@ -52,6 +52,7 @@ uses(LaravelNats\Tests\TestCase::class)->in(
     'Unit/Idempotency',
     'Unit/Support',
     'Unit/Observability',
+    'Unit/Outbox',
     'Unit/Subscriber',
 );
 
@@ -71,6 +72,7 @@ uses(LaravelNats\Tests\LaravelTestCase::class)->in(
     'Unit/Laravel/NatsPingCommandRegisteredTest.php',
     'Unit/Laravel/NatsValidateConfigCommandRegisteredTest.php',
     'Unit/Laravel/RedactedEnvelopeLogInboundMiddlewareTest.php',
+    'Unit/Laravel/TraceContextHeadersTest.php',
     'Unit/Security/NatsBasisConfigurationValidatorTest.php',
 );
 

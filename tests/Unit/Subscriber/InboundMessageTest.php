@@ -40,3 +40,14 @@ it('exposes request and correlation ids from headers case-insensitively', functi
     expect($m->requestId())->toBe('rid-1')
         ->and($m->correlationId())->toBe('cid-1');
 });
+
+it('exposes W3C trace context headers', function (): void {
+    $p = new Payload('{}', [
+        'TraceParent' => '00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01',
+        'tracestate' => 'rojo=00f067aa0ba902b7',
+    ], 'subj', null);
+    $m = InboundMessage::fromPayload($p, null);
+
+    expect($m->traceParent())->toBe('00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01')
+        ->and($m->traceState())->toBe('rojo=00f067aa0ba902b7');
+});

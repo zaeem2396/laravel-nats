@@ -141,6 +141,8 @@ Prefer this canonical map for quick navigation: [`docs/INDEX.md`](docs/INDEX.md)
 | Build long-running consumers | [`docs/v2/SUBSCRIBER.md`](docs/v2/SUBSCRIBER.md) |
 | Run queue workers on basis client | [`docs/v2/QUEUE.md`](docs/v2/QUEUE.md) |
 | Work with JetStream streams/consumers | [`docs/v2/JETSTREAM.md`](docs/v2/JETSTREAM.md) |
+| Propagate trace headers or route by subject | [`docs/v2/TRACE_CONTEXT.md`](docs/v2/TRACE_CONTEXT.md), [`docs/v2/CONNECTION_SELECTION.md`](docs/v2/CONNECTION_SELECTION.md) |
+| Add a transactional outbox around publishes | [`docs/v2/OUTBOX.md`](docs/v2/OUTBOX.md) |
 | Harden config and subject access | [`docs/v2/SECURITY.md`](docs/v2/SECURITY.md) |
 | Move from legacy APIs to v2 | [`docs/v2/MIGRATION.md`](docs/v2/MIGRATION.md) |
 
@@ -155,6 +157,9 @@ Prefer this canonical map for quick navigation: [`docs/INDEX.md`](docs/INDEX.md)
 - Subscriber: [`docs/v2/SUBSCRIBER.md`](docs/v2/SUBSCRIBER.md)
 - JetStream (v2): [`docs/v2/JETSTREAM.md`](docs/v2/JETSTREAM.md)
 - Queue (`nats_basis`): [`docs/v2/QUEUE.md`](docs/v2/QUEUE.md)
+- Trace context: [`docs/v2/TRACE_CONTEXT.md`](docs/v2/TRACE_CONTEXT.md)
+- Connection selection: [`docs/v2/CONNECTION_SELECTION.md`](docs/v2/CONNECTION_SELECTION.md)
+- Outbox recipe: [`docs/v2/OUTBOX.md`](docs/v2/OUTBOX.md)
 - Migration: [`docs/v2/MIGRATION.md`](docs/v2/MIGRATION.md)
 
 ### Production and operations

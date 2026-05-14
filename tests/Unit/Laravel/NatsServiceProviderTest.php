@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use LaravelNats\Connection\ConnectionManager;
+use LaravelNats\Connection\ConnectionSelector;
 use LaravelNats\Core\Client;
 use LaravelNats\Idempotency\CacheIdempotencyStore;
 use LaravelNats\Idempotency\Contracts\IdempotencyStoreContract;
@@ -14,6 +15,7 @@ use LaravelNats\Laravel\NatsV2Gateway;
 use LaravelNats\Laravel\Providers\NatsServiceProvider;
 use LaravelNats\Observability\Contracts\NatsMetricsContract;
 use LaravelNats\Observability\NullNatsMetrics;
+use LaravelNats\Outbox\NatsOutboxDispatcher;
 use LaravelNats\Publisher\Contracts\NatsPublisherContract;
 use LaravelNats\Publisher\NatsPublisher;
 use LaravelNats\Security\NatsBasisConfigurationValidator;
@@ -44,6 +46,7 @@ it('provides deferred services', function (): void {
         ->and($provides)->toContain(NatsManager::class)
         ->and($provides)->toContain(NatsV2Gateway::class)
         ->and($provides)->toContain(ConnectionManager::class)
+        ->and($provides)->toContain(ConnectionSelector::class)
         ->and($provides)->toContain(NatsPublisher::class)
         ->and($provides)->toContain(NatsPublisherContract::class)
         ->and($provides)->toContain(NatsSubscriberContract::class)
@@ -56,7 +59,8 @@ it('provides deferred services', function (): void {
         ->and($provides)->toContain(IdempotencyStoreContract::class)
         ->and($provides)->toContain(NatsMetricsContract::class)
         ->and($provides)->toContain(NatsBasisConfigurationValidator::class)
-        ->and($provides)->toContain(SubjectAclChecker::class);
+        ->and($provides)->toContain(SubjectAclChecker::class)
+        ->and($provides)->toContain(NatsOutboxDispatcher::class);
 });
 
 it('resolves IdempotencyStoreContract as cache-backed store', function (): void {
@@ -103,6 +107,10 @@ it('resolves nats.v2 as NatsV2Gateway', function (): void {
     expect($this->app->make('nats.v2'))->toBeInstanceOf(NatsV2Gateway::class);
 });
 
+it('resolves connection selector from container', function (): void {
+    expect($this->app->make(ConnectionSelector::class))->toBeInstanceOf(ConnectionSelector::class);
+});
+
 it('merges nats_basis config from package', function (): void {
     $config = $this->app->make('config');
 
@@ -123,6 +131,27 @@ it('merges nats_basis.correlation defaults from package', function (): void {
     expect($config->get('nats_basis.correlation.inject_on_publish'))->toBeFalse()
         ->and($config->get('nats_basis.correlation.request_id_header'))->toBe('X-Request-Id')
         ->and($config->get('nats_basis.correlation.correlation_id_header'))->toBe('Nats-Correlation-Id');
+});
+
+it('merges nats_basis trace context defaults from package', function (): void {
+    $config = $this->app->make('config');
+
+    expect($config->get('nats_basis.trace_context.inject_on_publish'))->toBeFalse()
+        ->and($config->get('nats_basis.trace_context.traceparent_header'))->toBe('traceparent')
+        ->and($config->get('nats_basis.trace_context.tracestate_header'))->toBe('tracestate');
+});
+
+it('merges nats_basis connection selection defaults from package', function (): void {
+    $config = $this->app->make('config');
+
+    expect($config->get('nats_basis.connection_selection.subject_prefixes'))->toBe([]);
+});
+
+it('merges nats_basis outbox defaults from package', function (): void {
+    $config = $this->app->make('config');
+
+    expect($config->get('nats_basis.outbox.batch_size'))->toBe(100)
+        ->and($config->get('nats_basis.outbox.stop_on_failure'))->toBeTrue();
 });
 
 it('merges nats_basis.observability defaults from package', function (): void {
@@ -161,4 +190,8 @@ it('resolves NatsMetricsContract as null implementation by default', function ()
     $metrics = $this->app->make(NatsMetricsContract::class);
 
     expect($metrics)->toBeInstanceOf(NullNatsMetrics::class);
+});
+
+it('resolves the outbox dispatcher from container', function (): void {
+    expect($this->app->make(NatsOutboxDispatcher::class))->toBeInstanceOf(NatsOutboxDispatcher::class);
 });

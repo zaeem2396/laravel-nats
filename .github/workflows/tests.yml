@@ -6,8 +6,8 @@
 # Integration tests use a real NATS server running in Docker.
 #
 # Matrix:
-# - PHP 8.2, 8.3, 8.4 (minimum PHP 8.2 for Pest/PHPUnit compatibility)
-# - Laravel 10, 11, 12, 13
+# - PHP 8.2, 8.3, 8.4, 8.5 (minimum PHP 8.2 for Pest/PHPUnit compatibility)
+# - Laravel 10, 11, 12, 13 (Laravel 13 requires PHP 8.3+)
 # ============================================================================
 
 name: Tests
@@ -88,6 +88,24 @@ jobs:
 
           # Laravel 13 - PHP 8.4
           - php: '8.4'
+            laravel: '13.*'
+            testbench: '11.*'
+            stability: prefer-stable
+
+          # Laravel 11 - PHP 8.5
+          - php: '8.5'
+            laravel: '11.*'
+            testbench: '9.*'
+            stability: prefer-stable
+
+          # Laravel 12 - PHP 8.5
+          - php: '8.5'
+            laravel: '12.*'
+            testbench: '10.*'
+            stability: prefer-stable
+
+          # Laravel 13 - PHP 8.5
+          - php: '8.5'
             laravel: '13.*'
             testbench: '11.*'
             stability: prefer-stable

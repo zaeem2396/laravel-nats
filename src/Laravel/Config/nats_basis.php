@@ -47,6 +47,64 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Trace context headers (v2.7)
+    |--------------------------------------------------------------------------
+    |
+    | When inject_on_publish is true, valid W3C traceparent and optional
+    | tracestate headers are copied from the current HTTP request unless the
+    | publish call already supplied them.
+    |
+    */
+    'trace_context' => [
+        'inject_on_publish' => filter_var(env('NATS_TRACE_CONTEXT_INJECT', false), FILTER_VALIDATE_BOOL),
+        'traceparent_header' => env('NATS_TRACEPARENT_HEADER', 'traceparent'),
+        'tracestate_header' => env('NATS_TRACESTATE_HEADER', 'tracestate'),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Connection selection (v2.7)
+    |--------------------------------------------------------------------------
+    |
+    | Optional subject prefix routing for NatsV2 methods that accept a connection
+    | argument. Explicit method arguments still win. Env format:
+    | NATS_CONNECTION_SUBJECT_PREFIXES="orders.:orders,billing.:billing"
+    |
+    */
+    'connection_selection' => [
+        'subject_prefixes' => (static function (): array {
+            $out = [];
+            foreach (array_filter(array_map(
+                static fn (string $s): string => trim($s),
+                explode(',', (string) env('NATS_CONNECTION_SUBJECT_PREFIXES', '')),
+            )) as $entry) {
+                $parts = array_map(trim(...), explode(':', $entry, 2));
+                if (count($parts) === 2 && $parts[0] !== '' && $parts[1] !== '') {
+                    $out[$parts[0]] = $parts[1];
+                }
+            }
+
+            return $out;
+        })(),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Outbox recipe (v2.7)
+    |--------------------------------------------------------------------------
+    |
+    | NatsOutboxDispatcher is storage-agnostic; applications own the database
+    | table and implement NatsOutboxStoreContract. These defaults are intended
+    | for scheduler/command code that drains a custom store in batches.
+    |
+    */
+    'outbox' => [
+        'batch_size' => (int) env('NATS_OUTBOX_BATCH_SIZE', 100),
+        'stop_on_failure' => filter_var(env('NATS_OUTBOX_STOP_ON_FAILURE', true), FILTER_VALIDATE_BOOL),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Observability (v2.5) — metrics hooks, envelope redaction, health ping
     |--------------------------------------------------------------------------
     |

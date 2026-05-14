@@ -9,6 +9,8 @@ use Basis\Nats\Message\Msg;
 use Basis\Nats\Stream\Stream;
 use Illuminate\Support\Facades\Facade;
 use LaravelNats\JetStream\BasisJetStreamManager;
+use LaravelNats\Outbox\Contracts\NatsOutboxStoreContract;
+use LaravelNats\Outbox\NatsOutboxDispatchResult;
 
 /**
  * Facade for the v2 NATS stack (basis-company/nats).
@@ -19,6 +21,8 @@ use LaravelNats\JetStream\BasisJetStreamManager;
  * @method static void unsubscribeAll(string|null $connection = null)
  * @method static mixed process(string|null $connection = null, int|float|null $timeout = 0)
  * @method static Client connection(string|null $name = null)
+ * @method static string|null selectConnection(string|null $subject = null, string|null $explicit = null)
+ * @method static NatsOutboxDispatchResult dispatchOutbox(NatsOutboxStoreContract $store, int|null $limit = null, bool|null $stopOnFailure = null)
  * @method static bool ping(string|null $connection = null)
  * @method static void disconnect(string|null $name = null)
  * @method static void disconnectAll()

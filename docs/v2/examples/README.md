@@ -13,4 +13,5 @@ Small focused examples for `NatsV2::subscribe`. See [SUBSCRIBER.md](../SUBSCRIBE
 - [Named connection](07-named-connection.md)
 - [Envelope payload](08-envelope-payload.md)
 - [Wildcards](09-wildcards.md)
+- Advanced features: [Trace context](../TRACE_CONTEXT.md), [connection selection](../CONNECTION_SELECTION.md), [outbox recipe](../OUTBOX.md)
 

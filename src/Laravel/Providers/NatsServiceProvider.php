@@ -10,6 +10,7 @@ use Illuminate\Log\LogManager;
 use Illuminate\Queue\Worker;
 use Illuminate\Support\ServiceProvider;
 use LaravelNats\Connection\ConnectionManager;
+use LaravelNats\Connection\ConnectionSelector;
 use LaravelNats\Core\Client;
 use LaravelNats\Idempotency\CacheIdempotencyStore;
 use LaravelNats\Idempotency\Contracts\IdempotencyStoreContract;
@@ -43,6 +44,7 @@ use LaravelNats\Laravel\Queue\BasisNatsConnector;
 use LaravelNats\Laravel\Queue\NatsConnector;
 use LaravelNats\Observability\Contracts\NatsMetricsContract;
 use LaravelNats\Observability\NullNatsMetrics;
+use LaravelNats\Outbox\NatsOutboxDispatcher;
 use LaravelNats\Publisher\Contracts\NatsPublisherContract;
 use LaravelNats\Publisher\NatsPublisher;
 use LaravelNats\Security\NatsBasisConfigurationValidator;
@@ -100,6 +102,7 @@ class NatsServiceProvider extends ServiceProvider implements DeferrableProvider
             NatsManager::class,
             NatsV2Gateway::class,
             ConnectionManager::class,
+            ConnectionSelector::class,
             NatsPublisher::class,
             NatsPublisherContract::class,
             NatsSubscriberContract::class,
@@ -113,6 +116,7 @@ class NatsServiceProvider extends ServiceProvider implements DeferrableProvider
             NatsMetricsContract::class,
             NatsBasisConfigurationValidator::class,
             SubjectAclChecker::class,
+            NatsOutboxDispatcher::class,
         ];
     }
 
@@ -191,6 +195,10 @@ class NatsServiceProvider extends ServiceProvider implements DeferrableProvider
             return new SubjectAclChecker($app->make('config'));
         });
 
+        $this->app->singleton(ConnectionSelector::class, function ($app) {
+            return new ConnectionSelector($app->make('config'));
+        });
+
         $this->app->singleton(NatsMetricsContract::class, static fn () => new NullNatsMetrics());
 
         $this->app->singleton(NatsPublisher::class, function ($app) {
@@ -203,6 +211,10 @@ class NatsServiceProvider extends ServiceProvider implements DeferrableProvider
         });
 
         $this->app->bind(NatsPublisherContract::class, NatsPublisher::class);
+
+        $this->app->singleton(NatsOutboxDispatcher::class, function ($app) {
+            return new NatsOutboxDispatcher($app->make(NatsPublisherContract::class));
+        });
 
         $this->app->singleton(IdempotencyStoreContract::class, function ($app) {
             $config = $app->make('config');
@@ -274,6 +286,8 @@ class NatsServiceProvider extends ServiceProvider implements DeferrableProvider
                 $app->make(PullConsumerBatch::class),
                 $app->make(BasisStreamProvisioner::class),
                 $app->make('config'),
+                $app->make(ConnectionSelector::class),
+                $app->make(NatsOutboxDispatcher::class),
             );
         });
 

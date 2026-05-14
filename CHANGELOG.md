@@ -9,7 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- (none)
+- **NatsV2 v2.7 advanced features:** `NatsHeaderBag` and shared case-insensitive `NatsHeaders` helpers; optional W3C trace context propagation (`NATS_TRACE_CONTEXT_INJECT`) with `InboundMessage::traceParent()` / `traceState()`.
+- **NatsV2 connection selection:** subject-prefix routing via `nats_basis.connection_selection.subject_prefixes` / `NATS_CONNECTION_SUBJECT_PREFIXES` and `NatsV2::selectConnection()`.
+- **NatsV2 outbox recipe:** storage-agnostic `NatsOutboxMessage`, `NatsOutboxStoreContract`, `NatsOutboxDispatcher`, `NatsV2::dispatchOutbox()`, and `nats_basis.outbox` defaults.
 
 ### Changed
 
@@ -21,7 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Documentation
 
-- (none)
+- Added v2.7 guides for trace context, connection selection, and the outbox recipe; updated README, docs index, client features, examples, and roadmap links.
 
 ## [1.5.2] - 2026-04-26
 
