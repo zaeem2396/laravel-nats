@@ -26,6 +26,7 @@
     },
     "require-dev": {
         "friendsofphp/php-cs-fixer": "^3.0",
+        "laravel/pint": "^1.0",
         "laravel/framework": "^10.0|^11.0|^12.0|^13.0",
         "mockery/mockery": "^1.6",
         "orchestra/testbench": "^8.0|^9.0|^10.0|^11.0",
@@ -56,10 +57,17 @@
     },
     "scripts": {
         "test": "vendor/bin/pest",
-        "test:coverage": "vendor/bin/pest --coverage",
+        "test:ci": "vendor/bin/pest",
+        "test:coverage": "vendor/bin/pest --coverage --coverage-clover=build/coverage.xml",
         "analyse": "vendor/bin/phpstan analyse",
+        "pint": "vendor/bin/pint tests",
+        "pint:check": "vendor/bin/pint --test tests",
         "format": "vendor/bin/php-cs-fixer fix 2>/dev/null",
-        "format:check": "vendor/bin/php-cs-fixer fix --dry-run --diff 2>/dev/null"
+        "format:check": "vendor/bin/php-cs-fixer fix --dry-run --diff 2>/dev/null",
+        "ci": [
+            "@test:ci",
+            "@pint:check"
+        ]
     },
     "config": {
         "sort-packages": true,
