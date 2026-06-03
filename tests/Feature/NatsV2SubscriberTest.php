@@ -12,7 +12,7 @@ beforeEach(function (): void {
 });
 
 it('subscribes and receives v2 envelope payload via NatsV2', function (): void {
-    $subject = 'v2.sub.test.' . uniqid();
+    $subject = 'v2.sub.test.'.uniqid();
     $received = null;
 
     NatsV2::subscribe($subject, function (InboundMessage $message) use (&$received): void {

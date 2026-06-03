@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use Illuminate\Cache\ArrayStore;
+use Illuminate\Cache\Repository;
 use Illuminate\Config\Repository as ConfigRepository;
 use LaravelNats\Idempotency\CacheIdempotencyStore;
 use LaravelNats\Subscriber\InboundMessage;
@@ -12,7 +14,7 @@ describe('IdempotencyInboundMiddleware', function (): void {
         $config = new ConfigRepository([
             'nats_basis.idempotency.enabled' => false,
         ]);
-        $repo = new \Illuminate\Cache\Repository(new \Illuminate\Cache\ArrayStore());
+        $repo = new Repository(new ArrayStore);
         $store = new CacheIdempotencyStore($repo);
         $middleware = new IdempotencyInboundMiddleware($config, $store);
 
@@ -32,7 +34,7 @@ describe('IdempotencyInboundMiddleware', function (): void {
             'nats_basis.idempotency.header_name' => 'Nats-Idempotency-Key',
             'nats_basis.idempotency.ttl_seconds' => 3600,
         ]);
-        $repo = new \Illuminate\Cache\Repository(new \Illuminate\Cache\ArrayStore());
+        $repo = new Repository(new ArrayStore);
         $store = new CacheIdempotencyStore($repo);
         $middleware = new IdempotencyInboundMiddleware($config, $store);
 

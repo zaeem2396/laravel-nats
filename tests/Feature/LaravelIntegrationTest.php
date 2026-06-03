@@ -24,7 +24,7 @@ it('can connect via facade', function (): void {
 
 it('publishes orders.created payload to NATS', function (): void {
     $received = null;
-    $subject = 'orders.created.' . uniqid();
+    $subject = 'orders.created.'.uniqid();
 
     Nats::subscribe($subject, function (MessageInterface $message) use (&$received): void {
         $received = $message->getDecodedPayload();
@@ -45,7 +45,7 @@ it('publishes orders.created payload to NATS', function (): void {
 it('subscribes to orders.* wildcard subject', function (): void {
     $received = null;
     // orders.* matches exactly one token after "orders." (e.g. orders.created, orders.xyz)
-    $subject = 'orders.' . uniqid('test');
+    $subject = 'orders.'.uniqid('test');
 
     Nats::subscribe('orders.*', function (MessageInterface $message) use (&$received): void {
         $received = $message->getDecodedPayload();
@@ -61,7 +61,7 @@ it('subscribes to orders.* wildcard subject', function (): void {
 
 it('can publish and subscribe via facade', function (): void {
     $received = null;
-    $subject = 'laravel.test.' . uniqid();
+    $subject = 'laravel.test.'.uniqid();
 
     Nats::subscribe($subject, function (MessageInterface $message) use (&$received): void {
         $received = $message->getDecodedPayload();
@@ -76,7 +76,7 @@ it('can publish and subscribe via facade', function (): void {
 });
 
 it('request/reply orders.get pattern', function (): void {
-    $subject = 'orders.get.' . uniqid();
+    $subject = 'orders.get.'.uniqid();
 
     Nats::subscribe($subject, function (MessageInterface $message): void {
         $replyTo = $message->getReplyTo();
@@ -95,7 +95,7 @@ it('request/reply orders.get pattern', function (): void {
 });
 
 it('can use request/reply via facade', function (): void {
-    $subject = 'laravel.echo.' . uniqid();
+    $subject = 'laravel.echo.'.uniqid();
 
     // Set up responder - replies with echo of the request
     Nats::subscribe($subject, function (MessageInterface $message): void {
@@ -107,7 +107,7 @@ it('can use request/reply via facade', function (): void {
 
     // Send request with reply-to using publishRaw
     $response = null;
-    $replySubject = '_INBOX.' . uniqid();
+    $replySubject = '_INBOX.'.uniqid();
 
     Nats::subscribe($replySubject, function (MessageInterface $msg) use (&$response): void {
         $response = $msg->getDecodedPayload();
@@ -129,20 +129,20 @@ it('can use request/reply via facade', function (): void {
 
 it('can subscribe with queue group via facade', function (): void {
     $received = [];
-    $subject = 'laravel.queue.' . uniqid();
+    $subject = 'laravel.queue.'.uniqid();
     $queueGroup = 'workers';
 
     // Create two queue subscribers
     Nats::subscribe($subject, function (MessageInterface $message) use (&$received): void {
-        $received[] = 'worker1:' . $message->getPayload();
+        $received[] = 'worker1:'.$message->getPayload();
     }, $queueGroup);
 
     Nats::subscribe($subject, function (MessageInterface $message) use (&$received): void {
-        $received[] = 'worker2:' . $message->getPayload();
+        $received[] = 'worker2:'.$message->getPayload();
     }, $queueGroup);
 
     // Publish messages
-    for ($i = 1; $i <= 5; ++$i) {
+    for ($i = 1; $i <= 5; $i++) {
         Nats::publish($subject, "msg{$i}");
     }
 
@@ -197,11 +197,11 @@ it('resolves Client from container', function (): void {
 });
 
 it('can unsubscribe via facade', function (): void {
-    $subject = 'laravel.unsub.' . uniqid();
+    $subject = 'laravel.unsub.'.uniqid();
     $received = 0;
 
     $sid = Nats::subscribe($subject, function () use (&$received): void {
-        ++$received;
+        $received++;
     });
 
     Nats::publish($subject, 'msg1');

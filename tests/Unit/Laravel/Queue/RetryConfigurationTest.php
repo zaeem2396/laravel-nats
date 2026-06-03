@@ -7,7 +7,7 @@ use LaravelNats\Laravel\Queue\RetryConfiguration;
 describe('RetryConfiguration', function (): void {
     describe('constructor', function (): void {
         it('creates instance with default values', function (): void {
-            $config = new RetryConfiguration();
+            $config = new RetryConfiguration;
 
             expect($config->getMaxTries())->toBe(3);
             expect($config->getRetryDelay())->toBe(0);

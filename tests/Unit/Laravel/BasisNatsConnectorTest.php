@@ -7,7 +7,7 @@ use LaravelNats\Laravel\Queue\BasisNatsQueue;
 
 describe('BasisNatsConnector', function (): void {
     it('returns BasisNatsQueue with connection config', function (): void {
-        $connector = new BasisNatsConnector();
+        $connector = new BasisNatsConnector;
         $queue = $connector->connect([
             'queue' => 'jobs',
             'retry_after' => 120,
@@ -25,7 +25,7 @@ describe('BasisNatsConnector', function (): void {
     });
 
     it('uses full subject when dead_letter_queue contains a dot', function (): void {
-        $connector = new BasisNatsConnector();
+        $connector = new BasisNatsConnector;
         $queue = $connector->connect([
             'queue' => 'default',
             'dead_letter_queue' => 'errors.dlq.all',
@@ -35,7 +35,7 @@ describe('BasisNatsConnector', function (): void {
     });
 
     it('applies max_in_flight from config', function (): void {
-        $connector = new BasisNatsConnector();
+        $connector = new BasisNatsConnector;
         $queue = $connector->connect([
             'queue' => 'default',
             'max_in_flight' => 10,
@@ -45,13 +45,13 @@ describe('BasisNatsConnector', function (): void {
     });
 
     it('implements Laravel 13 queue size introspection methods', function (): void {
-        $connector = new BasisNatsConnector();
+        $connector = new BasisNatsConnector;
         $queue = $connector->connect([
             'queue' => 'default',
             'max_in_flight' => 10,
         ]);
 
-        $ref = new \ReflectionProperty(BasisNatsQueue::class, 'inFlight');
+        $ref = new ReflectionProperty(BasisNatsQueue::class, 'inFlight');
         $ref->setAccessible(true);
         $ref->setValue($queue, 2);
 
@@ -63,7 +63,7 @@ describe('BasisNatsConnector', function (): void {
     });
 
     it('treats zero max_in_flight as unlimited', function (): void {
-        $connector = new BasisNatsConnector();
+        $connector = new BasisNatsConnector;
         $queue = $connector->connect([
             'queue' => 'default',
             'max_in_flight' => 0,
@@ -73,13 +73,13 @@ describe('BasisNatsConnector', function (): void {
     });
 
     it('returns null from pop when in-flight cap is already reached', function (): void {
-        $connector = new BasisNatsConnector();
+        $connector = new BasisNatsConnector;
         $queue = $connector->connect([
             'queue' => 'q',
             'max_in_flight' => 1,
         ]);
 
-        $ref = new \ReflectionProperty(BasisNatsQueue::class, 'inFlight');
+        $ref = new ReflectionProperty(BasisNatsQueue::class, 'inFlight');
         $ref->setAccessible(true);
         $ref->setValue($queue, 1);
 
@@ -87,13 +87,13 @@ describe('BasisNatsConnector', function (): void {
     });
 
     it('decrements in-flight via notifyJobHandled', function (): void {
-        $connector = new BasisNatsConnector();
+        $connector = new BasisNatsConnector;
         $queue = $connector->connect([
             'queue' => 'q',
             'max_in_flight' => 5,
         ]);
 
-        $ref = new \ReflectionProperty(BasisNatsQueue::class, 'inFlight');
+        $ref = new ReflectionProperty(BasisNatsQueue::class, 'inFlight');
         $ref->setAccessible(true);
         $ref->setValue($queue, 2);
 

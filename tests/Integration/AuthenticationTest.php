@@ -83,7 +83,7 @@ describe('username/password authentication', function (): void {
         $client = new Client($config);
         $client->connect();
 
-        $subject = 'auth.test.' . bin2hex(random_bytes(4));
+        $subject = 'auth.test.'.bin2hex(random_bytes(4));
         $received = null;
 
         $client->subscribe($subject, function ($message) use (&$received): void {
@@ -152,7 +152,7 @@ describe('token authentication', function (): void {
         $client = new Client($config);
         $client->connect();
 
-        $subject = 'token.test.' . bin2hex(random_bytes(4));
+        $subject = 'token.test.'.bin2hex(random_bytes(4));
         $received = null;
 
         $client->subscribe($subject, function ($message) use (&$received): void {

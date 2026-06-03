@@ -61,7 +61,7 @@ describe('Long-running Stability', function (): void {
             $client = createStabilityClient();
 
             try {
-                $subject = 'stability.rapid-publish.' . uniqid();
+                $subject = 'stability.rapid-publish.'.uniqid();
                 $messageCount = 100;
 
                 for ($i = 0; $i < $messageCount; $i++) {
@@ -79,7 +79,7 @@ describe('Long-running Stability', function (): void {
             $client = createStabilityClient();
 
             try {
-                $subject = 'stability.pubsub.' . uniqid();
+                $subject = 'stability.pubsub.'.uniqid();
                 $received = [];
                 $messageCount = 5;
 
@@ -120,7 +120,7 @@ describe('Long-running Stability', function (): void {
                 $client->connect();
 
                 // Verify functionality after reconnect
-                $subject = 'stability.reconnect.' . uniqid();
+                $subject = 'stability.reconnect.'.uniqid();
                 $received = null;
 
                 $client->subscribe($subject, function ($msg) use (&$received): void {
@@ -143,9 +143,9 @@ describe('Long-running Stability', function (): void {
             $client = createStabilityClient();
 
             try {
-                $queueName = 'stability-queue-' . uniqid();
+                $queueName = 'stability-queue-'.uniqid();
                 $queue = new NatsQueue($client, $queueName, 60);
-                $queue->setContainer(new Container());
+                $queue->setContainer(new Container);
                 $queue->setConnectionName('nats');
 
                 $jobCount = 20;
@@ -154,7 +154,7 @@ describe('Long-running Stability', function (): void {
                 // Push multiple jobs
                 for ($i = 0; $i < $jobCount; $i++) {
                     $payload = json_encode([
-                        'uuid' => 'stability-job-' . $i,
+                        'uuid' => 'stability-job-'.$i,
                         'displayName' => 'StabilityJob',
                         'data' => ['index' => $i],
                         'attempts' => 1,
@@ -175,9 +175,9 @@ describe('Long-running Stability', function (): void {
             $client = createStabilityClient();
 
             try {
-                $queueName = 'stability-push-recv-' . uniqid();
+                $queueName = 'stability-push-recv-'.uniqid();
                 $queue = new NatsQueue($client, $queueName, 60);
-                $queue->setContainer(new Container());
+                $queue->setContainer(new Container);
                 $queue->setConnectionName('nats');
 
                 $payload = json_encode([
@@ -188,7 +188,7 @@ describe('Long-running Stability', function (): void {
 
                 // Subscribe first, then push
                 $receivedPayload = null;
-                $fullSubject = 'laravel.queue.' . $queueName;
+                $fullSubject = 'laravel.queue.'.$queueName;
                 $client->subscribe($fullSubject, function ($msg) use (&$receivedPayload): void {
                     $receivedPayload = $msg->getPayload();
                 });
@@ -208,9 +208,9 @@ describe('Long-running Stability', function (): void {
             $client = createStabilityClient();
 
             try {
-                $queueName = 'stability-large-' . uniqid();
+                $queueName = 'stability-large-'.uniqid();
                 $queue = new NatsQueue($client, $queueName, 60);
-                $queue->setContainer(new Container());
+                $queue->setContainer(new Container);
                 $queue->setConnectionName('nats');
 
                 $largeData = str_repeat('x', 10000);
@@ -223,7 +223,7 @@ describe('Long-running Stability', function (): void {
 
                 // Subscribe first
                 $receivedPayload = null;
-                $fullSubject = 'laravel.queue.' . $queueName;
+                $fullSubject = 'laravel.queue.'.$queueName;
                 $client->subscribe($fullSubject, function ($msg) use (&$receivedPayload): void {
                     $receivedPayload = $msg->getPayload();
                 });
@@ -246,7 +246,7 @@ describe('Long-running Stability', function (): void {
             $client = createStabilityClient();
 
             try {
-                $subject = 'stability.request.' . uniqid();
+                $subject = 'stability.request.'.uniqid();
 
                 // Set up responder
                 $client->subscribe($subject, function ($msg) use ($client): void {
@@ -277,7 +277,7 @@ describe('Memory Stability', function (): void {
         $client = createStabilityClient();
 
         try {
-            $subject = 'memory.publish.' . uniqid();
+            $subject = 'memory.publish.'.uniqid();
             $iterations = 100;
 
             // Warm up
@@ -308,9 +308,9 @@ describe('Memory Stability', function (): void {
         $client = createStabilityClient();
 
         try {
-            $queueName = 'memory-queue-' . uniqid();
+            $queueName = 'memory-queue-'.uniqid();
             $queue = new NatsQueue($client, $queueName, 60);
-            $queue->setContainer(new Container());
+            $queue->setContainer(new Container);
             $queue->setConnectionName('nats');
 
             $iterations = 30;
@@ -325,7 +325,7 @@ describe('Memory Stability', function (): void {
 
             for ($i = 0; $i < $iterations; $i++) {
                 $payload = json_encode([
-                    'uuid' => 'memory-job-' . $i,
+                    'uuid' => 'memory-job-'.$i,
                     'displayName' => 'MemoryJob',
                     'data' => str_repeat('x', 500),
                     'attempts' => 1,

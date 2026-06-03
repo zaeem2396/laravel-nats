@@ -27,9 +27,9 @@ describe('Queue Integration', function (): void {
             $client = createQueueTestClient();
 
             try {
-                $uniqueSubject = 'integration-' . uniqid();
+                $uniqueSubject = 'integration-'.uniqid();
                 $queue = new NatsQueue($client, $uniqueSubject, 60);
-                $queue->setContainer(new Container());
+                $queue->setContainer(new Container);
                 $queue->setConnectionName('nats');
 
                 $payload = json_encode([
@@ -41,7 +41,7 @@ describe('Queue Integration', function (): void {
 
                 // Subscribe first, then publish
                 $received = null;
-                $client->subscribe('laravel.queue.' . $uniqueSubject, function ($msg) use (&$received): void {
+                $client->subscribe('laravel.queue.'.$uniqueSubject, function ($msg) use (&$received): void {
                     $received = $msg;
                 });
 
@@ -64,7 +64,7 @@ describe('Queue Integration', function (): void {
 
             try {
                 $queue = new NatsQueue($client, 'integration-test', 60);
-                $queue->setContainer(new Container());
+                $queue->setContainer(new Container);
 
                 $payload1 = json_encode(['job' => 'Job1']);
                 $payload2 = json_encode(['job' => 'Job2']);
@@ -81,7 +81,7 @@ describe('Queue Integration', function (): void {
 
     describe('NatsConnector integration', function (): void {
         it('creates a working queue connection', function (): void {
-            $connector = new NatsConnector();
+            $connector = new NatsConnector;
             $config = [
                 'host' => 'localhost',
                 'port' => 4222,
@@ -111,7 +111,7 @@ describe('Queue Integration', function (): void {
                 $this->markTestSkipped('Secured NATS server not available');
             }
 
-            $connector = new NatsConnector();
+            $connector = new NatsConnector;
             $config = [
                 'host' => 'localhost',
                 'port' => 4223,
@@ -141,9 +141,9 @@ describe('Queue Integration', function (): void {
             $client = createQueueTestClient();
 
             try {
-                $uniqueQueue = 'job-test-' . uniqid();
+                $uniqueQueue = 'job-test-'.uniqid();
                 $queue = new NatsQueue($client, $uniqueQueue, 60);
-                $queue->setContainer(new Container());
+                $queue->setContainer(new Container);
                 $queue->setConnectionName('nats');
 
                 $payload = json_encode([
@@ -155,7 +155,7 @@ describe('Queue Integration', function (): void {
 
                 // Create a NatsJob directly (simulating what pop() would do)
                 $job = new NatsJob(
-                    container: new Container(),
+                    container: new Container,
                     nats: $queue,
                     job: $payload,
                     connectionName: 'nats',
@@ -175,9 +175,9 @@ describe('Queue Integration', function (): void {
             $client = createQueueTestClient();
 
             try {
-                $uniqueQueue = 'release-test-' . uniqid();
+                $uniqueQueue = 'release-test-'.uniqid();
                 $queue = new NatsQueue($client, $uniqueQueue, 60);
-                $queue->setContainer(new Container());
+                $queue->setContainer(new Container);
                 $queue->setConnectionName('nats');
 
                 $payload = json_encode([
@@ -193,13 +193,13 @@ describe('Queue Integration', function (): void {
 
                 // Track released jobs
                 $releasedPayload = null;
-                $client->subscribe('laravel.queue.' . $uniqueQueue, function ($msg) use (&$releasedPayload): void {
+                $client->subscribe('laravel.queue.'.$uniqueQueue, function ($msg) use (&$releasedPayload): void {
                     $releasedPayload = $msg->getPayload();
                 });
 
                 // Create and release the job
                 $job = new NatsJob(
-                    container: new Container(),
+                    container: new Container,
                     nats: $queue,
                     job: $payload,
                     connectionName: 'nats',
@@ -226,7 +226,7 @@ describe('Queue Integration', function (): void {
 
             try {
                 $queue = new NatsQueue($client, 'multi-queue-test', 60);
-                $queue->setContainer(new Container());
+                $queue->setContainer(new Container);
 
                 $queue1Messages = [];
                 $queue2Messages = [];
@@ -260,19 +260,19 @@ describe('Queue Integration', function (): void {
             $client = createQueueTestClient();
 
             try {
-                $uniqueQueue = 'subject-test-' . uniqid();
+                $uniqueQueue = 'subject-test-'.uniqid();
                 $queue = new NatsQueue($client, $uniqueQueue, 60);
-                $queue->setContainer(new Container());
+                $queue->setContainer(new Container);
 
                 $receivedSubject = null;
-                $client->subscribe('laravel.queue.' . $uniqueQueue, function ($msg) use (&$receivedSubject): void {
+                $client->subscribe('laravel.queue.'.$uniqueQueue, function ($msg) use (&$receivedSubject): void {
                     $receivedSubject = $msg->getSubject();
                 });
 
                 $queue->pushRaw(json_encode(['uuid' => 'subject-job']));
                 $client->process(0.3);
 
-                expect($receivedSubject)->toBe('laravel.queue.' . $uniqueQueue);
+                expect($receivedSubject)->toBe('laravel.queue.'.$uniqueQueue);
             } finally {
                 $client->disconnect();
             }
@@ -284,12 +284,12 @@ describe('Queue Integration', function (): void {
             $client = createQueueTestClient();
 
             try {
-                $uniqueQueue = 'volume-test-' . uniqid();
+                $uniqueQueue = 'volume-test-'.uniqid();
                 $queue = new NatsQueue($client, $uniqueQueue, 60);
-                $queue->setContainer(new Container());
+                $queue->setContainer(new Container);
 
                 $received = [];
-                $client->subscribe('laravel.queue.' . $uniqueQueue, function ($msg) use (&$received): void {
+                $client->subscribe('laravel.queue.'.$uniqueQueue, function ($msg) use (&$received): void {
                     $received[] = json_decode($msg->getPayload(), true);
                 });
 
@@ -317,9 +317,9 @@ describe('Queue Integration', function (): void {
             $client = createQueueTestClient();
 
             try {
-                $uniqueQueue = 'failed-test-' . uniqid();
+                $uniqueQueue = 'failed-test-'.uniqid();
                 $queue = new NatsQueue($client, $uniqueQueue, 60);
-                $queue->setContainer(new Container());
+                $queue->setContainer(new Container);
                 $queue->setConnectionName('nats');
 
                 $payload = json_encode([
@@ -331,7 +331,7 @@ describe('Queue Integration', function (): void {
 
                 // Create job directly from payload (simulating received job)
                 $job = new NatsJob(
-                    container: new Container(),
+                    container: new Container,
                     nats: $queue,
                     job: $payload,
                     connectionName: 'nats',
@@ -355,10 +355,10 @@ describe('Queue Integration', function (): void {
             $client = createQueueTestClient();
 
             try {
-                $uniqueQueue = 'dlq-test-' . uniqid();
-                $dlqSubject = 'laravel.queue.dlq-' . uniqid();
+                $uniqueQueue = 'dlq-test-'.uniqid();
+                $dlqSubject = 'laravel.queue.dlq-'.uniqid();
                 $queue = new NatsQueue($client, $uniqueQueue, 60, 3, $dlqSubject);
-                $queue->setContainer(new Container());
+                $queue->setContainer(new Container);
                 $queue->setConnectionName('nats');
 
                 $payload = json_encode([
@@ -376,7 +376,7 @@ describe('Queue Integration', function (): void {
 
                 // Create job directly and fail it
                 $job = new NatsJob(
-                    container: new Container(),
+                    container: new Container,
                     nats: $queue,
                     job: $payload,
                     connectionName: 'nats',
@@ -404,9 +404,9 @@ describe('Queue Integration', function (): void {
             $client = createQueueTestClient();
 
             try {
-                $uniqueQueue = 'no-dlq-test-' . uniqid();
+                $uniqueQueue = 'no-dlq-test-'.uniqid();
                 $queue = new NatsQueue($client, $uniqueQueue, 60);
-                $queue->setContainer(new Container());
+                $queue->setContainer(new Container);
                 $queue->setConnectionName('nats');
 
                 expect($queue->getDeadLetterQueueSubject())->toBeNull();
@@ -418,7 +418,7 @@ describe('Queue Integration', function (): void {
 
                 // Create job directly
                 $job = new NatsJob(
-                    container: new Container(),
+                    container: new Container,
                     nats: $queue,
                     job: $payload,
                     connectionName: 'nats',

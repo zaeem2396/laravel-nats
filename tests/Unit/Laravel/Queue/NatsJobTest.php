@@ -3,13 +3,16 @@
 declare(strict_types=1);
 
 use Illuminate\Container\Container;
+use LaravelNats\Laravel\Queue\BackoffStrategy;
 use LaravelNats\Laravel\Queue\NatsJob;
 use LaravelNats\Laravel\Queue\NatsQueue;
+use LaravelNats\Laravel\Queue\RetryConfiguration;
+use Mockery\MockInterface;
 
 /**
  * Create a mock NatsQueue for testing.
  */
-function createMockQueue(): \Mockery\MockInterface
+function createMockQueue(): MockInterface
 {
     $queue = Mockery::mock(NatsQueue::class);
     $queue->shouldReceive('getQueue')->andReturn('test-queue');
@@ -41,10 +44,10 @@ function createTestPayload(): string
 /**
  * Create a NatsJob instance for testing.
  */
-function createTestJob(?string $payload = null, ?\Mockery\MockInterface $queue = null): NatsJob
+function createTestJob(?string $payload = null, ?MockInterface $queue = null): NatsJob
 {
     return new NatsJob(
-        container: new Container(),
+        container: new Container,
         nats: $queue ?? createMockQueue(),
         job: $payload ?? createTestPayload(),
         connectionName: 'nats',
@@ -326,7 +329,7 @@ describe('NatsJob', function (): void {
 
             $strategy = $job->getBackoffStrategy();
 
-            expect($strategy)->toBeInstanceOf(\LaravelNats\Laravel\Queue\BackoffStrategy::class);
+            expect($strategy)->toBeInstanceOf(BackoffStrategy::class);
         });
 
         it('uses backoff from payload when available', function (): void {
@@ -337,7 +340,7 @@ describe('NatsJob', function (): void {
 
             $strategy = $job->getBackoffStrategy();
 
-            expect($strategy->getType())->toBe(\LaravelNats\Laravel\Queue\BackoffStrategy::STRATEGY_LINEAR);
+            expect($strategy->getType())->toBe(BackoffStrategy::STRATEGY_LINEAR);
         });
 
         it('falls back to queue retry_after', function (): void {
@@ -402,7 +405,7 @@ describe('NatsJob', function (): void {
 
             $config = $job->getRetryConfiguration();
 
-            expect($config)->toBeInstanceOf(\LaravelNats\Laravel\Queue\RetryConfiguration::class);
+            expect($config)->toBeInstanceOf(RetryConfiguration::class);
         });
 
         it('uses maxTries from payload', function (): void {
@@ -597,7 +600,7 @@ describe('NatsJob', function (): void {
         it('stores the connection name', function (): void {
             $payload = json_encode(['uuid' => 'test']);
             $job = new NatsJob(
-                container: new Container(),
+                container: new Container,
                 nats: createMockQueue(),
                 job: $payload,
                 connectionName: 'my-nats-connection',

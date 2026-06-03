@@ -22,7 +22,7 @@ use LaravelNats\Core\Connection\ConnectionConfig;
 
 describe('constructor defaults', function (): void {
     it('has sensible defaults', function (): void {
-        $config = new ConnectionConfig();
+        $config = new ConnectionConfig;
 
         expect($config->getHost())->toBe('localhost')
             ->and($config->getPort())->toBe(4222)
@@ -164,7 +164,7 @@ describe('helper methods', function (): void {
     });
 
     it('detects no auth', function (): void {
-        $config = new ConnectionConfig();
+        $config = new ConnectionConfig;
 
         expect($config->hasAuth())->toBeFalse();
     });

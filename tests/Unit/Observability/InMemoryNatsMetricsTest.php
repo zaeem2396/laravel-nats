@@ -5,7 +5,7 @@ declare(strict_types=1);
 use LaravelNats\Observability\InMemoryNatsMetrics;
 
 it('accumulates counters by name and labels', function (): void {
-    $m = new InMemoryNatsMetrics();
+    $m = new InMemoryNatsMetrics;
     $m->incrementCounter('laravel_nats.publish.total', ['connection' => 'default', 'outcome' => 'success']);
     $m->incrementCounter('laravel_nats.publish.total', ['connection' => 'default', 'outcome' => 'success'], 2);
 
@@ -13,7 +13,7 @@ it('accumulates counters by name and labels', function (): void {
 });
 
 it('records histogram observations', function (): void {
-    $m = new InMemoryNatsMetrics();
+    $m = new InMemoryNatsMetrics;
     $m->observeHistogram('laravel_nats.publish.latency_ms', 12.5, ['connection' => 'default']);
 
     $obs = $m->histogramObservations();
@@ -24,7 +24,7 @@ it('records histogram observations', function (): void {
 });
 
 it('reset clears state', function (): void {
-    $m = new InMemoryNatsMetrics();
+    $m = new InMemoryNatsMetrics;
     $m->incrementCounter('c', []);
     $m->reset();
 

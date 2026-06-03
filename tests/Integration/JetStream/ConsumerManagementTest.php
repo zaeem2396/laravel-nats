@@ -7,13 +7,15 @@ use LaravelNats\Core\JetStream\ConsumerInfo;
 use LaravelNats\Core\JetStream\JetStreamClient;
 use LaravelNats\Core\JetStream\StreamConfig;
 use LaravelNats\Exceptions\ConnectionException;
+use LaravelNats\Exceptions\NatsException;
+use LaravelNats\Tests\TestCase;
 
 /**
  * Helper to create a connected JetStream client for consumer tests.
  */
 function createConsumerTestClient(): JetStreamClient
 {
-    $client = \LaravelNats\Tests\TestCase::createConnectedJetStreamClient();
+    $client = TestCase::createConnectedJetStreamClient();
 
     return new JetStreamClient($client);
 }
@@ -42,7 +44,7 @@ function runWithConsumerClientRetry(callable $run): void
         } finally {
             try {
                 $js->getClient()->disconnect();
-            } catch (\Throwable) {
+            } catch (Throwable) {
                 // ignore
             }
         }
@@ -55,7 +57,7 @@ function runWithConsumerClientRetry(callable $run): void
 
 describe('Consumer Management', function (): void {
     beforeEach(function (): void {
-        if (! \LaravelNats\Tests\TestCase::isNatsReachable()) {
+        if (! TestCase::isNatsReachable()) {
             $this->markTestSkipped('NATS server not available');
         }
     });
@@ -63,13 +65,13 @@ describe('Consumer Management', function (): void {
     describe('consumer CRUD operations', function (): void {
         it('creates a durable consumer on a stream', function (): void {
             runWithConsumerClientRetry(function (JetStreamClient $js): void {
-                $streamName = 'consumer-stream-' . uniqid();
-                $subject = $streamName . '.>';
+                $streamName = 'consumer-stream-'.uniqid();
+                $subject = $streamName.'.>';
                 $streamConfig = new StreamConfig($streamName, [$subject]);
                 $js->createStream($streamConfig);
 
-                $consumerName = 'test-consumer-' . uniqid();
-                $config = (new ConsumerConfig($consumerName))->withFilterSubject($streamName . '.>');
+                $consumerName = 'test-consumer-'.uniqid();
+                $config = (new ConsumerConfig($consumerName))->withFilterSubject($streamName.'.>');
 
                 $info = $js->createConsumer($streamName, $consumerName, $config);
 
@@ -81,18 +83,18 @@ describe('Consumer Management', function (): void {
                 try {
                     $js->deleteConsumer($streamName, $consumerName);
                     $js->deleteStream($streamName);
-                } catch (\Throwable) {
+                } catch (Throwable) {
                 }
             });
         });
 
         it('gets consumer information', function (): void {
             runWithConsumerClientRetry(function (JetStreamClient $js): void {
-                $streamName = 'consumer-info-stream-' . uniqid();
-                $subject = $streamName . '.>';
+                $streamName = 'consumer-info-stream-'.uniqid();
+                $subject = $streamName.'.>';
                 $js->createStream(new StreamConfig($streamName, [$subject]));
 
-                $consumerName = 'info-consumer-' . uniqid();
+                $consumerName = 'info-consumer-'.uniqid();
                 $config = new ConsumerConfig($consumerName);
                 $js->createConsumer($streamName, $consumerName, $config);
 
@@ -104,18 +106,18 @@ describe('Consumer Management', function (): void {
                 try {
                     $js->deleteConsumer($streamName, $consumerName);
                     $js->deleteStream($streamName);
-                } catch (\Throwable) {
+                } catch (Throwable) {
                 }
             });
         });
 
         it('deletes a consumer', function (): void {
             runWithConsumerClientRetry(function (JetStreamClient $js): void {
-                $streamName = 'consumer-del-stream-' . uniqid();
-                $subject = $streamName . '.>';
+                $streamName = 'consumer-del-stream-'.uniqid();
+                $subject = $streamName.'.>';
                 $js->createStream(new StreamConfig($streamName, [$subject]));
 
-                $consumerName = 'del-consumer-' . uniqid();
+                $consumerName = 'del-consumer-'.uniqid();
                 $js->createConsumer($streamName, $consumerName, new ConsumerConfig($consumerName));
 
                 $deleted = $js->deleteConsumer($streamName, $consumerName);
@@ -123,24 +125,24 @@ describe('Consumer Management', function (): void {
                 expect($deleted)->toBeTrue();
 
                 expect(fn () => $js->getConsumerInfo($streamName, $consumerName))->toThrow(
-                    \LaravelNats\Exceptions\NatsException::class,
+                    NatsException::class,
                 );
 
                 try {
                     $js->deleteStream($streamName);
-                } catch (\Throwable) {
+                } catch (Throwable) {
                 }
             });
         });
 
         it('lists consumers for a stream', function (): void {
             runWithConsumerClientRetry(function (JetStreamClient $js): void {
-                $streamName = 'consumer-list-stream-' . uniqid();
-                $subject = $streamName . '.>';
+                $streamName = 'consumer-list-stream-'.uniqid();
+                $subject = $streamName.'.>';
                 $js->createStream(new StreamConfig($streamName, [$subject]));
 
-                $name1 = 'list-consumer-a-' . uniqid();
-                $name2 = 'list-consumer-b-' . uniqid();
+                $name1 = 'list-consumer-a-'.uniqid();
+                $name2 = 'list-consumer-b-'.uniqid();
                 $js->createConsumer($streamName, $name1, new ConsumerConfig($name1));
                 $js->createConsumer($streamName, $name2, new ConsumerConfig($name2));
 
@@ -157,7 +159,7 @@ describe('Consumer Management', function (): void {
                     $js->deleteConsumer($streamName, $name1);
                     $js->deleteConsumer($streamName, $name2);
                     $js->deleteStream($streamName);
-                } catch (\Throwable) {
+                } catch (Throwable) {
                 }
             });
         });

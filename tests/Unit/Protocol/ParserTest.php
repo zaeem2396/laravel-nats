@@ -25,7 +25,7 @@ use LaravelNats\Exceptions\ProtocolException;
 
 // Create a fresh parser for each test
 beforeEach(function (): void {
-    $this->parser = new Parser();
+    $this->parser = new Parser;
 });
 
 describe('INFO parsing', function (): void {
@@ -42,7 +42,7 @@ describe('INFO parsing', function (): void {
             'jetstream' => true,
         ]);
 
-        $line = 'INFO ' . $infoJson;
+        $line = 'INFO '.$infoJson;
 
         $info = $this->parser->parseInfo($line);
 
@@ -272,12 +272,12 @@ describe('subject validation', function (): void {
 
     // Without wildcards
     it('rejects asterisk when wildcards disabled', function (): void {
-        $parser = new Parser();
+        $parser = new Parser;
         expect($parser->isValidSubject('orders.*', false))->toBeFalse();
     });
 
     it('rejects greater-than when wildcards disabled', function (): void {
-        $parser = new Parser();
+        $parser = new Parser;
         expect($parser->isValidSubject('orders.>', false))->toBeFalse();
     });
 });

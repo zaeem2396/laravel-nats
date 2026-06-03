@@ -19,6 +19,7 @@ declare(strict_types=1);
  */
 
 use LaravelNats\Core\Messaging\Message;
+use LaravelNats\Exceptions\TimeoutException;
 
 describe('basic pub/sub', function (): void {
     it('receives published message', function (): void {
@@ -96,19 +97,19 @@ describe('wildcard subscriptions', function (): void {
         $prefix = $this->uniqueSubject('orders');
         $received = [];
 
-        $client->subscribe($prefix . '.*', function (Message $msg) use (&$received): void {
+        $client->subscribe($prefix.'.*', function (Message $msg) use (&$received): void {
             $received[] = $msg->getSubject();
         });
 
-        $client->publish($prefix . '.created', 'test1');
-        $client->publish($prefix . '.updated', 'test2');
-        $client->publish($prefix . '.deleted', 'test3');
+        $client->publish($prefix.'.created', 'test1');
+        $client->publish($prefix.'.updated', 'test2');
+        $client->publish($prefix.'.deleted', 'test3');
 
         $client->process(0.5);
 
-        expect($received)->toContain($prefix . '.created')
-            ->and($received)->toContain($prefix . '.updated')
-            ->and($received)->toContain($prefix . '.deleted');
+        expect($received)->toContain($prefix.'.created')
+            ->and($received)->toContain($prefix.'.updated')
+            ->and($received)->toContain($prefix.'.deleted');
 
         $client->disconnect();
     });
@@ -118,17 +119,17 @@ describe('wildcard subscriptions', function (): void {
         $prefix = $this->uniqueSubject('events');
         $received = [];
 
-        $client->subscribe($prefix . '.>', function (Message $msg) use (&$received): void {
+        $client->subscribe($prefix.'.>', function (Message $msg) use (&$received): void {
             $received[] = $msg->getSubject();
         });
 
-        $client->publish($prefix . '.user.created', 'test1');
-        $client->publish($prefix . '.order.item.added', 'test2');
+        $client->publish($prefix.'.user.created', 'test1');
+        $client->publish($prefix.'.order.item.added', 'test2');
 
         $client->process(0.5);
 
-        expect($received)->toContain($prefix . '.user.created')
-            ->and($received)->toContain($prefix . '.order.item.added');
+        expect($received)->toContain($prefix.'.user.created')
+            ->and($received)->toContain($prefix.'.order.item.added');
 
         $client->disconnect();
     });
@@ -215,7 +216,7 @@ describe('request reply', function (): void {
         // No responder set up
 
         expect(fn () => $client->request($subject, 'test', 0.5))
-            ->toThrow(\LaravelNats\Exceptions\TimeoutException::class);
+            ->toThrow(TimeoutException::class);
 
         $client->disconnect();
     });

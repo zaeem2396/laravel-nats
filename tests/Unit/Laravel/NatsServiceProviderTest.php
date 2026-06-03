@@ -84,7 +84,7 @@ it('publishes config file', function (): void {
 
     // ServiceProvider tracks publishes in a static property
     // We can verify the config path exists
-    $configPath = __DIR__ . '/../../../src/Laravel/Config/nats.php';
+    $configPath = __DIR__.'/../../../src/Laravel/Config/nats.php';
 
     expect(file_exists($configPath))->toBeTrue();
 });

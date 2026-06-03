@@ -18,7 +18,7 @@ declare(strict_types=1);
 use LaravelNats\Core\Protocol\CommandBuilder;
 
 beforeEach(function (): void {
-    $this->builder = new CommandBuilder();
+    $this->builder = new CommandBuilder;
 });
 
 describe('CONNECT command', function (): void {
