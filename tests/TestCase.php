@@ -124,21 +124,66 @@ abstract class TestCase extends BaseTestCase
     {
         $host = getenv('NATS_HOST') ?: 'localhost';
         $port = (int) (getenv('NATS_PORT') ?: '4222');
-        $previous = error_reporting(0);
+
+        return self::isTcpPortOpen($port, $host);
+    }
+
+    /**
+     * Check whether a TCP port accepts connections without emitting PHP warnings.
+     */
+    public static function isTcpPortOpen(int $port, string $host = 'localhost'): bool
+    {
+        if (function_exists('socket_create')) {
+            $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
+
+            if ($socket === false) {
+                return false;
+            }
+
+            socket_set_nonblock($socket);
+            socket_connect($socket, $host, $port);
+
+            $write = [$socket];
+            $except = [$socket];
+            $read = null;
+
+            $selected = socket_select($read, $write, $except, 0, 500000);
+
+            if ($selected === false || $selected === 0) {
+                socket_close($socket);
+
+                return false;
+            }
+
+            $soError = socket_get_option($socket, SOL_SOCKET, SO_ERROR);
+            socket_close($socket);
+
+            return $soError === 0;
+        }
+
+        $errno = 0;
+        $errstr = '';
+        set_error_handler(static fn (): bool => true);
 
         try {
-            $socket = fsockopen($host, $port, $errno, $errstr, 1);
+            $socket = stream_socket_client(
+                sprintf('tcp://%s:%d', $host, $port),
+                $errno,
+                $errstr,
+                1,
+                STREAM_CLIENT_CONNECT,
+            );
         } finally {
-            error_reporting($previous);
+            restore_error_handler();
         }
 
-        if ($socket !== false) {
-            fclose($socket);
-
-            return true;
+        if ($socket === false) {
+            return false;
         }
 
-        return false;
+        fclose($socket);
+
+        return true;
     }
 
     /**
@@ -151,21 +196,7 @@ abstract class TestCase extends BaseTestCase
      */
     protected function isNatsAvailable(): bool
     {
-        $previous = error_reporting(0);
-
-        try {
-            $socket = fsockopen($this->natsHost, $this->natsPort, $errno, $errstr, 1);
-        } finally {
-            error_reporting($previous);
-        }
-
-        if ($socket !== false) {
-            fclose($socket);
-
-            return true;
-        }
-
-        return false;
+        return self::isTcpPortOpen($this->natsPort, $this->natsHost);
     }
 
     /**
