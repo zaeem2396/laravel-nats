@@ -200,13 +200,5 @@ function tokenConfig(array $overrides = []): \LaravelNats\Core\Connection\Connec
  */
 function isPortAvailable(int $port, string $host = 'localhost'): bool
 {
-    $socket = @fsockopen($host, $port, $errno, $errstr, 1);
-
-    if ($socket !== false) {
-        fclose($socket);
-
-        return true;
-    }
-
-    return false;
+    return \LaravelNats\Tests\TestCase::isTcpPortOpen($port, $host);
 }

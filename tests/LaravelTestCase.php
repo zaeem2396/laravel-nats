@@ -68,20 +68,9 @@ abstract class LaravelTestCase extends OrchestraTestCase
      */
     protected function isNatsAvailable(): bool
     {
-        $socket = @fsockopen(
-            env('NATS_HOST', 'localhost'),
+        return TestCase::isTcpPortOpen(
             (int) env('NATS_PORT', 4222),
-            $errno,
-            $errstr,
-            1,
+            (string) env('NATS_HOST', 'localhost'),
         );
-
-        if ($socket === false) {
-            return false;
-        }
-
-        fclose($socket);
-
-        return true;
     }
 }
