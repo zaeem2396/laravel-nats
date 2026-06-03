@@ -1,0 +1,43 @@
+# ============================================================================
+# LARAVEL NATS - PINT WORKFLOW
+# ============================================================================
+
+name: Pint
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+    branches: [main, develop]
+  workflow_dispatch:
+
+concurrency:
+  group: pint-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  pint:
+    name: Laravel Pint
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: json
+          coverage: none
+
+      - name: Install dependencies
+        env:
+          COMPOSER_NO_SECURITY_BLOCKING: 1
+        run: |
+          composer require "laravel/framework:12.*" "orchestra/testbench:10.*" --dev --no-interaction --no-update
+          composer update --prefer-stable --prefer-dist --no-interaction --no-progress
+          composer require laravel/pint --dev --no-interaction
+
+      - name: Run Pint
+        run: vendor/bin/pint --test tests
