@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace LaravelNats\Tests;
 
+use Illuminate\Cache\CacheServiceProvider;
+use Illuminate\Foundation\Application;
+use Illuminate\Queue\QueueServiceProvider;
 use LaravelNats\Laravel\Facades\Nats;
 use LaravelNats\Laravel\Facades\NatsV2;
 use LaravelNats\Laravel\Providers\NatsServiceProvider;
@@ -20,15 +23,14 @@ abstract class LaravelTestCase extends OrchestraTestCase
     /**
      * Get package providers.
      *
-     * @param \Illuminate\Foundation\Application $app
-     *
+     * @param  Application  $app
      * @return array<int, class-string>
      */
     protected function getPackageProviders($app): array
     {
         return [
-            \Illuminate\Queue\QueueServiceProvider::class,
-            \Illuminate\Cache\CacheServiceProvider::class,
+            QueueServiceProvider::class,
+            CacheServiceProvider::class,
             NatsServiceProvider::class,
         ];
     }
@@ -36,8 +38,7 @@ abstract class LaravelTestCase extends OrchestraTestCase
     /**
      * Get package aliases.
      *
-     * @param \Illuminate\Foundation\Application $app
-     *
+     * @param  Application  $app
      * @return array<string, class-string>
      */
     protected function getPackageAliases($app): array
@@ -51,7 +52,7 @@ abstract class LaravelTestCase extends OrchestraTestCase
     /**
      * Define environment setup.
      *
-     * @param \Illuminate\Foundation\Application $app
+     * @param  Application  $app
      */
     protected function defineEnvironment($app): void
     {
