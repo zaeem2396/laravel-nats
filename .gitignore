@@ -46,3 +46,6 @@ psalm.xml
 # Docker
 docker-compose.override.yml
 
+# Archived docs (legacy roadmap retained locally)
+/archive/
+
