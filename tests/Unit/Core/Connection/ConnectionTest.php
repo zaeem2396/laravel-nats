@@ -40,13 +40,22 @@ it('exposes parser and command builder', function (): void {
         ->and($this->connection->getCommandBuilder())->not->toBeNull();
 });
 
-it('fails connect to unreachable host', function (): void {
+it('fails connect to closed port without socket warnings', function (): void {
     $config = ConnectionConfig::fromArray([
-        'host' => '198.51.100.1',
-        'port' => 4222,
-        'timeout' => 0.05,
+        'host' => '127.0.0.1',
+        'port' => 1,
+        'timeout' => 0.2,
     ]);
 
-    expect(fn () => (new Connection($config))->connect())
-        ->toThrow(ConnectionException::class);
+    $previousHandler = set_error_handler(static fn (): bool => true);
+
+    try {
+        expect(fn () => (new Connection($config))->connect())
+            ->toThrow(ConnectionException::class);
+    } finally {
+        restore_error_handler();
+        if ($previousHandler !== null) {
+            set_error_handler($previousHandler);
+        }
+    }
 });

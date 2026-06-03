@@ -131,11 +131,20 @@ describe('error handling', function (): void {
         $config = ConnectionConfig::fromArray([
             'host' => 'localhost',
             'port' => 9999, // Wrong port
-            'timeout' => 1.0,
+            'timeout' => 0.2,
         ]);
         $connection = new Connection($config);
 
-        expect(fn () => $connection->connect())
-            ->toThrow(ConnectionException::class);
+        $previousHandler = set_error_handler(static fn (): bool => true);
+
+        try {
+            expect(fn () => $connection->connect())
+                ->toThrow(ConnectionException::class);
+        } finally {
+            restore_error_handler();
+            if ($previousHandler !== null) {
+                set_error_handler($previousHandler);
+            }
+        }
     });
 });

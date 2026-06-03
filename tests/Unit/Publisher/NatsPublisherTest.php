@@ -50,9 +50,13 @@ function publisherWithDisconnectedClient(): NatsPublisher
     $config = makePublisherConfig(false);
     $manager = new ConnectionManager($config);
     $basis = new Client(new BasisConfiguration(host: '127.0.0.1', port: 4222));
-    $ref = new ReflectionProperty(ConnectionManager::class, 'clients');
-    $ref->setAccessible(true);
-    $ref->setValue($manager, ['default' => $basis]);
+
+    // Basis\Client always constructs a Connection; clear it to exercise the guard.
+    $connectionRef = new ReflectionProperty(Client::class, 'connection');
+    $connectionRef->setValue($basis, null);
+
+    $clientsRef = new ReflectionProperty(ConnectionManager::class, 'clients');
+    $clientsRef->setValue($manager, ['default' => $basis]);
 
     return makePublisher($manager, $config);
 }
@@ -69,6 +73,6 @@ describe('NatsPublisher', function (): void {
         $publisher = publisherWithDisconnectedClient();
 
         expect(fn () => $publisher->publish('orders.created', ['id' => 1]))
-            ->toThrow(PublishException::class);
+            ->toThrow(PublishException::class, 'disconnected');
     });
 });
