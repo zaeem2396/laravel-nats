@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace LaravelNats\Tests;
 
+use LaravelNats\Core\Client;
+use LaravelNats\Core\Connection\ConnectionConfig;
+use PHPUnit\Framework\SkippedWithMessageException;
 use PHPUnit\Framework\TestCase as BaseTestCase;
 
 /**
@@ -46,15 +49,18 @@ abstract class TestCase extends BaseTestCase
      * round-trip so the returned client is ready for use. This reduces flaky
      * "Not connected to NATS server" failures in CI and long test runs.
      *
-     * @throws \RuntimeException If connection fails or JetStream is unavailable after retries
      *
-     * @return \LaravelNats\Core\Client Connected and verified client
+     *
+     *
+     * @return Client Connected and verified client
+     *
+     * @throws \RuntimeException If connection fails or JetStream is unavailable after retries
      */
-    public static function createConnectedJetStreamClient(): \LaravelNats\Core\Client
+    public static function createConnectedJetStreamClient(): Client
     {
         $host = getenv('NATS_HOST') ?: 'localhost';
         $port = (int) (getenv('NATS_PORT') ?: '4222');
-        $config = \LaravelNats\Core\Connection\ConnectionConfig::fromArray([
+        $config = ConnectionConfig::fromArray([
             'host' => $host,
             'port' => $port,
             'timeout' => 5.0,
@@ -65,7 +71,7 @@ abstract class TestCase extends BaseTestCase
 
         for ($attempt = 1; $attempt <= $maxConnectionAttempts; $attempt++) {
             try {
-                $client = new \LaravelNats\Core\Client($config);
+                $client = new Client($config);
                 $client->connect();
 
                 // Wait for connection and JetStream to be ready (up to ~2.5s)
@@ -126,6 +132,28 @@ abstract class TestCase extends BaseTestCase
         $port = (int) (getenv('NATS_PORT') ?: '4222');
 
         return self::isTcpPortOpen($port, $host);
+    }
+
+    /**
+     * Skip the current test when NATS is not reachable on the default port.
+     */
+    public static function skipUnlessNatsReachable(string $message = 'NATS server not available'): void
+    {
+        if (! self::isNatsReachable()) {
+            throw new SkippedWithMessageException($message);
+        }
+    }
+
+    /**
+     * Skip the current test when NATS is not reachable on a specific port.
+     */
+    public static function skipUnlessPortOpen(int $port, string $host = 'localhost', ?string $message = null): void
+    {
+        if (! self::isTcpPortOpen($port, $host)) {
+            throw new SkippedWithMessageException(
+                $message ?? "NATS server not available at {$host}:{$port}",
+            );
+        }
     }
 
     /**
@@ -205,8 +233,7 @@ abstract class TestCase extends BaseTestCase
      * Using unique subjects prevents test pollution when running
      * tests in parallel or when tests don't clean up properly.
      *
-     * @param string $prefix Optional prefix for the subject
-     *
+     * @param  string  $prefix  Optional prefix for the subject
      * @return string A unique subject name
      */
     protected function uniqueSubject(string $prefix = 'test'): string
@@ -220,10 +247,9 @@ abstract class TestCase extends BaseTestCase
      * Useful for async operations where we need to wait
      * for a message to be received.
      *
-     * @param callable(): bool $condition Condition to check
-     * @param float $timeout Maximum time to wait in seconds
-     * @param int $interval Check interval in microseconds
-     *
+     * @param  callable(): bool  $condition  Condition to check
+     * @param  float  $timeout  Maximum time to wait in seconds
+     * @param  int  $interval  Check interval in microseconds
      * @return bool True if condition was met, false on timeout
      */
     protected function waitFor(callable $condition, float $timeout = 5.0, int $interval = 10000): bool
