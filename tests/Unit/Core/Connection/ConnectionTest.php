@@ -40,22 +40,19 @@ it('exposes parser and command builder', function (): void {
         ->and($this->connection->getCommandBuilder())->not->toBeNull();
 });
 
-it('fails connect to closed port without socket warnings', function (): void {
+it('fails connect to closed port', function (): void {
     $config = ConnectionConfig::fromArray([
         'host' => '127.0.0.1',
         'port' => 1,
         'timeout' => 0.2,
     ]);
 
-    $previousHandler = set_error_handler(static fn (): bool => true);
+    set_error_handler(static fn (): bool => true);
 
     try {
         expect(fn () => (new Connection($config))->connect())
             ->toThrow(ConnectionException::class);
     } finally {
         restore_error_handler();
-        if ($previousHandler !== null) {
-            set_error_handler($previousHandler);
-        }
     }
 });

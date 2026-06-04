@@ -135,16 +135,13 @@ describe('error handling', function (): void {
         ]);
         $connection = new Connection($config);
 
-        $previousHandler = set_error_handler(static fn (): bool => true);
+        set_error_handler(static fn (): bool => true);
 
         try {
             expect(fn () => $connection->connect())
                 ->toThrow(ConnectionException::class);
         } finally {
             restore_error_handler();
-            if ($previousHandler !== null) {
-                set_error_handler($previousHandler);
-            }
         }
     });
 });
