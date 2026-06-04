@@ -59,6 +59,8 @@ Run tests with: vendor/bin/pest
         </include>
         <exclude>
             <directory>src/Laravel/Config</directory>
+            <!-- Thin Artisan entrypoints; registration covered in ArtisanCommandsRegistrationTest -->
+            <directory>src/Laravel/Console/Commands</directory>
         </exclude>
     </source>
 </phpunit>

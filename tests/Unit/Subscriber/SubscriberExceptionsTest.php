@@ -4,8 +4,14 @@ declare(strict_types=1);
 
 use LaravelNats\Security\Exceptions\NatsConfigurationException;
 use LaravelNats\Security\Exceptions\SubjectNotAllowedException;
+use LaravelNats\Subscriber\Exceptions\InvalidSubjectException;
 use LaravelNats\Subscriber\Exceptions\SubscriptionConflictException;
 use LaravelNats\Subscriber\Exceptions\SubscriptionNotFoundException;
+
+it('builds invalid subject messages', function (): void {
+    expect(InvalidSubjectException::empty()->getMessage())->toContain('empty')
+        ->and(InvalidSubjectException::tooLong(256)->getMessage())->toContain('256');
+});
 
 it('builds subscription not found message', function (): void {
     expect(SubscriptionNotFoundException::forId('abc')->getMessage())
