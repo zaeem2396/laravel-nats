@@ -7,7 +7,8 @@ Use this page as the quick-access map for package docs.
 - v2 overview: [`v2/README.md`](v2/README.md)
 - v2 guide: [`v2/GUIDE.md`](v2/GUIDE.md)
 - migration strategy: [`v2/MIGRATION.md`](v2/MIGRATION.md)
-- roadmap: [`ROADMAP_V2_NATSPHP.md`](ROADMAP_V2_NATSPHP.md)
+- roadmap: [`ROADMAP.md`](ROADMAP.md)
+- changelog: [`../CHANGELOG.md`](../CHANGELOG.md)
 
 ## Messaging
 
@@ -25,6 +26,11 @@ Use this page as the quick-access map for package docs.
 - correlation headers: [`v2/CORRELATION.md`](v2/CORRELATION.md)
 - trace context: [`v2/TRACE_CONTEXT.md`](v2/TRACE_CONTEXT.md)
 - protocol features: [`v2/CLIENT_FEATURES.md`](v2/CLIENT_FEATURES.md)
+
+## Quality And CI
+
+- local checks: run `composer ci` (Pest, PHPStan, Pint, PHP-CS-Fixer)
+- workflows: Tests, Static Analysis, Code Style, Pint, Coverage (see repository `.github/workflows/`)
 
 ## Help And Examples
 
