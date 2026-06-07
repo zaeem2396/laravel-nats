@@ -3,6 +3,8 @@
 [![Tests](https://github.com/zaeem2396/laravel-nats/actions/workflows/tests.yml/badge.svg)](https://github.com/zaeem2396/laravel-nats/actions/workflows/tests.yml)
 [![Static Analysis](https://github.com/zaeem2396/laravel-nats/actions/workflows/static-analysis.yml/badge.svg)](https://github.com/zaeem2396/laravel-nats/actions/workflows/static-analysis.yml)
 [![Code Style](https://github.com/zaeem2396/laravel-nats/actions/workflows/code-style.yml/badge.svg)](https://github.com/zaeem2396/laravel-nats/actions/workflows/code-style.yml)
+[![Coverage](https://github.com/zaeem2396/laravel-nats/actions/workflows/coverage.yml/badge.svg)](https://github.com/zaeem2396/laravel-nats/actions/workflows/coverage.yml)
+[![Pint](https://github.com/zaeem2396/laravel-nats/actions/workflows/pint.yml/badge.svg)](https://github.com/zaeem2396/laravel-nats/actions/workflows/pint.yml)
 
 Laravel wrapper for NATS with two tracks and an index-first docs experience:
 
@@ -61,8 +63,9 @@ Version map:
 - **1.5.1**: documentation refresh (navigation + cross-links)
 - **1.5.2**: README/docs index layout; Docker local NATS section; [`docs/INDEX.md`](docs/INDEX.md)
 - **1.6.0+**: v2.7 header helpers, optional W3C trace context, subject-prefix connection selection, outbox recipe; Laravel 13 supported in package dev constraints; CI tests PHP 8.5 on Laravel 11–13
+- **1.6.1**: expanded Pest coverage, GitHub Actions coverage/Pint workflows, `composer ci` script; no public API changes
 
-Roadmap: [`docs/ROADMAP_V2_NATSPHP.md`](docs/ROADMAP_V2_NATSPHP.md)
+Roadmap: [`docs/ROADMAP.md`](docs/ROADMAP.md) · Changelog: [`CHANGELOG.md`](CHANGELOG.md)
 
 ## Docker Setup (Local NATS)
 
@@ -197,7 +200,7 @@ For teams still using legacy stack workflows:
 
 - Queue and consumer runtime references: check [`docs/v2/QUEUE.md`](docs/v2/QUEUE.md) and [`docs/v2/MIGRATION.md`](docs/v2/MIGRATION.md) for current behavior and migration-safe usage.
 - Legacy JetStream stream/consumer workflows remain available while migration is in progress.
-- Plan migration paths with [`docs/v2/MIGRATION.md`](docs/v2/MIGRATION.md) and track scope via [`docs/ROADMAP_V2_NATSPHP.md`](docs/ROADMAP_V2_NATSPHP.md).
+- Plan migration paths with [`docs/v2/MIGRATION.md`](docs/v2/MIGRATION.md) and track releases via [`docs/ROADMAP.md`](docs/ROADMAP.md).
 
 ## Security And Production Checks
 
@@ -213,20 +216,21 @@ Full details: [`docs/v2/SECURITY.md`](docs/v2/SECURITY.md)
 ## Testing And Quality Checks
 
 ```bash
-# Optional local NATS
+# Optional local NATS (integration tests)
 docker compose up -d
 
-# Test suite
+# Full local CI gate (Pest + PHPStan + Pint + PHP-CS-Fixer)
+composer ci
+
+# Individual checks
 composer test
-
-# Static analysis
 composer analyse
-
-# Style check
+composer pint:check
 composer format:check
+composer test:coverage   # requires PCOV or Xdebug
 ```
 
-For release prep, run these checks before tagging and ensure `CHANGELOG.md` reflects the release scope.
+GitHub Actions also runs a dedicated [coverage workflow](.github/workflows/coverage.yml) with NATS and PCOV. For release prep, run `composer ci` and ensure `CHANGELOG.md` reflects the release scope.
 
 ## Troubleshooting
 
@@ -263,9 +267,7 @@ See release notes: [`CHANGELOG.md`](CHANGELOG.md)
 Before opening a PR, run:
 
 ```bash
-composer test
-composer format:check
-composer analyse
+composer ci
 ```
 
 ## License

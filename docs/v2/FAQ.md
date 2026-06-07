@@ -28,7 +28,7 @@
 
 ## See also
 
-- [Roadmap](../ROADMAP_V2_NATSPHP.md)
+- [Roadmap](../ROADMAP.md)
 - [SECURITY.md](SECURITY.md)
 
 **`tlsHandshakeFirst` vs CA files in production?** The TLS guard accepts **`tlsHandshakeFirst`** when your topology requires TLS before other negotiation, but you should still terminate on trusted infrastructure. Details: [SECURITY.md](SECURITY.md).

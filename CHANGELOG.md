@@ -23,6 +23,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - (none)
 
+## [1.6.1] - 2026-06-04
+
+### Added
+
+- **Tests:** broad Pest coverage for public APIs — exceptions, serializers, Core `Client`/`Connection`, publisher ACL and disconnected paths, subscriber middleware, `BasisNatsQueue`, Artisan command registration, Laravel events, idempotency headers, and related support types.
+- **CI:** GitHub Actions [Coverage](.github/workflows/coverage.yml) workflow (PCOV + NATS, Clover artifact, 80% minimum) and [Pint](.github/workflows/pint.yml) workflow for the `tests/` tree.
+- **Developer tooling:** `laravel/pint` dev dependency; Composer scripts `ci`, `test:coverage`, `pint`, and `pint:check`.
+
+### Changed
+
+- **CI:** test matrix job timeout increased to 15 minutes for full NATS integration runs; PHP-CS-Fixer scoped to `src/`, Laravel Pint to `tests/` to avoid conflicting formatters.
+- **Composer:** allow Laravel 10 installs under Composer 2.9 security advisory blocking (`audit.block-insecure`, `COMPOSER_NO_SECURITY_BLOCKING` in CI).
+- **Tests:** `TestCase::skipUnlessNatsReachable()` / `skipUnlessPortOpen()` for clean skips when NATS is down; PHPUnit coverage excludes thin Artisan command entrypoints (registration is tested separately).
+
+### Fixed
+
+- **Tests:** stable `NatsPublisher` disconnected-client assertion when NATS is running in CI; Pest 4 risky-test handling for intentional connect-failure cases; non-blocking TCP port checks to avoid PHPUnit warnings under `failOnWarning`.
+- **Static analysis:** PHPStan satisfaction for `BasisNatsQueue` / `NatsQueue` `enqueueUsing()` queue name (resolved queue name; no behavior change).
+
+### Documentation
+
+- Added [`docs/ROADMAP.md`](docs/ROADMAP.md); replaced broken `ROADMAP_V2_NATSPHP.md` links across README and v2 guides.
+- README: Coverage and Pint badges, **1.6.1** version map entry, `composer ci` testing instructions.
+
 ## [1.6.0] - 2026-05-13
 
 ### Added
@@ -56,7 +80,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Documentation
 
-- Roadmap: mark v2.6 as completed in the summary table and bump the internal doc version ([docs/ROADMAP_V2_NATSPHP.md](docs/ROADMAP_V2_NATSPHP.md)).
+- Roadmap: mark v2.6 as completed in the summary table and bump the internal doc version (see [docs/ROADMAP.md](docs/ROADMAP.md)).
 - Cross-link the v2 documentation index and README to the roadmap and clarify the **1.5.0** ↔ v2.6 mapping ([docs/v2/README.md](docs/v2/README.md)).
 - Sweep v2 guides (subscriber, queue, JetStream, FAQ, observability) with consistent "see also" pointers to [docs/v2/SECURITY.md](docs/v2/SECURITY.md) and the roadmap.
 
@@ -321,6 +345,21 @@ Run `composer update zaeem2396/laravel-nats` to upgrade.
 
 Run `composer update zaeem2396/laravel-nats` to upgrade.
 
+### From 1.6.0 to 1.6.1
+
+- **No public API changes.** Patch release focused on tests, CI, and documentation.
+- **Contributors:** use `composer ci` locally (Pest, PHPStan, Pint, PHP-CS-Fixer). Coverage workflow requires NATS + PCOV (see [`.github/workflows/coverage.yml`](.github/workflows/coverage.yml)).
+
+```json
+{
+    "require": {
+        "zaeem2396/laravel-nats": "^1.6.1"
+    }
+}
+```
+
+Run `composer update zaeem2396/laravel-nats` to upgrade.
+
 ### From 1.5.2 to 1.6.0
 
 - **v2.7 advanced features:** optional W3C trace context on publish (`nats_basis.trace_context`, `NATS_TRACE_CONTEXT_INJECT`); subject-prefix routing to named connections (`nats_basis.connection_selection`, `NATS_CONNECTION_SUBJECT_PREFIXES`, `NatsV2::selectConnection()`); storage-agnostic transactional outbox helpers (`NatsOutboxMessage`, `NatsOutboxStoreContract`, `NatsOutboxDispatcher`, `NatsV2::dispatchOutbox()`, `nats_basis.outbox`). See [docs/v2/TRACE_CONTEXT.md](docs/v2/TRACE_CONTEXT.md), [docs/v2/CONNECTION_SELECTION.md](docs/v2/CONNECTION_SELECTION.md), [docs/v2/OUTBOX.md](docs/v2/OUTBOX.md), and [docs/v2/CLIENT_FEATURES.md](docs/v2/CLIENT_FEATURES.md).
@@ -370,7 +409,8 @@ Run `composer update zaeem2396/laravel-nats` to upgrade.
 
 ---
 
-[Unreleased]: https://github.com/zaeem2396/laravel-nats/compare/v1.6.0...HEAD
+[Unreleased]: https://github.com/zaeem2396/laravel-nats/compare/v1.6.1...HEAD
+[1.6.1]: https://github.com/zaeem2396/laravel-nats/compare/v1.6.0...v1.6.1
 [1.6.0]: https://github.com/zaeem2396/laravel-nats/compare/v1.5.2...v1.6.0
 [1.5.2]: https://github.com/zaeem2396/laravel-nats/compare/v1.5.1...v1.5.2
 [1.5.1]: https://github.com/zaeem2396/laravel-nats/compare/v1.5.0...v1.5.1
