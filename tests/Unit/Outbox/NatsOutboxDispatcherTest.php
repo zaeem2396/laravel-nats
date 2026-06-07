@@ -13,7 +13,7 @@ it('publishes pending outbox messages and marks them published', function (): vo
         new NatsOutboxMessage('2', 'orders.updated', ['id' => 2], connection: 'orders'),
     ];
     $store = new InMemoryOutboxStore($messages);
-    $publisher = new RecordingOutboxPublisher();
+    $publisher = new RecordingOutboxPublisher;
 
     $result = (new NatsOutboxDispatcher($publisher))->dispatch($store, limit: 10);
 
@@ -62,8 +62,7 @@ final class RecordingOutboxPublisher implements NatsPublisherContract
 
     public function __construct(
         private readonly ?string $failSubject = null,
-    ) {
-    }
+    ) {}
 
     public function publish(string $subject, array $payload, array $headers = [], ?string $connection = null): void
     {
@@ -88,12 +87,11 @@ final class InMemoryOutboxStore implements NatsOutboxStoreContract
     public array $failed = [];
 
     /**
-     * @param list<NatsOutboxMessage> $messages
+     * @param  list<NatsOutboxMessage>  $messages
      */
     public function __construct(
         private readonly array $messages,
-    ) {
-    }
+    ) {}
 
     public function nextBatch(int $limit): iterable
     {

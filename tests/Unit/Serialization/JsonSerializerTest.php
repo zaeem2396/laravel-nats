@@ -18,9 +18,10 @@ declare(strict_types=1);
  */
 
 use LaravelNats\Core\Serialization\JsonSerializer;
+use LaravelNats\Exceptions\SerializationException;
 
 beforeEach(function (): void {
-    $this->serializer = new JsonSerializer();
+    $this->serializer = new JsonSerializer;
 });
 
 describe('serialize', function (): void {
@@ -96,7 +97,7 @@ describe('serialize', function (): void {
     });
 
     it('serializes objects with public properties', function (): void {
-        $obj = new stdClass();
+        $obj = new stdClass;
         $obj->name = 'Test';
         $obj->value = 100;
 
@@ -162,6 +163,21 @@ describe('deserialize', function (): void {
 describe('content type', function (): void {
     it('returns application/json', function (): void {
         expect($this->serializer->getContentType())->toBe('application/json');
+    });
+});
+
+describe('serialize failures', function (): void {
+    it('throws SerializationException when encoding fails', function (): void {
+        $resource = fopen('php://memory', 'r');
+
+        try {
+            expect(fn () => $this->serializer->serialize($resource))
+                ->toThrow(SerializationException::class);
+        } finally {
+            if (is_resource($resource)) {
+                fclose($resource);
+            }
+        }
     });
 });
 

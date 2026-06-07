@@ -9,13 +9,13 @@ use LaravelNats\Laravel\Console\Commands\NatsWorkCommand;
 
 describe('NATS Artisan commands (JetStream + nats:work + nats:consume + nats:consume:stream — Phase 4.3)', function (): void {
     it('defines nats:consume command (Phase 4.2 — Subject-Based Consumer)', function (): void {
-        $refl = new \ReflectionClass(NatsConsumeCommand::class);
+        $refl = new ReflectionClass(NatsConsumeCommand::class);
         $defaults = $refl->getDefaultProperties();
         expect(isset($defaults['signature']) && str_contains((string) $defaults['signature'], 'nats:consume'))->toBeTrue();
     });
 
     it('defines nats:work command (Phase 4.1)', function (): void {
-        $refl = new \ReflectionClass(NatsWorkCommand::class);
+        $refl = new ReflectionClass(NatsWorkCommand::class);
         $defaults = $refl->getDefaultProperties();
         expect(isset($defaults['signature']) && str_contains((string) $defaults['signature'], 'nats:work'))->toBeTrue();
     });
@@ -33,7 +33,7 @@ describe('NATS Artisan commands (JetStream + nats:work + nats:consume + nats:con
     });
 
     it('defines nats:consume:stream command (Phase 4.3 — JetStream Consumer Worker)', function (): void {
-        $refl = new \ReflectionClass(NatsConsumeStreamCommand::class);
+        $refl = new ReflectionClass(NatsConsumeStreamCommand::class);
         $defaults = $refl->getDefaultProperties();
         expect(isset($defaults['signature']) && str_contains((string) $defaults['signature'], 'nats:consume:stream'))->toBeTrue();
     });

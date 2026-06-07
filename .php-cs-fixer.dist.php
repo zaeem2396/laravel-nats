@@ -12,6 +12,8 @@
  *   vendor/bin/php-cs-fixer fix           # Fix all files
  *   vendor/bin/php-cs-fixer fix --dry-run # Preview changes
  *
+ * Tests are formatted with Laravel Pint (see pint.json and .github/workflows/pint.yml).
+ *
  * ============================================================================
  */
 
@@ -21,7 +23,6 @@ use PhpCsFixer\Finder;
 $finder = Finder::create()
     ->in([
         __DIR__ . '/src',
-        __DIR__ . '/tests',
     ])
     ->name('*.php')
     ->ignoreDotFiles(true)

@@ -7,7 +7,7 @@ use LaravelNats\Core\JetStream\ConsumerConfig;
 describe('ConsumerConfig', function (): void {
     describe('constructor', function (): void {
         it('creates instance with null durable name (ephemeral)', function (): void {
-            $config = new ConsumerConfig();
+            $config = new ConsumerConfig;
 
             expect($config->getDurableName())->toBeNull();
             expect($config->getDeliverPolicy())->toBe(ConsumerConfig::DELIVER_ALL);
@@ -88,7 +88,7 @@ describe('ConsumerConfig', function (): void {
         });
 
         it('returns new instance with updated filter subject', function (): void {
-            $config = new ConsumerConfig();
+            $config = new ConsumerConfig;
             $newConfig = $config->withFilterSubject('events.>');
 
             expect($newConfig->getFilterSubject())->toBe('events.>');
@@ -96,7 +96,7 @@ describe('ConsumerConfig', function (): void {
         });
 
         it('returns new instance with updated deliver policy', function (): void {
-            $config = new ConsumerConfig();
+            $config = new ConsumerConfig;
             $newConfig = $config->withDeliverPolicy(ConsumerConfig::DELIVER_LAST);
 
             expect($newConfig->getDeliverPolicy())->toBe(ConsumerConfig::DELIVER_LAST);
@@ -104,7 +104,7 @@ describe('ConsumerConfig', function (): void {
         });
 
         it('returns new instance with updated ack policy', function (): void {
-            $config = new ConsumerConfig();
+            $config = new ConsumerConfig;
             $newConfig = $config->withAckPolicy(ConsumerConfig::ACK_NONE);
 
             expect($newConfig->getAckPolicy())->toBe(ConsumerConfig::ACK_NONE);
@@ -112,7 +112,7 @@ describe('ConsumerConfig', function (): void {
         });
 
         it('returns new instance with updated ack wait', function (): void {
-            $config = new ConsumerConfig();
+            $config = new ConsumerConfig;
             $newConfig = $config->withAckWait(60.0);
 
             expect($newConfig->getAckWait())->toBe(60.0);
@@ -143,7 +143,7 @@ describe('ConsumerConfig', function (): void {
         });
 
         it('excludes null optional fields', function (): void {
-            $config = new ConsumerConfig();
+            $config = new ConsumerConfig;
 
             $array = $config->toArray();
 

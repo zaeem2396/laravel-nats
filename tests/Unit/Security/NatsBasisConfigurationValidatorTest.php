@@ -19,7 +19,7 @@ it('passes for valid default-shaped connection when forced', function (): void {
         ],
     ]);
 
-    $v = new NatsBasisConfigurationValidator();
+    $v = new NatsBasisConfigurationValidator;
     $v->validate($config, $this->app, true);
 
     expect(true)->toBeTrue();
@@ -38,7 +38,7 @@ it('rejects empty host when forced', function (): void {
         ],
     ]);
 
-    $v = new NatsBasisConfigurationValidator();
+    $v = new NatsBasisConfigurationValidator;
 
     expect(fn () => $v->validate($config, $this->app, true))
         ->toThrow(NatsConfigurationException::class);
@@ -57,7 +57,7 @@ it('rejects invalid port when forced', function (): void {
         ],
     ]);
 
-    $v = new NatsBasisConfigurationValidator();
+    $v = new NatsBasisConfigurationValidator;
 
     expect(fn () => $v->validate($config, $this->app, true))
         ->toThrow(NatsConfigurationException::class);
@@ -87,7 +87,7 @@ it('requires TLS material in production when tls.require_in_production is true',
         ],
     ]);
 
-    $v = new NatsBasisConfigurationValidator();
+    $v = new NatsBasisConfigurationValidator;
 
     expect(fn () => $v->validate($config, $this->app, true))
         ->toThrow(NatsConfigurationException::class);
@@ -117,7 +117,7 @@ it('allows production when tls ca is set and require_in_production is true', fun
         ],
     ]);
 
-    $v = new NatsBasisConfigurationValidator();
+    $v = new NatsBasisConfigurationValidator;
     $v->validate($config, $this->app, true);
 
     expect(true)->toBeTrue();

@@ -156,7 +156,7 @@ class NatsQueue extends Queue implements QueueContract, NatsJobQueueBridge
         return $this->enqueueUsing(
             $job,
             $this->createPayload($job, $this->getQueue($queue), $data),
-            $queue,
+            $this->getQueue($queue),
             null,
             function ($payload, $queue) {
                 return $this->pushRaw($payload, $queue);

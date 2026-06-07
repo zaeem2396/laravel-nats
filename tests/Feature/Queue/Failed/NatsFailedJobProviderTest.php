@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Illuminate\Queue\Failed\FailedJobProviderInterface;
 use LaravelNats\Laravel\Queue\Failed\NatsFailedJobProvider;
 
 describe('NatsFailedJobProvider', function (): void {
@@ -9,7 +10,7 @@ describe('NatsFailedJobProvider', function (): void {
         it('implements FailedJobProviderInterface', function (): void {
             $provider = new NatsFailedJobProvider('default', 'failed_jobs');
 
-            expect($provider)->toBeInstanceOf(\Illuminate\Queue\Failed\FailedJobProviderInterface::class);
+            expect($provider)->toBeInstanceOf(FailedJobProviderInterface::class);
         });
     });
 

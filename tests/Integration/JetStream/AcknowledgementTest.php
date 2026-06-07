@@ -8,10 +8,11 @@ use LaravelNats\Core\JetStream\JetStreamConsumedMessage;
 use LaravelNats\Core\JetStream\StreamConfig;
 use LaravelNats\Exceptions\ConnectionException;
 use LaravelNats\Exceptions\TimeoutException;
+use LaravelNats\Tests\TestCase;
 
 function createAckTestClient(): JetStreamClient
 {
-    $client = \LaravelNats\Tests\TestCase::createConnectedJetStreamClient();
+    $client = TestCase::createConnectedJetStreamClient();
 
     return new JetStreamClient($client);
 }
@@ -37,7 +38,7 @@ function runWithAckClientRetry(callable $run): void
         } finally {
             try {
                 $js->getClient()->disconnect();
-            } catch (\Throwable) {
+            } catch (Throwable) {
                 // ignore
             }
         }
@@ -50,7 +51,7 @@ function runWithAckClientRetry(callable $run): void
 
 describe('Acknowledgement (pull consumer)', function (): void {
     beforeEach(function (): void {
-        if (! \LaravelNats\Tests\TestCase::isNatsReachable()) {
+        if (! TestCase::isNatsReachable()) {
             $this->markTestSkipped('NATS server not available');
         }
     });
@@ -58,17 +59,17 @@ describe('Acknowledgement (pull consumer)', function (): void {
     it('fetches next message and acks it', function (): void {
         try {
             runWithAckClientRetry(function (JetStreamClient $js): void {
-                $streamName = 'ack-stream-' . uniqid();
-                $subject = $streamName . '.>';
+                $streamName = 'ack-stream-'.uniqid();
+                $subject = $streamName.'.>';
                 $js->createStream(new StreamConfig($streamName, [$subject]));
 
-                $consumerName = 'ack-consumer-' . uniqid();
+                $consumerName = 'ack-consumer-'.uniqid();
                 $config = (new ConsumerConfig($consumerName))
                     ->withAckPolicy(ConsumerConfig::ACK_EXPLICIT)
                     ->withDeliverPolicy(ConsumerConfig::DELIVER_ALL);
                 $js->createConsumer($streamName, $consumerName, $config);
 
-                $js->getClient()->publish($streamName . '.evt', ['test' => 'ack-me']);
+                $js->getClient()->publish($streamName.'.evt', ['test' => 'ack-me']);
 
                 // Give JetStream time to persist and index the message before fetch
                 usleep(1500000);
@@ -89,7 +90,7 @@ describe('Acknowledgement (pull consumer)', function (): void {
                 try {
                     $js->deleteConsumer($streamName, $consumerName);
                     $js->deleteStream($streamName);
-                } catch (\Throwable) {
+                } catch (Throwable) {
                 }
             });
         } catch (TimeoutException $e) {
@@ -101,11 +102,11 @@ describe('Acknowledgement (pull consumer)', function (): void {
 
     it('returns null when no_wait and no message', function (): void {
         runWithAckClientRetry(function (JetStreamClient $js): void {
-            $streamName = 'ack-nowait-stream-' . uniqid();
-            $subject = $streamName . '.>';
+            $streamName = 'ack-nowait-stream-'.uniqid();
+            $subject = $streamName.'.>';
             $js->createStream(new StreamConfig($streamName, [$subject]));
 
-            $consumerName = 'ack-nowait-consumer-' . uniqid();
+            $consumerName = 'ack-nowait-consumer-'.uniqid();
             $config = (new ConsumerConfig($consumerName))->withAckPolicy(ConsumerConfig::ACK_EXPLICIT);
             $js->createConsumer($streamName, $consumerName, $config);
 
@@ -116,7 +117,7 @@ describe('Acknowledgement (pull consumer)', function (): void {
             try {
                 $js->deleteConsumer($streamName, $consumerName);
                 $js->deleteStream($streamName);
-            } catch (\Throwable) {
+            } catch (Throwable) {
             }
         });
     });

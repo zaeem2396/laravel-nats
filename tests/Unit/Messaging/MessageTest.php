@@ -146,7 +146,7 @@ describe('reply detection', function (): void {
 
 describe('decoded payload', function (): void {
     it('decodes JSON with serializer', function (): void {
-        $serializer = new JsonSerializer();
+        $serializer = new JsonSerializer;
         $message = new Message(
             subject: 'test',
             payload: '{"id":123,"name":"Test"}',
@@ -179,7 +179,7 @@ describe('decoded payload', function (): void {
     });
 
     it('caches decoded payload', function (): void {
-        $serializer = new JsonSerializer();
+        $serializer = new JsonSerializer;
         $message = new Message(
             subject: 'test',
             payload: '{"id":789}',
@@ -196,7 +196,7 @@ describe('decoded payload', function (): void {
 
 describe('factory methods', function (): void {
     it('creates message for publishing', function (): void {
-        $serializer = new JsonSerializer();
+        $serializer = new JsonSerializer;
         $message = Message::create(
             subject: 'orders.created',
             payload: ['id' => 123],
@@ -226,7 +226,7 @@ describe('factory methods', function (): void {
 
 describe('reply creation', function (): void {
     it('creates reply message', function (): void {
-        $serializer = new JsonSerializer();
+        $serializer = new JsonSerializer;
         $original = new Message(
             subject: 'api.request',
             payload: '{}',
@@ -241,7 +241,7 @@ describe('reply creation', function (): void {
     });
 
     it('returns null when no reply-to', function (): void {
-        $serializer = new JsonSerializer();
+        $serializer = new JsonSerializer;
         $original = new Message(subject: 'test', payload: '{}');
 
         $reply = $original->createReply(['data' => 'test'], $serializer);

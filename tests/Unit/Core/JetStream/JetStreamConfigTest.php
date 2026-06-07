@@ -7,7 +7,7 @@ use LaravelNats\Core\JetStream\JetStreamConfig;
 describe('JetStreamConfig', function (): void {
     describe('constructor', function (): void {
         it('creates instance with default values', function (): void {
-            $config = new JetStreamConfig();
+            $config = new JetStreamConfig;
 
             expect($config->getDomain())->toBeNull();
             expect($config->getTimeout())->toBe(5.0);
@@ -48,7 +48,7 @@ describe('JetStreamConfig', function (): void {
 
     describe('withDomain', function (): void {
         it('returns new instance with updated domain', function (): void {
-            $config = new JetStreamConfig();
+            $config = new JetStreamConfig;
             $newConfig = $config->withDomain('new-domain');
 
             expect($config->getDomain())->toBeNull();
@@ -66,7 +66,7 @@ describe('JetStreamConfig', function (): void {
 
     describe('withTimeout', function (): void {
         it('returns new instance with updated timeout', function (): void {
-            $config = new JetStreamConfig();
+            $config = new JetStreamConfig;
             $newConfig = $config->withTimeout(15.0);
 
             expect($config->getTimeout())->toBe(5.0);
@@ -87,7 +87,7 @@ describe('JetStreamConfig', function (): void {
         });
 
         it('includes null domain in array', function (): void {
-            $config = new JetStreamConfig();
+            $config = new JetStreamConfig;
             $array = $config->toArray();
 
             expect($array['domain'])->toBeNull();

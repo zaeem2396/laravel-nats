@@ -16,7 +16,7 @@ it('logs redacted envelope data at debug', function (): void {
         ],
     ]);
 
-    $logger = \Mockery::mock(LoggerInterface::class);
+    $logger = Mockery::mock(LoggerInterface::class);
     $logger->shouldReceive('debug')
         ->once()
         ->withArgs(function (string $msg, array $context): bool {
@@ -53,7 +53,7 @@ it('skips logging when body is not a v2 envelope', function (): void {
         ],
     ]);
 
-    $logger = \Mockery::mock(LoggerInterface::class);
+    $logger = Mockery::mock(LoggerInterface::class);
     $logger->shouldNotReceive('debug');
 
     $middleware = new RedactedEnvelopeLogInboundMiddleware($logger, $config);

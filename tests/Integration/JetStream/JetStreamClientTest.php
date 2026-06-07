@@ -19,6 +19,7 @@ use LaravelNats\Core\Connection\ConnectionConfig;
 use LaravelNats\Core\JetStream\JetStreamClient;
 use LaravelNats\Core\JetStream\JetStreamConfig;
 use LaravelNats\Exceptions\ConnectionException;
+use LaravelNats\Tests\TestCase;
 
 /**
  * Helper to create a connected client for JetStream tests.
@@ -27,7 +28,7 @@ use LaravelNats\Exceptions\ConnectionException;
  */
 function createJetStreamTestClient(): Client
 {
-    return \LaravelNats\Tests\TestCase::createConnectedJetStreamClient();
+    return TestCase::createConnectedJetStreamClient();
 }
 
 describe('JetStream Client', function (): void {

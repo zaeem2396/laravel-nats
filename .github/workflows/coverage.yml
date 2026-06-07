@@ -1,0 +1,90 @@
+# ============================================================================
+# LARAVEL NATS - COVERAGE WORKFLOW
+# ============================================================================
+#
+# Runs Pest with PCOV on a single representative stack with live NATS
+# (same containers as the test matrix) so integration tests are not skipped.
+# ============================================================================
+
+name: Coverage
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+    branches: [main, develop]
+  workflow_dispatch:
+
+concurrency:
+  group: coverage-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  coverage:
+    name: Pest coverage (PHP 8.3 / Laravel 12)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Start NATS servers
+        run: |
+          docker run -d --name nats -p 4222:4222 -p 8222:8222 nats:2.10 --jetstream
+          docker run -d --name nats-secured -p 4223:4222 -p 8223:8222 nats:2.10 --jetstream --user testuser --pass testpass
+          docker run -d --name nats-token -p 4224:4222 -p 8224:8222 nats:2.10 --jetstream --auth secret-token-12345
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: json, sockets, pcntl, pcov
+          coverage: pcov
+          ini-values: memory_limit=512M
+
+      - name: Install dependencies
+        env:
+          COMPOSER_NO_SECURITY_BLOCKING: 1
+        run: |
+          composer require "laravel/framework:12.*" "orchestra/testbench:10.*" --dev --no-interaction --no-update
+          composer update --prefer-stable --prefer-dist --no-interaction --no-progress
+
+      - name: Install netcat
+        run: sudo apt-get update && sudo apt-get install -y netcat-openbsd
+
+      - name: Wait for NATS servers
+        run: |
+          echo "Waiting for NATS servers..."
+          max_attempts=120
+          attempt=0
+          sleep 3
+          while [ $attempt -lt $max_attempts ]; do
+            ready=true
+            nc -z localhost 4222 2>/dev/null || ready=false
+            nc -z localhost 4223 2>/dev/null || ready=false
+            nc -z localhost 4224 2>/dev/null || ready=false
+            if [ "$ready" = true ]; then
+              echo "All NATS servers are ready"
+              exit 0
+            fi
+            attempt=$((attempt + 1))
+            sleep 1
+          done
+          docker ps -a | grep nats || true
+          exit 1
+
+      - name: Run Pest with coverage
+        env:
+          NATS_HOST: localhost
+          NATS_PORT: 4222
+        run: |
+          mkdir -p build
+          vendor/bin/pest --coverage --coverage-clover=build/coverage.xml --min=80
+
+      - name: Upload coverage artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-clover
+          path: build/coverage.xml
+          if-no-files-found: error

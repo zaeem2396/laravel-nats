@@ -4,16 +4,15 @@ declare(strict_types=1);
 
 use LaravelNats\Laravel\Queue\NatsConnector;
 use LaravelNats\Laravel\Queue\NatsQueue;
+use LaravelNats\Tests\TestCase;
 
 describe('NatsConnector', function (): void {
     describe('connect', function (): void {
         it('creates a NatsQueue instance from config', function (): void {
             // Skip if no NATS server available
-            if (! isPortAvailable(4222)) {
-                $this->markTestSkipped('NATS server not available');
-            }
+            TestCase::skipUnlessNatsReachable();
 
-            $connector = new NatsConnector();
+            $connector = new NatsConnector;
             $config = [
                 'host' => 'localhost',
                 'port' => 4222,
@@ -32,11 +31,9 @@ describe('NatsConnector', function (): void {
         });
 
         it('uses default values when config is minimal', function (): void {
-            if (! isPortAvailable(4222)) {
-                $this->markTestSkipped('NATS server not available');
-            }
+            TestCase::skipUnlessNatsReachable();
 
-            $connector = new NatsConnector();
+            $connector = new NatsConnector;
             $queue = $connector->connect([]);
 
             expect($queue)->toBeInstanceOf(NatsQueue::class);
@@ -48,11 +45,9 @@ describe('NatsConnector', function (): void {
         });
 
         it('applies authentication config correctly', function (): void {
-            if (! isPortAvailable(4223)) {
-                $this->markTestSkipped('Secured NATS server not available');
-            }
+            TestCase::skipUnlessPortOpen(4223, message: 'Secured NATS server not available');
 
-            $connector = new NatsConnector();
+            $connector = new NatsConnector;
             $config = [
                 'host' => 'localhost',
                 'port' => 4223,
@@ -71,11 +66,9 @@ describe('NatsConnector', function (): void {
         });
 
         it('applies token authentication correctly', function (): void {
-            if (! isPortAvailable(4224)) {
-                $this->markTestSkipped('Token NATS server not available');
-            }
+            TestCase::skipUnlessPortOpen(4224, message: 'Token NATS server not available');
 
-            $connector = new NatsConnector();
+            $connector = new NatsConnector;
             $config = [
                 'host' => 'localhost',
                 'port' => 4224,
@@ -92,11 +85,9 @@ describe('NatsConnector', function (): void {
         });
 
         it('applies timeout configuration', function (): void {
-            if (! isPortAvailable(4222)) {
-                $this->markTestSkipped('NATS server not available');
-            }
+            TestCase::skipUnlessNatsReachable();
 
-            $connector = new NatsConnector();
+            $connector = new NatsConnector;
             $config = [
                 'timeout' => 10.0,
                 'ping_interval' => 60.0,
@@ -112,11 +103,9 @@ describe('NatsConnector', function (): void {
         });
 
         it('applies client name configuration', function (): void {
-            if (! isPortAvailable(4222)) {
-                $this->markTestSkipped('NATS server not available');
-            }
+            TestCase::skipUnlessNatsReachable();
 
-            $connector = new NatsConnector();
+            $connector = new NatsConnector;
             $config = [
                 'client_name' => 'my-custom-queue-client',
             ];

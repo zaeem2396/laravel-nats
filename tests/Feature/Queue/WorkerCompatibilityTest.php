@@ -19,12 +19,15 @@ use LaravelNats\Core\Client;
 use LaravelNats\Core\Connection\ConnectionConfig;
 use LaravelNats\Laravel\Queue\NatsJob;
 use LaravelNats\Laravel\Queue\NatsQueue;
+use LaravelNats\Tests\TestCase;
 
 /**
  * Helper to create a connected NATS client for testing.
  */
 function createWorkerTestClient(): Client
 {
+    TestCase::skipUnlessNatsReachable();
+
     $config = ConnectionConfig::local();
     $client = new Client($config);
     $client->connect();
@@ -33,20 +36,14 @@ function createWorkerTestClient(): Client
 }
 
 describe('Queue Worker Compatibility', function (): void {
-    beforeEach(function (): void {
-        if (! \LaravelNats\Tests\TestCase::isNatsReachable()) {
-            $this->markTestSkipped('NATS server not available');
-        }
-    });
-
     describe('queue pop operation', function (): void {
         it('returns null when queue is empty', function (): void {
             $client = createWorkerTestClient();
 
             try {
-                $uniqueQueue = 'empty-queue-' . uniqid();
+                $uniqueQueue = 'empty-queue-'.uniqid();
                 $queue = new NatsQueue($client, $uniqueQueue, 60);
-                $queue->setContainer(new Container());
+                $queue->setContainer(new Container);
                 $queue->setConnectionName('nats');
 
                 $job = $queue->pop($uniqueQueue);
@@ -61,14 +58,14 @@ describe('Queue Worker Compatibility', function (): void {
             $client = createWorkerTestClient();
 
             try {
-                $uniqueQueue = 'pop-test-' . uniqid();
+                $uniqueQueue = 'pop-test-'.uniqid();
                 $queue = new NatsQueue($client, $uniqueQueue, 60);
-                $queue->setContainer(new Container());
+                $queue->setContainer(new Container);
                 $queue->setConnectionName('nats');
 
                 // First, subscribe to receive the message
                 $received = null;
-                $client->subscribe('laravel.queue.' . $uniqueQueue, function ($msg) use (&$received): void {
+                $client->subscribe('laravel.queue.'.$uniqueQueue, function ($msg) use (&$received): void {
                     $received = $msg;
                 });
 
@@ -95,20 +92,20 @@ describe('Queue Worker Compatibility', function (): void {
             $client = createWorkerTestClient();
 
             try {
-                $queue1 = 'queue-a-' . uniqid();
-                $queue2 = 'queue-b-' . uniqid();
+                $queue1 = 'queue-a-'.uniqid();
+                $queue2 = 'queue-b-'.uniqid();
                 $natsQueue = new NatsQueue($client, 'default', 60);
-                $natsQueue->setContainer(new Container());
+                $natsQueue->setContainer(new Container);
                 $natsQueue->setConnectionName('nats');
 
                 // Subscribe to both queues
                 $receivedQ1 = null;
                 $receivedQ2 = null;
 
-                $client->subscribe('laravel.queue.' . $queue1, function ($msg) use (&$receivedQ1): void {
+                $client->subscribe('laravel.queue.'.$queue1, function ($msg) use (&$receivedQ1): void {
                     $receivedQ1 = $msg;
                 });
-                $client->subscribe('laravel.queue.' . $queue2, function ($msg) use (&$receivedQ2): void {
+                $client->subscribe('laravel.queue.'.$queue2, function ($msg) use (&$receivedQ2): void {
                     $receivedQ2 = $msg;
                 });
 
@@ -134,9 +131,9 @@ describe('Queue Worker Compatibility', function (): void {
             $client = createWorkerTestClient();
 
             try {
-                $uniqueQueue = 'job-instance-' . uniqid();
+                $uniqueQueue = 'job-instance-'.uniqid();
                 $queue = new NatsQueue($client, $uniqueQueue, 60);
-                $queue->setContainer(new Container());
+                $queue->setContainer(new Container);
                 $queue->setConnectionName('nats');
 
                 $payload = json_encode([
@@ -150,7 +147,7 @@ describe('Queue Worker Compatibility', function (): void {
 
                 // Create job directly (simulating pop result)
                 $job = new NatsJob(
-                    container: new Container(),
+                    container: new Container,
                     nats: $queue,
                     job: $payload,
                     connectionName: 'nats',
@@ -174,7 +171,7 @@ describe('Queue Worker Compatibility', function (): void {
 
             try {
                 $queue = new NatsQueue($client, 'default', 60);
-                $queue->setContainer(new Container());
+                $queue->setContainer(new Container);
                 $queue->setConnectionName('nats');
 
                 $payload = json_encode([
@@ -184,7 +181,7 @@ describe('Queue Worker Compatibility', function (): void {
                 ]);
 
                 $job = new NatsJob(
-                    container: new Container(),
+                    container: new Container,
                     nats: $queue,
                     job: $payload,
                     connectionName: 'nats',
@@ -202,7 +199,7 @@ describe('Queue Worker Compatibility', function (): void {
 
             try {
                 $queue = new NatsQueue($client, 'default', 60);
-                $queue->setContainer(new Container());
+                $queue->setContainer(new Container);
                 $queue->setConnectionName('nats');
 
                 $payload = json_encode([
@@ -212,7 +209,7 @@ describe('Queue Worker Compatibility', function (): void {
                 ]);
 
                 $job = new NatsJob(
-                    container: new Container(),
+                    container: new Container,
                     nats: $queue,
                     job: $payload,
                     connectionName: 'nats',
@@ -232,7 +229,7 @@ describe('Queue Worker Compatibility', function (): void {
 
             try {
                 $queue = new NatsQueue($client, 'default', 60);
-                $queue->setContainer(new Container());
+                $queue->setContainer(new Container);
                 $queue->setConnectionName('nats');
 
                 $payload = json_encode([
@@ -241,7 +238,7 @@ describe('Queue Worker Compatibility', function (): void {
                 ]);
 
                 $job = new NatsJob(
-                    container: new Container(),
+                    container: new Container,
                     nats: $queue,
                     job: $payload,
                     connectionName: 'nats',
@@ -262,14 +259,14 @@ describe('Queue Worker Compatibility', function (): void {
             $client = createWorkerTestClient();
 
             try {
-                $uniqueQueue = 'release-test-' . uniqid();
+                $uniqueQueue = 'release-test-'.uniqid();
                 $queue = new NatsQueue($client, $uniqueQueue, 60);
-                $queue->setContainer(new Container());
+                $queue->setContainer(new Container);
                 $queue->setConnectionName('nats');
 
                 // Subscribe to catch the released message
                 $released = null;
-                $client->subscribe('laravel.queue.' . $uniqueQueue, function ($msg) use (&$released): void {
+                $client->subscribe('laravel.queue.'.$uniqueQueue, function ($msg) use (&$released): void {
                     $released = $msg;
                 });
 
@@ -279,7 +276,7 @@ describe('Queue Worker Compatibility', function (): void {
                 ]);
 
                 $job = new NatsJob(
-                    container: new Container(),
+                    container: new Container,
                     nats: $queue,
                     job: $payload,
                     connectionName: 'nats',
@@ -307,13 +304,13 @@ describe('Queue Worker Compatibility', function (): void {
             $client = createWorkerTestClient();
 
             try {
-                $uniqueQueue = 'attempts-test-' . uniqid();
+                $uniqueQueue = 'attempts-test-'.uniqid();
                 $queue = new NatsQueue($client, $uniqueQueue, 60);
-                $queue->setContainer(new Container());
+                $queue->setContainer(new Container);
                 $queue->setConnectionName('nats');
 
                 $released = [];
-                $client->subscribe('laravel.queue.' . $uniqueQueue, function ($msg) use (&$released): void {
+                $client->subscribe('laravel.queue.'.$uniqueQueue, function ($msg) use (&$released): void {
                     $released[] = $msg;
                 });
 
@@ -323,7 +320,7 @@ describe('Queue Worker Compatibility', function (): void {
                 ]);
 
                 $job = new NatsJob(
-                    container: new Container(),
+                    container: new Container,
                     nats: $queue,
                     job: $payload,
                     connectionName: 'nats',
@@ -337,7 +334,7 @@ describe('Queue Worker Compatibility', function (): void {
                 // Create new job from released payload
                 $payload2 = $released[0]->getPayload();
                 $job2 = new NatsJob(
-                    container: new Container(),
+                    container: new Container,
                     nats: $queue,
                     job: $payload2,
                     connectionName: 'nats',
@@ -358,7 +355,7 @@ describe('Queue Worker Compatibility', function (): void {
             try {
                 $retryAfter = 90;
                 $queue = new NatsQueue($client, 'default', $retryAfter);
-                $queue->setContainer(new Container());
+                $queue->setContainer(new Container);
                 $queue->setConnectionName('nats');
 
                 expect($queue->getRetryAfter())->toBe(90);
@@ -372,7 +369,7 @@ describe('Queue Worker Compatibility', function (): void {
 
             try {
                 $queue = new NatsQueue($client, 'default', 60);
-                $queue->setContainer(new Container());
+                $queue->setContainer(new Container);
                 $queue->setConnectionName('nats');
 
                 $payload = json_encode([
@@ -382,7 +379,7 @@ describe('Queue Worker Compatibility', function (): void {
                 ]);
 
                 $job = new NatsJob(
-                    container: new Container(),
+                    container: new Container,
                     nats: $queue,
                     job: $payload,
                     connectionName: 'nats',
@@ -401,7 +398,7 @@ describe('Queue Worker Compatibility', function (): void {
                 ]);
 
                 $jobMaxed = new NatsJob(
-                    container: new Container(),
+                    container: new Container,
                     nats: $queue,
                     job: $payloadMaxed,
                     connectionName: 'nats',
@@ -421,19 +418,19 @@ describe('Queue Worker Compatibility', function (): void {
 
             try {
                 $queue = new NatsQueue($client, 'default', 60);
-                $queue->setContainer(new Container());
+                $queue->setContainer(new Container);
                 $queue->setConnectionName('nats');
 
-                $queueA = 'queue-a-' . uniqid();
-                $queueB = 'queue-b-' . uniqid();
+                $queueA = 'queue-a-'.uniqid();
+                $queueB = 'queue-b-'.uniqid();
 
                 $messagesA = [];
                 $messagesB = [];
 
-                $client->subscribe('laravel.queue.' . $queueA, function ($msg) use (&$messagesA): void {
+                $client->subscribe('laravel.queue.'.$queueA, function ($msg) use (&$messagesA): void {
                     $messagesA[] = $msg;
                 });
-                $client->subscribe('laravel.queue.' . $queueB, function ($msg) use (&$messagesB): void {
+                $client->subscribe('laravel.queue.'.$queueB, function ($msg) use (&$messagesB): void {
                     $messagesB[] = $msg;
                 });
 
@@ -454,9 +451,9 @@ describe('Queue Worker Compatibility', function (): void {
             $client = createWorkerTestClient();
 
             try {
-                $defaultQueue = 'my-default-' . uniqid();
+                $defaultQueue = 'my-default-'.uniqid();
                 $queue = new NatsQueue($client, $defaultQueue, 60);
-                $queue->setContainer(new Container());
+                $queue->setContainer(new Container);
                 $queue->setConnectionName('nats');
 
                 expect($queue->getQueue())->toBe($defaultQueue);
@@ -474,7 +471,7 @@ describe('Queue Worker Compatibility', function (): void {
 
             try {
                 $queue = new NatsQueue($client, 'default', 60);
-                $queue->setContainer(new Container());
+                $queue->setContainer(new Container);
                 $queue->setConnectionName('nats');
 
                 expect($queue->getClient())->toBe($client);
@@ -489,13 +486,13 @@ describe('Queue Worker Compatibility', function (): void {
 
             try {
                 $queue = new NatsQueue($client, 'default', 60);
-                $queue->setContainer(new Container());
+                $queue->setContainer(new Container);
                 $queue->setConnectionName('nats');
 
                 // Multiple push operations
-                $uniqueQueue = 'multi-op-' . uniqid();
+                $uniqueQueue = 'multi-op-'.uniqid();
                 $received = [];
-                $client->subscribe('laravel.queue.' . $uniqueQueue, function ($msg) use (&$received): void {
+                $client->subscribe('laravel.queue.'.$uniqueQueue, function ($msg) use (&$received): void {
                     $received[] = $msg;
                 });
 

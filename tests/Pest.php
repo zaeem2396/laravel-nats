@@ -27,6 +27,11 @@
  */
 
 declare(strict_types=1);
+use LaravelNats\Core\Client;
+use LaravelNats\Core\Connection\ConnectionConfig;
+use LaravelNats\Core\Protocol\Parser;
+use LaravelNats\Tests\LaravelTestCase;
+use LaravelNats\Tests\TestCase;
 
 /*
 |--------------------------------------------------------------------------
@@ -38,7 +43,7 @@ declare(strict_types=1);
 */
 
 // Unit tests: Pure PHP, no framework dependencies (excluding Laravel folder)
-uses(LaravelNats\Tests\TestCase::class)->in(
+uses(TestCase::class)->in(
     'Unit/Security/SubjectPrefixMatcherTest.php',
     'Unit/Security/SubjectAclCheckerTest.php',
     'Unit/Message',
@@ -47,17 +52,18 @@ uses(LaravelNats\Tests\TestCase::class)->in(
     'Unit/Messaging',
     'Unit/Protocol',
     'Unit/Serialization',
-    'Unit/Core/JetStream',
+    'Unit/Core',
     'Unit/JetStreamFinalityTest.php',
     'Unit/Idempotency',
     'Unit/Support',
     'Unit/Observability',
     'Unit/Outbox',
+    'Unit/Publisher',
     'Unit/Subscriber',
 );
 
 // Unit/Laravel tests: Laravel application context with Orchestra Testbench
-uses(LaravelNats\Tests\LaravelTestCase::class)->in(
+uses(LaravelTestCase::class)->in(
     'Unit/JetStream',
     'Unit/Laravel/Console/JetStreamCommandsTest.php',
     'Unit/Laravel/NatsFacadeTest.php',
@@ -71,19 +77,22 @@ uses(LaravelNats\Tests\LaravelTestCase::class)->in(
     'Unit/Laravel/BasisNatsConnectorTest.php',
     'Unit/Laravel/NatsPingCommandRegisteredTest.php',
     'Unit/Laravel/NatsValidateConfigCommandRegisteredTest.php',
+    'Unit/Laravel/Console/ArtisanCommandsRegistrationTest.php',
+    'Unit/Laravel/Events',
     'Unit/Laravel/RedactedEnvelopeLogInboundMiddlewareTest.php',
     'Unit/Laravel/TraceContextHeadersTest.php',
+    'Unit/Laravel/CorrelationLogInboundMiddlewareTest.php',
     'Unit/Security/NatsBasisConfigurationValidatorTest.php',
 );
 
 // Unit/Laravel/Queue tests: Queue components (minimal Laravel context)
-uses(LaravelNats\Tests\TestCase::class)->in('Unit/Laravel/Queue');
+uses(TestCase::class)->in('Unit/Laravel/Queue');
 
 // Feature tests: Laravel application context with Orchestra Testbench
-uses(LaravelNats\Tests\LaravelTestCase::class)->in('Feature');
+uses(LaravelTestCase::class)->in('Feature');
 
 // Integration tests: Require NATS server
-uses(LaravelNats\Tests\TestCase::class)
+uses(TestCase::class)
     ->beforeEach(function (): void {
         // Skip integration tests if NATS is not available
         if (! $this->isNatsAvailable()) {
@@ -100,7 +109,7 @@ uses(LaravelNats\Tests\TestCase::class)
 */
 
 expect()->extend('toBeValidSubject', function () {
-    $parser = new \LaravelNats\Core\Protocol\Parser();
+    $parser = new Parser;
 
     expect($parser->isValidSubject($this->value, true))->toBeTrue(
         "Expected '{$this->value}' to be a valid NATS subject",
@@ -110,7 +119,7 @@ expect()->extend('toBeValidSubject', function () {
 });
 
 expect()->extend('toBeInvalidSubject', function () {
-    $parser = new \LaravelNats\Core\Protocol\Parser();
+    $parser = new Parser;
 
     expect($parser->isValidSubject($this->value, true))->toBeFalse(
         "Expected '{$this->value}' to be an invalid NATS subject",
@@ -129,13 +138,11 @@ expect()->extend('toBeInvalidSubject', function () {
 /**
  * Get a fresh connection configuration for testing.
  *
- * @param array<string, mixed> $overrides Configuration overrides
- *
- * @return \LaravelNats\Core\Connection\ConnectionConfig
+ * @param  array<string, mixed>  $overrides  Configuration overrides
  */
-function testConfig(array $overrides = []): \LaravelNats\Core\Connection\ConnectionConfig
+function testConfig(array $overrides = []): ConnectionConfig
 {
-    return \LaravelNats\Core\Connection\ConnectionConfig::fromArray(array_merge([
+    return ConnectionConfig::fromArray(array_merge([
         'host' => env('NATS_HOST', 'localhost'),
         'port' => (int) env('NATS_PORT', 4222),
         'timeout' => 5.0,
@@ -144,12 +151,10 @@ function testConfig(array $overrides = []): \LaravelNats\Core\Connection\Connect
 
 /**
  * Create a test client connected to NATS.
- *
- * @return \LaravelNats\Core\Client
  */
-function testClient(): \LaravelNats\Core\Client
+function testClient(): Client
 {
-    $client = new \LaravelNats\Core\Client(testConfig());
+    $client = new Client(testConfig());
     $client->connect();
 
     return $client;
@@ -158,13 +163,11 @@ function testClient(): \LaravelNats\Core\Client
 /**
  * Get configuration for the secured NATS server (username/password).
  *
- * @param array<string, mixed> $overrides Configuration overrides
- *
- * @return \LaravelNats\Core\Connection\ConnectionConfig
+ * @param  array<string, mixed>  $overrides  Configuration overrides
  */
-function securedConfig(array $overrides = []): \LaravelNats\Core\Connection\ConnectionConfig
+function securedConfig(array $overrides = []): ConnectionConfig
 {
-    return \LaravelNats\Core\Connection\ConnectionConfig::fromArray(array_merge([
+    return ConnectionConfig::fromArray(array_merge([
         'host' => env('NATS_HOST', 'localhost'),
         'port' => (int) env('NATS_SECURED_PORT', 4223),
         'user' => 'testuser',
@@ -176,13 +179,11 @@ function securedConfig(array $overrides = []): \LaravelNats\Core\Connection\Conn
 /**
  * Get configuration for the token-auth NATS server.
  *
- * @param array<string, mixed> $overrides Configuration overrides
- *
- * @return \LaravelNats\Core\Connection\ConnectionConfig
+ * @param  array<string, mixed>  $overrides  Configuration overrides
  */
-function tokenConfig(array $overrides = []): \LaravelNats\Core\Connection\ConnectionConfig
+function tokenConfig(array $overrides = []): ConnectionConfig
 {
-    return \LaravelNats\Core\Connection\ConnectionConfig::fromArray(array_merge([
+    return ConnectionConfig::fromArray(array_merge([
         'host' => env('NATS_HOST', 'localhost'),
         'port' => (int) env('NATS_TOKEN_PORT', 4224),
         'token' => 'secret-token-12345',
@@ -193,12 +194,11 @@ function tokenConfig(array $overrides = []): \LaravelNats\Core\Connection\Connec
 /**
  * Check if a specific port is available.
  *
- * @param int $port Port to check
- * @param string $host Host to check (default: localhost)
- *
+ * @param  int  $port  Port to check
+ * @param  string  $host  Host to check (default: localhost)
  * @return bool True if server is reachable
  */
 function isPortAvailable(int $port, string $host = 'localhost'): bool
 {
-    return \LaravelNats\Tests\TestCase::isTcpPortOpen($port, $host);
+    return TestCase::isTcpPortOpen($port, $host);
 }

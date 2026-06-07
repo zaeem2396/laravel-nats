@@ -6,6 +6,7 @@ use Illuminate\Container\Container;
 use LaravelNats\Core\Client;
 use LaravelNats\Core\Connection\ConnectionConfig;
 use LaravelNats\Laravel\Queue\NatsQueue;
+use LaravelNats\Tests\TestCase;
 
 /**
  * Create a connected NATS client for queue tests.
@@ -14,23 +15,19 @@ use LaravelNats\Laravel\Queue\NatsQueue;
  */
 function createQueueTestSetup(string $queueName = 'test-queue', int $retryAfter = 90): array
 {
+    TestCase::skipUnlessNatsReachable();
+
     $config = ConnectionConfig::local();
     $client = new Client($config);
     $client->connect();
 
     $queue = new NatsQueue($client, $queueName, $retryAfter);
-    $queue->setContainer(new Container());
+    $queue->setContainer(new Container);
 
     return ['client' => $client, 'queue' => $queue];
 }
 
 describe('NatsQueue', function (): void {
-    beforeEach(function (): void {
-        if (! \LaravelNats\Tests\TestCase::isNatsReachable()) {
-            $this->markTestSkipped('NATS server not available');
-        }
-    });
-
     describe('getQueue', function (): void {
         it('returns the default queue name', function (): void {
             $setup = createQueueTestSetup();
@@ -235,7 +232,7 @@ describe('NatsQueue', function (): void {
 
             try {
                 // Use a unique queue name to avoid interference
-                $uniqueQueue = 'empty-queue-' . uniqid();
+                $uniqueQueue = 'empty-queue-'.uniqid();
 
                 $job = $setup['queue']->pop($uniqueQueue);
 
