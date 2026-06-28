@@ -64,7 +64,7 @@ NatsV2::publish('a.b', ['k' => 1]);
 
 Configure `nats_basis.connections.{name}`.
 
-`NatsV2::disconnect` / `disconnectAll` clear cached clients.
+`NatsV2::disconnect` / `disconnectAll` clear cached clients. From **1.6.2+**, `NatsV2::reconnect()` drops and recreates the basis client; legacy `Nats::reconnect()` and `Client::reconnect()` do the same for the wire-stack client.
 
 ## Headers
 
