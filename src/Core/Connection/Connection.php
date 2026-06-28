@@ -113,8 +113,19 @@ final class Connection implements ConnectionInterface
             return;
         }
 
-        $this->createSocket();
-        $this->performHandshake();
+        $this->disposeStaleTransport();
+
+        try {
+            $this->createSocket();
+            $this->performHandshake();
+        } catch (\Throwable $e) {
+            $this->disposeStaleTransport();
+            $this->connected = false;
+            $this->serverInfo = null;
+
+            throw $e;
+        }
+
         $this->connected = true;
         $this->lastActivityTime = microtime(true);
         $this->lastHealthCheck = microtime(true);
@@ -125,11 +136,7 @@ final class Connection implements ConnectionInterface
      */
     public function disconnect(): void
     {
-        if ($this->socket !== null) {
-            // Attempt graceful close
-            @fclose($this->socket);
-            $this->socket = null;
-        }
+        $this->closeSocket();
 
         $this->connected = false;
         $this->serverInfo = null;
@@ -307,7 +314,17 @@ final class Connection implements ConnectionInterface
             return null;
         }
 
-        return $data === '' ? null : $data;
+        if ($data === '') {
+            if ($this->socket !== null && feof($this->socket)) {
+                $this->markDisconnected();
+            }
+
+            return null;
+        }
+
+        $this->lastActivityTime = microtime(true);
+
+        return $data;
     }
 
     /**
@@ -766,6 +783,26 @@ final class Connection implements ConnectionInterface
     private function markDisconnected(): void
     {
         $this->connected = false;
+    }
+
+    /**
+     * Close an open socket without resetting connection metadata.
+     */
+    private function closeSocket(): void
+    {
+        if ($this->socket !== null) {
+            @fclose($this->socket);
+            $this->socket = null;
+        }
+    }
+
+    /**
+     * Drop any leftover transport from a prior session before reconnecting.
+     */
+    private function disposeStaleTransport(): void
+    {
+        $this->closeSocket();
+        $this->readBuffer = '';
     }
 
     /**

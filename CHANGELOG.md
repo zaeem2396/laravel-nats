@@ -17,11 +17,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
-- GitHub Actions Coverage workflow; use `composer test:coverage` locally when needed.
+- (none)
 
 ### Documentation
 
 - (none)
+
+## [1.6.2] - 2026-06-04
+
+### Added
+
+- **`ConnectionManager::reconnect()`** and **`NatsV2Gateway::reconnect()`** to recreate basis clients after a dropped session.
+- **`Client::reconnect()`** on the legacy wire-stack client (disconnect + connect, clearing subscriptions).
+
+### Fixed
+
+- **Legacy `Connection`:** dispose stale sockets before reconnecting after `markDisconnected()`; roll back the transport when the NATS handshake fails.
+- **Legacy `Connection::read()`:** update idle activity on successful reads and mark the session disconnected on EOF.
+
+### Documentation
+
+- Reconnect APIs documented in [`docs/v2/GUIDE.md`](docs/v2/GUIDE.md); README version map and roadmap updated.
 
 ## [1.6.1] - 2026-06-04
 
@@ -345,6 +361,21 @@ Run `composer update zaeem2396/laravel-nats` to upgrade.
 
 Run `composer update zaeem2396/laravel-nats` to upgrade.
 
+### From 1.6.1 to 1.6.2
+
+- **Reconnect helpers:** `NatsV2::reconnect()`, `ConnectionManager::reconnect()`, legacy `Nats::reconnect()`, and `Client::reconnect()` after dropped sessions.
+- **Legacy connection fixes:** safer transport cleanup when reconnecting; no config changes required.
+
+```json
+{
+    "require": {
+        "zaeem2396/laravel-nats": "^1.6.2"
+    }
+}
+```
+
+Run `composer update zaeem2396/laravel-nats` to upgrade.
+
 ### From 1.6.0 to 1.6.1
 
 - **No public API changes.** Patch release focused on tests, CI, and documentation.
@@ -409,7 +440,8 @@ Run `composer update zaeem2396/laravel-nats` to upgrade.
 
 ---
 
-[Unreleased]: https://github.com/zaeem2396/laravel-nats/compare/v1.6.1...HEAD
+[Unreleased]: https://github.com/zaeem2396/laravel-nats/compare/v1.6.2...HEAD
+[1.6.2]: https://github.com/zaeem2396/laravel-nats/compare/v1.6.1...v1.6.2
 [1.6.1]: https://github.com/zaeem2396/laravel-nats/compare/v1.6.0...v1.6.1
 [1.6.0]: https://github.com/zaeem2396/laravel-nats/compare/v1.5.2...v1.6.0
 [1.5.2]: https://github.com/zaeem2396/laravel-nats/compare/v1.5.1...v1.5.2

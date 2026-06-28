@@ -26,6 +26,7 @@ use LaravelNats\Outbox\NatsOutboxDispatchResult;
  * @method static bool ping(string|null $connection = null)
  * @method static void disconnect(string|null $name = null)
  * @method static void disconnectAll()
+ * @method static Client reconnect(string|null $name = null)
  * @method static BasisJetStreamManager jetstream(string|null $connection = null)
  * @method static void jetStreamPublish(string $stream, string $subject, array $payload, bool $useEnvelope = true, bool $waitForAck = true, array $headers = [], string|null $connection = null)
  * @method static list<Msg> jetStreamPull(string $stream, string $consumer, int|null $batch = null, float|null $expiresSeconds = null, string|null $connection = null)

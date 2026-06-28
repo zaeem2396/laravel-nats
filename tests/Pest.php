@@ -71,6 +71,7 @@ uses(LaravelTestCase::class)->in(
     'Unit/Laravel/NatsServiceProviderTest.php',
     'Unit/Laravel/NatsManagerJetStreamTest.php',
     'Unit/Laravel/NatsV2FacadeTest.php',
+    'Unit/Laravel/NatsV2GatewayReconnectTest.php',
     'Unit/Laravel/NatsV2GatewayJetStreamTest.php',
     'Unit/Laravel/NatsV2JetStreamCommandsRegisteredTest.php',
     'Unit/Laravel/CorrelationHeadersTest.php',
