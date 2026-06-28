@@ -10,8 +10,8 @@ Package releases follow [Semantic Versioning](https://semver.org/). See [CHANGEL
 | 1.4.0+ | v2.4–v2.5 | Basis JetStream, `nats_basis` queue, idempotency, observability |
 | 1.5.0+ | v2.6 | Config validation, TLS production guard, optional subject ACL |
 | 1.6.0+ | v2.7 | Trace context, connection selection, outbox recipe |
-| 1.6.1 | — | Test coverage, CI (Pest, PHPStan, Pint), no public API changes |
-| 1.6.2 | — | Connection reconnect helpers and transport edge-case fixes |
+| 1.6.1 | — | Test coverage, CI (Pest, PHPStan, Pint), no public API changes (shipped) |
+| 1.6.2 | — | Connection reconnect helpers and transport edge-case fixes (shipped) |
 
 ## Current stable
 

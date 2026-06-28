@@ -29,15 +29,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **`ConnectionManager::reconnect()`** and **`NatsV2Gateway::reconnect()`** to recreate basis clients after a dropped session.
 - **`Client::reconnect()`** on the legacy wire-stack client (disconnect + connect, clearing subscriptions).
+- **Tests:** reconnect coverage for legacy `Connection`, `ConnectionManager`, Core `Client`, `NatsV2Gateway`, and `NatsManager`.
+
+### Changed
+
+- **CI:** retry Docker Hub pulls when starting NATS in GitHub Actions (`.github/scripts/start-nats-ci.sh`).
 
 ### Fixed
 
 - **Legacy `Connection`:** dispose stale sockets before reconnecting after `markDisconnected()`; roll back the transport when the NATS handshake fails.
 - **Legacy `Connection::read()`:** update idle activity on successful reads and mark the session disconnected on EOF.
 
+### Removed
+
+- **CI:** GitHub Actions Coverage workflow (use local `composer test:coverage` with PCOV or Xdebug and NATS running).
+
 ### Documentation
 
-- Reconnect APIs documented in [`docs/v2/GUIDE.md`](docs/v2/GUIDE.md); README version map and roadmap updated.
+- Reconnect APIs documented in [`docs/v2/GUIDE.md`](docs/v2/GUIDE.md); README version map, [`docs/ROADMAP.md`](docs/ROADMAP.md), and v2 docs index updated for **1.6.2**.
 
 ## [1.6.1] - 2026-06-04
 
@@ -363,7 +372,7 @@ Run `composer update zaeem2396/laravel-nats` to upgrade.
 
 ### From 1.6.1 to 1.6.2
 
-- **Reconnect helpers:** `NatsV2::reconnect()`, `ConnectionManager::reconnect()`, legacy `Nats::reconnect()`, and `Client::reconnect()` after dropped sessions.
+- **New reconnect helpers:** `NatsV2::reconnect()`, `ConnectionManager::reconnect()`, and `Client::reconnect()` recreate clients after a dropped session. Legacy `Nats::reconnect()` on `NatsManager` remains available.
 - **Legacy connection fixes:** safer transport cleanup when reconnecting; no config changes required.
 
 ```json
