@@ -110,6 +110,19 @@ final class ConnectionManager
     }
 
     /**
+     * Drop and recreate a named basis client (or the default when null).
+     *
+     * @throws InvalidArgumentException
+     */
+    public function reconnect(?string $name = null): Client
+    {
+        $resolved = $name ?? $this->getDefaultConnection();
+        $this->disconnect($resolved);
+
+        return $this->connection($resolved);
+    }
+
+    /**
      * @return array<string, Client>
      */
     public function getConnections(): array
