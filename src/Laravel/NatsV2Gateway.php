@@ -204,6 +204,14 @@ final class NatsV2Gateway
         $this->connections->disconnectAll();
     }
 
+    /**
+     * @throws InvalidArgumentException
+     */
+    public function reconnect(?string $name = null): Client
+    {
+        return $this->connections->reconnect($name);
+    }
+
     public function jetstream(?string $connection = null): BasisJetStreamManager
     {
         return new BasisJetStreamManager($this->connections, $connection);
