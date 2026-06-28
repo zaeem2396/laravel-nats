@@ -63,6 +63,7 @@ Version map:
 - **1.5.2**: README/docs index layout; Docker local NATS section; [`docs/INDEX.md`](docs/INDEX.md)
 - **1.6.0+**: v2.7 header helpers, optional W3C trace context, subject-prefix connection selection, outbox recipe; Laravel 13 supported in package dev constraints; CI tests PHP 8.5 on Laravel 11–13
 - **1.6.1**: expanded Pest coverage, Pint CI workflow, `composer ci` script; no public API changes
+- **1.6.2**: connection reconnect helpers and transport cleanup for legacy and basis clients
 
 Roadmap: [`docs/ROADMAP.md`](docs/ROADMAP.md) · Changelog: [`CHANGELOG.md`](CHANGELOG.md)
 
