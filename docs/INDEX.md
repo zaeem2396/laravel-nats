@@ -30,7 +30,7 @@ Use this page as the quick-access map for package docs.
 ## Quality And CI
 
 - local checks: run `composer ci` (Pest, PHPStan, Pint, PHP-CS-Fixer)
-- workflows: Tests, Static Analysis, Code Style, Pint, Coverage (see repository `.github/workflows/`)
+- workflows: Tests, Static Analysis, Code Style, Pint (see repository `.github/workflows/`)
 
 ## Help And Examples
 

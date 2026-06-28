@@ -17,7 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
-- (none)
+- GitHub Actions Coverage workflow; use `composer test:coverage` locally when needed.
 
 ### Documentation
 
@@ -348,7 +348,7 @@ Run `composer update zaeem2396/laravel-nats` to upgrade.
 ### From 1.6.0 to 1.6.1
 
 - **No public API changes.** Patch release focused on tests, CI, and documentation.
-- **Contributors:** use `composer ci` locally (Pest, PHPStan, Pint, PHP-CS-Fixer). Coverage workflow requires NATS + PCOV (see [`.github/workflows/coverage.yml`](.github/workflows/coverage.yml)).
+- **Contributors:** use `composer ci` locally (Pest, PHPStan, Pint, PHP-CS-Fixer). Optional coverage: `composer test:coverage` with PCOV or Xdebug and NATS running.
 
 ```json
 {

@@ -116,17 +116,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Start NATS servers
-        run: |
-          # Start primary NATS server with JetStream (no authentication)
-          docker run -d --name nats -p 4222:4222 -p 8222:8222 nats:2.10 --jetstream
-          
-          # Start NATS with username/password authentication and JetStream
-          docker run -d --name nats-secured -p 4223:4222 -p 8223:8222 nats:2.10 --jetstream --user testuser --pass testpass
-          
-          # Start NATS with token authentication and JetStream
-          docker run -d --name nats-token -p 4224:4222 -p 8224:8222 nats:2.10 --jetstream --auth secret-token-12345
-          
-          echo "Started all NATS containers with JetStream enabled"
+        run: bash .github/scripts/start-nats-ci.sh
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -160,50 +150,7 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y netcat-openbsd
 
       - name: Wait for NATS servers
-        run: |
-          echo "Waiting for NATS servers..."
-          max_attempts=120
-          attempt=0
-          
-          # Give NATS a moment to start
-          sleep 3
-          
-          while [ $attempt -lt $max_attempts ]; do
-            ready=true
-            
-            # Check primary NATS (port 4222)
-            if ! nc -z localhost 4222 2>/dev/null; then
-              ready=false
-            fi
-            
-            # Check secured NATS (port 4223)
-            if ! nc -z localhost 4223 2>/dev/null; then
-              ready=false
-            fi
-            
-            # Check token NATS (port 4224)
-            if ! nc -z localhost 4224 2>/dev/null; then
-              ready=false
-            fi
-            
-            if [ "$ready" = true ]; then
-              echo "✓ All NATS servers are ready!"
-              exit 0
-            fi
-            
-            attempt=$((attempt + 1))
-            if [ $((attempt % 10)) -eq 0 ]; then
-              echo "Attempt $attempt/$max_attempts: Still waiting for NATS servers..."
-            fi
-            sleep 1
-          done
-          
-          echo "✗ NATS servers failed to start after $max_attempts seconds"
-          echo "Checking NATS container status..."
-          docker ps -a | grep nats || true
-          echo "Checking ports..."
-          netstat -tuln | grep -E "4222|4223|4224" || ss -tuln | grep -E "4222|4223|4224" || true
-          exit 1
+        run: bash .github/scripts/wait-for-nats-ci.sh
 
       - name: Run tests
         run: vendor/bin/pest
