@@ -3,7 +3,6 @@
 [![Tests](https://github.com/zaeem2396/laravel-nats/actions/workflows/tests.yml/badge.svg)](https://github.com/zaeem2396/laravel-nats/actions/workflows/tests.yml)
 [![Static Analysis](https://github.com/zaeem2396/laravel-nats/actions/workflows/static-analysis.yml/badge.svg)](https://github.com/zaeem2396/laravel-nats/actions/workflows/static-analysis.yml)
 [![Code Style](https://github.com/zaeem2396/laravel-nats/actions/workflows/code-style.yml/badge.svg)](https://github.com/zaeem2396/laravel-nats/actions/workflows/code-style.yml)
-[![Coverage](https://github.com/zaeem2396/laravel-nats/actions/workflows/coverage.yml/badge.svg)](https://github.com/zaeem2396/laravel-nats/actions/workflows/coverage.yml)
 [![Pint](https://github.com/zaeem2396/laravel-nats/actions/workflows/pint.yml/badge.svg)](https://github.com/zaeem2396/laravel-nats/actions/workflows/pint.yml)
 
 Laravel wrapper for NATS with two tracks and an index-first docs experience:
@@ -63,7 +62,7 @@ Version map:
 - **1.5.1**: documentation refresh (navigation + cross-links)
 - **1.5.2**: README/docs index layout; Docker local NATS section; [`docs/INDEX.md`](docs/INDEX.md)
 - **1.6.0+**: v2.7 header helpers, optional W3C trace context, subject-prefix connection selection, outbox recipe; Laravel 13 supported in package dev constraints; CI tests PHP 8.5 on Laravel 11–13
-- **1.6.1**: expanded Pest coverage, GitHub Actions coverage/Pint workflows, `composer ci` script; no public API changes
+- **1.6.1**: expanded Pest coverage, Pint CI workflow, `composer ci` script; no public API changes
 
 Roadmap: [`docs/ROADMAP.md`](docs/ROADMAP.md) · Changelog: [`CHANGELOG.md`](CHANGELOG.md)
 
@@ -227,10 +226,10 @@ composer test
 composer analyse
 composer pint:check
 composer format:check
-composer test:coverage   # requires PCOV or Xdebug
+composer test:coverage   # optional; requires PCOV or Xdebug
 ```
 
-GitHub Actions also runs a dedicated [coverage workflow](.github/workflows/coverage.yml) with NATS and PCOV. For release prep, run `composer ci` and ensure `CHANGELOG.md` reflects the release scope.
+For release prep, run `composer ci` and ensure `CHANGELOG.md` reflects the release scope.
 
 ## Troubleshooting
 
