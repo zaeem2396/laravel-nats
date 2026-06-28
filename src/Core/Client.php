@@ -130,6 +130,17 @@ final class Client implements PublisherInterface, SubscriberInterface
     }
 
     /**
+     * Disconnect and establish a fresh session on the same configuration.
+     *
+     * @throws ConnectionException When reconnection fails
+     */
+    public function reconnect(): void
+    {
+        $this->disconnect();
+        $this->connect();
+    }
+
+    /**
      * Check if connected to the NATS server.
      *
      * @return bool
