@@ -60,3 +60,4 @@ For a scheduler, call the dispatcher from an Artisan command or scheduled closur
 - [GUIDE.md](GUIDE.md)
 - [OBSERVABILITY.md](OBSERVABILITY.md)
 - [SECURITY.md](SECURITY.md)
+- Example: [examples/14-outbox.md](examples/14-outbox.md)

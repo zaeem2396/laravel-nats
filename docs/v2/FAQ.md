@@ -22,7 +22,11 @@
 
 **Validate config or enforce subject allowlists?** From **1.5.0+**, see [SECURITY.md](SECURITY.md): optional boot validation (`NATS_BASIS_VALIDATE_CONFIG`), TLS expectations in production (`NATS_TLS_REQUIRE_IN_PRODUCTION`), optional ACL for **`NatsV2`** publish / subscribe / JetStream publish paths, and **`nats:v2:config:validate`**. Subject ACL does **not** wrap the **`nats_basis`** queue driver’s internal publishes.
 
-**Trace context, connection routing, or transactional outbox?** From **1.6.0+**, see [TRACE_CONTEXT.md](TRACE_CONTEXT.md), [CONNECTION_SELECTION.md](CONNECTION_SELECTION.md), and [OUTBOX.md](OUTBOX.md).
+**Trace context, connection routing, or transactional outbox?** From **1.6.0+**, see [TRACE_CONTEXT.md](TRACE_CONTEXT.md), [CONNECTION_SELECTION.md](CONNECTION_SELECTION.md), and [OUTBOX.md](OUTBOX.md). Snippets: [examples/15-trace-context.md](examples/15-trace-context.md), [examples/14-outbox.md](examples/14-outbox.md).
+
+**How do I reconnect after a dropped session?** From **1.6.2+**, call `NatsV2::reconnect()` (or `Nats::reconnect()` on the legacy stack) to drop the cached client and open a fresh one. This is separate from basis-company/nats automatic reconnect. See [examples/11-reconnect.md](examples/11-reconnect.md) and [GUIDE.md](GUIDE.md).
+
+**Where are copy-paste examples?** [examples/README.md](examples/README.md) — subscribe, queue, ACL, reconnect, outbox, trace, request/reply, and idempotency.
 
 **Overhead?** One JSON encode and UUID per publish; negligible vs network.
 
@@ -30,6 +34,8 @@
 
 - [Roadmap](../ROADMAP.md)
 - [SECURITY.md](SECURITY.md)
+- [Examples](examples/README.md)
+- [GUIDE.md](GUIDE.md)
 
 **`tlsHandshakeFirst` vs CA files in production?** The TLS guard accepts **`tlsHandshakeFirst`** when your topology requires TLS before other negotiation, but you should still terminate on trusted infrastructure. Details: [SECURITY.md](SECURITY.md).
 

@@ -47,3 +47,4 @@ NatsV2::subscribe('orders.created', function ($message): void {
 - [CORRELATION.md](CORRELATION.md)
 - [OBSERVABILITY.md](OBSERVABILITY.md)
 - [CLIENT_FEATURES.md](CLIENT_FEATURES.md)
+- Example: [examples/15-trace-context.md](examples/15-trace-context.md)

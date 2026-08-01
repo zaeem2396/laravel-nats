@@ -111,3 +111,4 @@ Exit code is non-zero when validation fails.
 - [CLIENT_FEATURES.md](CLIENT_FEATURES.md) — clustering seeds, request/reply, headers
 - [IDEMPOTENCY.md](IDEMPOTENCY.md) — publish keys and subscriber deduplication
 - [FAQ.md](FAQ.md)
+- Example: [examples/13-security-acl.md](examples/13-security-acl.md)

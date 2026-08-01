@@ -22,6 +22,7 @@ The v2 stack is a **Laravel wrapper** around [basis-company/nats](https://packag
 14. Security & ACL — [SECURITY.md](SECURITY.md) (package 1.5.0+)
 15. Client features — [CLIENT_FEATURES.md](CLIENT_FEATURES.md) (cluster seeds, `request()`, multi-value headers, drain helper)
 16. Advanced features — [TRACE_CONTEXT.md](TRACE_CONTEXT.md), [CONNECTION_SELECTION.md](CONNECTION_SELECTION.md), [OUTBOX.md](OUTBOX.md) (package 1.6.0+)
+17. Examples — [examples/README.md](examples/README.md)
 
 ## Config
 
@@ -64,7 +65,9 @@ NatsV2::publish('a.b', ['k' => 1]);
 
 Configure `nats_basis.connections.{name}`.
 
-`NatsV2::disconnect` / `disconnectAll` clear cached clients. From **1.6.2+**, `NatsV2::reconnect()` drops and recreates the basis client; legacy `Nats::reconnect()` and `Client::reconnect()` do the same for the wire-stack client.
+`NatsV2::disconnect` / `disconnectAll` clear cached clients. From **1.6.2+**, `NatsV2::reconnect()` drops and recreates the basis client; legacy `Nats::reconnect()` and `Client::reconnect()` do the same for the wire-stack client. Snippet: [examples/11-reconnect.md](examples/11-reconnect.md).
+
+Automatic reconnect inside **basis-company/nats** (when `reconnect` is true on the connection) is separate from this package’s manual cache eviction helpers.
 
 ## Headers
 
@@ -100,9 +103,13 @@ Unit tests for envelope and provider; CI uses Docker NATS.
 
 From **package 1.4.0+**, use **`NatsV2::jetstream()`** for **`Basis\Nats\Api`**, **`jetStreamPublish`**, **`jetStreamPull`**, presets, and **`nats:v2:jetstream:*`** commands. Full reference: [JETSTREAM.md](JETSTREAM.md).
 
+## Examples
+
+Copy-paste oriented snippets (subscribe, queue, ACL, reconnect, outbox, trace, request/reply, idempotency): [examples/README.md](examples/README.md).
+
 ## See also
 
-[Migration](MIGRATION.md) - [Subscriber](SUBSCRIBER.md) - [JetStream](JETSTREAM.md) - [Security](SECURITY.md)
+[Migration](MIGRATION.md) · [Subscriber](SUBSCRIBER.md) · [JetStream](JETSTREAM.md) · [Queue](QUEUE.md) · [Security](SECURITY.md) · [FAQ](FAQ.md) · [Examples](examples/README.md)
 
 ### Security
 

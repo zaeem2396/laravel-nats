@@ -36,3 +36,10 @@ Use this page as the quick-access map for package docs.
 
 - FAQ: [`v2/FAQ.md`](v2/FAQ.md)
 - examples index: [`v2/examples/README.md`](v2/examples/README.md)
+- reconnect (1.6.2+): [`v2/examples/11-reconnect.md`](v2/examples/11-reconnect.md)
+- queue (`nats_basis`): [`v2/examples/12-queue-nats-basis.md`](v2/examples/12-queue-nats-basis.md)
+- security / ACL: [`v2/examples/13-security-acl.md`](v2/examples/13-security-acl.md)
+- outbox: [`v2/examples/14-outbox.md`](v2/examples/14-outbox.md)
+- trace context: [`v2/examples/15-trace-context.md`](v2/examples/15-trace-context.md)
+- request / reply: [`v2/examples/16-request-reply.md`](v2/examples/16-request-reply.md)
+- idempotency: [`v2/examples/17-idempotency.md`](v2/examples/17-idempotency.md)

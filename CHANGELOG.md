@@ -9,11 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- (none)
+- **Examples:** reconnect, `nats_basis` queue, security/ACL, outbox drain, W3C trace context, request/reply, and idempotency snippets under [`docs/v2/examples/`](docs/v2/examples/).
 
 ### Changed
 
-- (none)
+- **Docs navigation:** reorganized [`docs/v2/examples/README.md`](docs/v2/examples/README.md); expanded GUIDE, FAQ, INDEX, and feature-guide see-also links for reconnect and production patterns.
 
 ### Removed
 
@@ -21,7 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Documentation
 
-- (none)
+- Documentation improvements and examples for the **1.6.3** patch track (no public API changes).
 
 ## [1.6.2] - 2026-06-04
 
