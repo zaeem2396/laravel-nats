@@ -110,3 +110,4 @@ stopwaitsecs=3600
 - [GUIDE.md](GUIDE.md) — **`NatsV2`** and **`ConnectionManager`**
 - [README](README.md) — v2 doc index
 - [Roadmap](../ROADMAP.md) — security vs queue driver boundaries
+- Example: [examples/12-queue-nats-basis.md](examples/12-queue-nats-basis.md)

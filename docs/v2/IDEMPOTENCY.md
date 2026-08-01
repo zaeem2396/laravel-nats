@@ -79,3 +79,4 @@ Avoid keys longer than your cache backend allows; the package hashes keys for th
 - [CORRELATION.md](CORRELATION.md) — other NATS headers
 - [Roadmap](../ROADMAP.md)
 - [SECURITY.md](SECURITY.md) — ACL interaction with publish paths
+- Example: [examples/17-idempotency.md](examples/17-idempotency.md)
