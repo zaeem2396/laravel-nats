@@ -31,7 +31,8 @@ use LaravelNats\Subscriber\InboundMessage;
 
 NatsV2::subscribe('orders.created', function (InboundMessage $m): void {
     // Runs once per distinct idempotency key (per store TTL)
-    ProcessOrder::dispatchSync($m->payload());
+    $data = $m->envelopePayload()['data'] ?? [];
+    ProcessOrder::dispatchSync($data);
 });
 
 while (true) {

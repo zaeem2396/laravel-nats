@@ -2,40 +2,26 @@
 
 `NatsV2::request()` waits for a reply. Timeouts and NATS **503 no responders** map to typed exceptions.
 
-### Responder
-
-```php
-use LaravelNats\Laravel\Facades\NatsV2;
-use LaravelNats\Subscriber\InboundMessage;
-
-NatsV2::subscribe('math.add', function (InboundMessage $m): void {
-    $a = (int) ($m->payload()['a'] ?? 0);
-    $b = (int) ($m->payload()['b'] ?? 0);
-    // Reply using the inbound reply subject when present on the wire message.
-    // Prefer documenting your app’s reply convention; see CLIENT_FEATURES.md.
-});
-
-while (true) {
-    NatsV2::process(null, 1.0);
-}
-```
-
 ### Requester
 
 ```php
+use Basis\Nats\Message\Payload;
 use LaravelNats\Exceptions\NatsNoRespondersException;
 use LaravelNats\Exceptions\NatsRequestTimeoutException;
 use LaravelNats\Laravel\Facades\NatsV2;
 
 try {
-    $reply = NatsV2::request('math.add', ['a' => 2, 'b' => 3], 2.0);
-    // $reply is the raw reply body from the basis client
+    /** @var Payload $reply */
+    $reply = NatsV2::request('math.add', json_encode(['a' => 2, 'b' => 3]), 2.0);
+    $data = json_decode($reply->body, true);
 } catch (NatsNoRespondersException $e) {
     // No interest on the subject (Status-Code 503)
 } catch (NatsRequestTimeoutException $e) {
     // Timed out waiting for a reply
 }
 ```
+
+Responders typically subscribe on the same subject with the basis client (or a worker that publishes to `$message->replyTo`). See [CLIENT_FEATURES.md](../CLIENT_FEATURES.md).
 
 ### Bounded drain before shutdown
 
