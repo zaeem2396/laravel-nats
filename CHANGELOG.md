@@ -9,11 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- **Examples:** reconnect, `nats_basis` queue, security/ACL, outbox drain, W3C trace context, request/reply, and idempotency snippets under [`docs/v2/examples/`](docs/v2/examples/).
+- (none)
 
 ### Changed
 
-- **Docs navigation:** reorganized [`docs/v2/examples/README.md`](docs/v2/examples/README.md); expanded GUIDE, FAQ, INDEX, and feature-guide see-also links for reconnect and production patterns.
+- (none)
 
 ### Removed
 
@@ -21,7 +21,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Documentation
 
-- Documentation improvements and examples for the **1.6.3** patch track (no public API changes).
+- (none)
+
+## [1.6.3] - 2026-08-01
+
+### Added
+
+- **Examples:** reconnect, `nats_basis` queue, security/ACL, outbox drain, W3C trace context, request/reply, and idempotency snippets under [`docs/v2/examples/`](docs/v2/examples/).
+
+### Changed
+
+- **Docs navigation:** reorganized [`docs/v2/examples/README.md`](docs/v2/examples/README.md); expanded GUIDE, FAQ, INDEX, and feature-guide see-also links for reconnect and production patterns.
+
+### Documentation
+
+- Documentation improvements and examples for **1.6.3** (no public API changes).
 
 ## [1.6.2] - 2026-06-04
 
@@ -370,6 +384,21 @@ Run `composer update zaeem2396/laravel-nats` to upgrade.
 
 Run `composer update zaeem2396/laravel-nats` to upgrade.
 
+### From 1.6.2 to 1.6.3
+
+- **No public API changes.** Patch release focused on documentation and examples.
+- **Examples:** see [`docs/v2/examples/README.md`](docs/v2/examples/README.md) for reconnect, queue, ACL, outbox, trace context, request/reply, and idempotency snippets.
+
+```json
+{
+    "require": {
+        "zaeem2396/laravel-nats": "^1.6.3"
+    }
+}
+```
+
+Run `composer update zaeem2396/laravel-nats` to upgrade.
+
 ### From 1.6.1 to 1.6.2
 
 - **New reconnect helpers:** `NatsV2::reconnect()`, `ConnectionManager::reconnect()`, and `Client::reconnect()` recreate clients after a dropped session. Legacy `Nats::reconnect()` on `NatsManager` remains available.
@@ -449,7 +478,8 @@ Run `composer update zaeem2396/laravel-nats` to upgrade.
 
 ---
 
-[Unreleased]: https://github.com/zaeem2396/laravel-nats/compare/v1.6.2...HEAD
+[Unreleased]: https://github.com/zaeem2396/laravel-nats/compare/v1.6.3...HEAD
+[1.6.3]: https://github.com/zaeem2396/laravel-nats/compare/v1.6.2...v1.6.3
 [1.6.2]: https://github.com/zaeem2396/laravel-nats/compare/v1.6.1...v1.6.2
 [1.6.1]: https://github.com/zaeem2396/laravel-nats/compare/v1.6.0...v1.6.1
 [1.6.0]: https://github.com/zaeem2396/laravel-nats/compare/v1.5.2...v1.6.0

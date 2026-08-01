@@ -12,11 +12,11 @@ Package releases follow [Semantic Versioning](https://semver.org/). See [CHANGEL
 | 1.6.0+ | v2.7 | Trace context, connection selection, outbox recipe |
 | 1.6.1 | — | Test coverage, CI (Pest, PHPStan, Pint), no public API changes (shipped) |
 | 1.6.2 | — | Connection reconnect helpers and transport edge-case fixes (shipped) |
-| 1.6.3 | — | Documentation improvements and expanded examples (in progress) |
+| 1.6.3 | — | Documentation improvements and expanded examples (shipped) |
 
 ## Current stable
 
-**v1.6.2** — connection reconnect and transport reliability improvements. Next: **v1.6.3** documentation and examples.
+**v1.6.3** — documentation improvements and expanded v2 examples.
 
 ## Upgrade path
 
