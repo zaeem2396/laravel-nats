@@ -5,18 +5,19 @@
 # It analyzes types, catches potential null pointer exceptions, and ensures
 # type safety throughout the codebase.
 #
-# Levels (0-9):
+# Levels (0-9 in PHPStan 1.x):
 # - Level 0: Basic checks (typos, unknown classes)
 # - Level 5: Checks return types, method existence
 # - Level 8: Strict mode (mixed type, property types)
-# - Level 9: Maximum strictness (everything)
+# - Level 9: Maximum strictness (no mixed casts or offset access)
 #
-# We use level 8 for a good balance of strictness and practicality.
+# v1.6.4 targets level 9 (max for PHPStan 1.x). Mixed config/JSON values are
+# narrowed via LaravelNats\Support\MixedTypes rather than ignored.
 # ============================================================================
 
 parameters:
-    # Analysis strictness level (0-9, where 9 is the strictest)
-    level: 8
+    # Analysis strictness level (0-9, where 9 is the strictest in PHPStan 1.x)
+    level: 9
 
     # Paths to analyze
     paths:
@@ -26,8 +27,8 @@ parameters:
     excludePaths:
         - src/Laravel/Config  # Config files aren't type-strict
 
-    # Report unmatched ignored errors
-    reportUnmatchedIgnoredErrors: false
+    # Report unmatched ignored errors so stale ignores cannot hide regressions
+    reportUnmatchedIgnoredErrors: true
 
     # Treat phpdoc types as certain (not just for IDE)
     treatPhpDocTypesAsCertain: true
@@ -38,8 +39,7 @@ parameters:
 
     # Ignore specific errors that are false positives or intentional
     ignoreErrors:
-        # Resource types cannot be typed in PHP
-        - '#Property .+::\$socket has unknown class resource as its type#'
+        # fread/fwrite still see Connection::$socket as resource|null
         - '#Parameter \#1 \$stream of function .+ expects resource, resource\|null given#'
 
     # Bootstrap files for Laravel facades and helpers
@@ -49,4 +49,3 @@ parameters:
     # Parallel processing for faster analysis
     parallel:
         maximumNumberOfProcesses: 4
-

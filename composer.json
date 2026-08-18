@@ -59,7 +59,7 @@
         "test": "vendor/bin/pest",
         "test:ci": "vendor/bin/pest",
         "test:coverage": "vendor/bin/pest --coverage --coverage-clover=build/coverage.xml",
-        "analyse": "vendor/bin/phpstan analyse",
+        "analyse": "vendor/bin/phpstan analyse --memory-limit=512M",
         "pint": "vendor/bin/pint tests",
         "pint:check": "vendor/bin/pint --test tests",
         "format": "vendor/bin/php-cs-fixer fix 2>/dev/null",
