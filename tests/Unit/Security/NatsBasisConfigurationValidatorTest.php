@@ -63,6 +63,44 @@ it('rejects invalid port when forced', function (): void {
         ->toThrow(NatsConfigurationException::class);
 });
 
+it('rejects a non-numeric port when forced', function (): void {
+    $config = new Repository([
+        'nats_basis' => [
+            'connections' => [
+                'default' => [
+                    'host' => 'localhost',
+                    'port' => 'not-a-port',
+                    'timeout' => 1.0,
+                ],
+            ],
+        ],
+    ]);
+
+    $v = new NatsBasisConfigurationValidator;
+
+    expect(fn () => $v->validate($config, $this->app, true))
+        ->toThrow(NatsConfigurationException::class);
+});
+
+it('rejects a non-scalar port when forced', function (): void {
+    $config = new Repository([
+        'nats_basis' => [
+            'connections' => [
+                'default' => [
+                    'host' => 'localhost',
+                    'port' => ['4222'],
+                    'timeout' => 1.0,
+                ],
+            ],
+        ],
+    ]);
+
+    $v = new NatsBasisConfigurationValidator;
+
+    expect(fn () => $v->validate($config, $this->app, true))
+        ->toThrow(NatsConfigurationException::class);
+});
+
 it('requires TLS material in production when tls.require_in_production is true', function (): void {
     $this->app->detectEnvironment(fn () => 'production');
 

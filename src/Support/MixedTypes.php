@@ -107,6 +107,11 @@ final class MixedTypes
     }
 
     /**
+     * Keep only non-numeric string keys so the result is a true `array<string, mixed>`.
+     *
+     * PHP coerces keys like `"0"` to integers, so converting int keys with `(string)`
+     * does not preserve a string-key map. List-shaped data belongs in {@see list()} / {@see stringList()}.
+     *
      * @return array<string, mixed>
      */
     public static function assoc(mixed $value): array
@@ -119,8 +124,6 @@ final class MixedTypes
         foreach ($value as $key => $item) {
             if (is_string($key)) {
                 $out[$key] = $item;
-            } elseif (is_int($key)) {
-                $out[(string) $key] = $item;
             }
         }
 

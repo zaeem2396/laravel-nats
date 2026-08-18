@@ -64,7 +64,7 @@ final class NatsBasisConfigurationValidator
             throw NatsConfigurationException::forConnection($name, 'host must be a non-empty string.');
         }
 
-        $port = MixedTypes::int($entry['port'] ?? 4222, 4222);
+        $port = MixedTypes::int($entry['port'] ?? 4222, 0);
         if ($port < 1 || $port > 65535) {
             throw NatsConfigurationException::forConnection($name, sprintf('port must be between 1 and 65535, got %d.', $port));
         }

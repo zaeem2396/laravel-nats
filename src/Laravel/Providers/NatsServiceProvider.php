@@ -48,6 +48,7 @@ use LaravelNats\Observability\NullNatsMetrics;
 use LaravelNats\Outbox\NatsOutboxDispatcher;
 use LaravelNats\Publisher\Contracts\NatsPublisherContract;
 use LaravelNats\Publisher\NatsPublisher;
+use LaravelNats\Security\Exceptions\NatsConfigurationException;
 use LaravelNats\Security\NatsBasisConfigurationValidator;
 use LaravelNats\Security\SubjectAclChecker;
 use LaravelNats\Subscriber\Contracts\NatsSubscriberContract;
@@ -340,7 +341,7 @@ class NatsServiceProvider extends ServiceProvider implements DeferrableProvider
     {
         $config = $this->app->make('config');
         if (! $config instanceof ConfigRepository) {
-            return;
+            throw NatsConfigurationException::global('Laravel config repository is not bound.');
         }
 
         $this->app->make(NatsBasisConfigurationValidator::class)->validate(

@@ -43,8 +43,9 @@ it('narrows mixed booleans like PHP casts for scalars', function (): void {
 });
 
 it('normalizes mixed arrays into assoc maps and lists', function (): void {
-    expect(MixedTypes::assoc(['host' => '127.0.0.1', 0 => 'x']))
-        ->toBe(['host' => '127.0.0.1', '0' => 'x'])
+    expect(MixedTypes::assoc(['host' => '127.0.0.1', 'stream' => 'ORDERS', 0 => 'x']))
+        ->toBe(['host' => '127.0.0.1', 'stream' => 'ORDERS'])
+        ->and(array_keys(MixedTypes::assoc(['host' => '127.0.0.1', 0 => 'x'])))->each->toBeString()
         ->and(MixedTypes::assoc('nope'))->toBe([])
         ->and(MixedTypes::list(['a', 'b']))->toBe(['a', 'b'])
         ->and(MixedTypes::stringList(['orders', 2, null]))->toBe(['orders', '2'])

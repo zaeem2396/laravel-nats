@@ -18,6 +18,7 @@ use LaravelNats\Observability\NullNatsMetrics;
 use LaravelNats\Outbox\NatsOutboxDispatcher;
 use LaravelNats\Publisher\Contracts\NatsPublisherContract;
 use LaravelNats\Publisher\NatsPublisher;
+use LaravelNats\Security\Exceptions\NatsConfigurationException;
 use LaravelNats\Security\NatsBasisConfigurationValidator;
 use LaravelNats\Security\SubjectAclChecker;
 use LaravelNats\Subscriber\Contracts\NatsSubscriberContract;
@@ -194,4 +195,18 @@ it('resolves NatsMetricsContract as null implementation by default', function ()
 
 it('resolves the outbox dispatcher from container', function (): void {
     expect($this->app->make(NatsOutboxDispatcher::class))->toBeInstanceOf(NatsOutboxDispatcher::class);
+});
+
+it('fails boot-time security validation when config is not a repository', function (): void {
+    $original = $this->app->make('config');
+    $this->app->instance('config', new stdClass);
+    $provider = new NatsServiceProvider($this->app);
+    $method = new ReflectionMethod($provider, 'bootNatsBasisSecurity');
+
+    try {
+        expect(fn () => $method->invoke($provider))
+            ->toThrow(NatsConfigurationException::class, 'Laravel config repository is not bound.');
+    } finally {
+        $this->app->instance('config', $original);
+    }
 });
