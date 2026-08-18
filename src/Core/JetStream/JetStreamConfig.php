@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace LaravelNats\Core\JetStream;
 
+use LaravelNats\Support\MixedTypes;
+
 /**
  * JetStreamConfig holds configuration for JetStream operations.
  *
@@ -54,8 +56,8 @@ final class JetStreamConfig
     public static function fromArray(array $config): self
     {
         return new self(
-            domain: $config['domain'] ?? null,
-            timeout: (float) ($config['timeout'] ?? self::DEFAULT_TIMEOUT),
+            domain: MixedTypes::nullableString($config['domain'] ?? null),
+            timeout: MixedTypes::float($config['timeout'] ?? self::DEFAULT_TIMEOUT, self::DEFAULT_TIMEOUT),
         );
     }
 

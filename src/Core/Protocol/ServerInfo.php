@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace LaravelNats\Core\Protocol;
 
+use LaravelNats\Support\MixedTypes;
+
 /**
  * ServerInfo represents the INFO message sent by the NATS server upon connection.
  *
@@ -81,21 +83,21 @@ final class ServerInfo
     public static function fromArray(array $data): self
     {
         return new self(
-            serverId: $data['server_id'] ?? '',
-            serverName: $data['server_name'] ?? '',
-            version: $data['version'] ?? '',
-            proto: (int) ($data['proto'] ?? 1),
-            host: $data['host'] ?? '0.0.0.0',
-            port: (int) ($data['port'] ?? 4222),
-            maxPayload: (int) ($data['max_payload'] ?? 1048576),
-            headersSupported: (bool) ($data['headers'] ?? false),
-            jetStreamEnabled: (bool) ($data['jetstream'] ?? false),
-            authRequired: (bool) ($data['auth_required'] ?? false),
-            tlsRequired: (bool) ($data['tls_required'] ?? false),
-            tlsAvailable: (bool) ($data['tls_available'] ?? false),
-            connectUrls: $data['connect_urls'] ?? [],
-            clusterId: $data['cluster'] ?? null,
-            clusterName: $data['cluster_name'] ?? null,
+            serverId: MixedTypes::string($data['server_id'] ?? ''),
+            serverName: MixedTypes::string($data['server_name'] ?? ''),
+            version: MixedTypes::string($data['version'] ?? ''),
+            proto: MixedTypes::int($data['proto'] ?? 1, 1),
+            host: MixedTypes::string($data['host'] ?? '0.0.0.0', '0.0.0.0'),
+            port: MixedTypes::int($data['port'] ?? 4222, 4222),
+            maxPayload: MixedTypes::int($data['max_payload'] ?? 1048576, 1048576),
+            headersSupported: MixedTypes::bool($data['headers'] ?? false),
+            jetStreamEnabled: MixedTypes::bool($data['jetstream'] ?? false),
+            authRequired: MixedTypes::bool($data['auth_required'] ?? false),
+            tlsRequired: MixedTypes::bool($data['tls_required'] ?? false),
+            tlsAvailable: MixedTypes::bool($data['tls_available'] ?? false),
+            connectUrls: MixedTypes::stringList($data['connect_urls'] ?? []),
+            clusterId: MixedTypes::nullableString($data['cluster'] ?? null),
+            clusterName: MixedTypes::nullableString($data['cluster_name'] ?? null),
         );
     }
 

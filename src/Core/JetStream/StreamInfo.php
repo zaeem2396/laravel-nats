@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace LaravelNats\Core\JetStream;
 
+use LaravelNats\Support\MixedTypes;
+
 /**
  * StreamInfo represents the current state and configuration of a JetStream stream.
  *
@@ -46,10 +48,8 @@ final class StreamInfo
      */
     public static function fromArray(array $data): self
     {
-        $configData = $data['config'] ?? [];
-        $config = StreamConfig::fromArray($configData);
-
-        $state = $data['state'] ?? [];
+        $config = StreamConfig::fromArray(MixedTypes::assoc($data['config'] ?? []));
+        $state = MixedTypes::assoc($data['state'] ?? []);
 
         return new self($config, $state);
     }
@@ -81,7 +81,7 @@ final class StreamInfo
      */
     public function getMessageCount(): int
     {
-        return (int) ($this->state['messages'] ?? 0);
+        return MixedTypes::int($this->state['messages'] ?? 0);
     }
 
     /**
@@ -91,7 +91,7 @@ final class StreamInfo
      */
     public function getByteCount(): int
     {
-        return (int) ($this->state['bytes'] ?? 0);
+        return MixedTypes::int($this->state['bytes'] ?? 0);
     }
 
     /**
@@ -101,9 +101,7 @@ final class StreamInfo
      */
     public function getFirstSequence(): ?int
     {
-        $seq = $this->state['first_seq'] ?? null;
-
-        return $seq !== null ? (int) $seq : null;
+        return MixedTypes::nullableInt($this->state['first_seq'] ?? null);
     }
 
     /**
@@ -113,9 +111,7 @@ final class StreamInfo
      */
     public function getLastSequence(): ?int
     {
-        $seq = $this->state['last_seq'] ?? null;
-
-        return $seq !== null ? (int) $seq : null;
+        return MixedTypes::nullableInt($this->state['last_seq'] ?? null);
     }
 
     /**
@@ -125,7 +121,7 @@ final class StreamInfo
      */
     public function getConsumerCount(): int
     {
-        return (int) ($this->state['consumer_count'] ?? 0);
+        return MixedTypes::int($this->state['consumer_count'] ?? 0);
     }
 
     /**

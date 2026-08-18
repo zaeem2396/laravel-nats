@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace LaravelNats\Core\JetStream;
 
 use InvalidArgumentException;
+use LaravelNats\Support\MixedTypes;
 
 /**
  * StreamConfig holds configuration for a JetStream stream.
@@ -137,45 +138,48 @@ final class StreamConfig
      */
     public static function fromArray(array $data): self
     {
-        $name = $data['name'] ?? throw new InvalidArgumentException('Stream name is required');
-        $subjects = $data['subjects'] ?? [];
+        $name = MixedTypes::string($data['name'] ?? '');
+        if ($name === '') {
+            throw new InvalidArgumentException('Stream name is required');
+        }
+        $subjects = MixedTypes::stringList($data['subjects'] ?? []);
 
         $config = new self($name, $subjects);
 
         if (isset($data['description'])) {
-            $config->description = (string) $data['description'];
+            $config->description = MixedTypes::string($data['description']);
         }
 
         if (isset($data['retention'])) {
-            $config->retention = (string) $data['retention'];
+            $config->retention = MixedTypes::string($data['retention']);
         }
 
         if (isset($data['max_messages'])) {
-            $config->maxMessages = (int) $data['max_messages'];
+            $config->maxMessages = MixedTypes::int($data['max_messages']);
         }
 
         if (isset($data['max_bytes'])) {
-            $config->maxBytes = (int) $data['max_bytes'];
+            $config->maxBytes = MixedTypes::int($data['max_bytes']);
         }
 
         if (isset($data['max_age'])) {
-            $config->maxAge = (int) $data['max_age'];
+            $config->maxAge = MixedTypes::int($data['max_age']);
         }
 
         if (isset($data['storage'])) {
-            $config->storage = (string) $data['storage'];
+            $config->storage = MixedTypes::string($data['storage']);
         }
 
         if (isset($data['replicas'])) {
-            $config->replicas = (int) $data['replicas'];
+            $config->replicas = MixedTypes::int($data['replicas']);
         }
 
         if (isset($data['discard'])) {
-            $config->discard = (string) $data['discard'];
+            $config->discard = MixedTypes::string($data['discard']);
         }
 
         if (isset($data['duplicate_window'])) {
-            $config->duplicateWindow = (int) $data['duplicate_window'];
+            $config->duplicateWindow = MixedTypes::int($data['duplicate_window']);
         }
 
         if (isset($data['allow_direct'])) {

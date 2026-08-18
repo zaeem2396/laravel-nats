@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace LaravelNats\Core\JetStream;
 
+use LaravelNats\Support\MixedTypes;
+
 /**
  * ConsumerInfo represents the current state and configuration of a JetStream consumer.
  *
@@ -61,11 +63,10 @@ final class ConsumerInfo
      */
     public static function fromArray(array $data): self
     {
-        $streamName = (string) ($data['stream_name'] ?? $data['name'] ?? '');
-        $name = (string) ($data['name'] ?? '');
-        $configData = $data['config'] ?? [];
-        $config = ConsumerConfig::fromArray($configData);
-        $state = $data['state'] ?? [];
+        $streamName = MixedTypes::string($data['stream_name'] ?? $data['name'] ?? '');
+        $name = MixedTypes::string($data['name'] ?? '');
+        $config = ConsumerConfig::fromArray(MixedTypes::assoc($data['config'] ?? []));
+        $state = MixedTypes::assoc($data['state'] ?? []);
 
         return new self($streamName, $name, $config, $state);
     }
@@ -95,17 +96,17 @@ final class ConsumerInfo
 
     public function getNumPending(): int
     {
-        return (int) ($this->state['num_pending'] ?? 0);
+        return MixedTypes::int($this->state['num_pending'] ?? 0);
     }
 
     public function getNumAckPending(): int
     {
-        return (int) ($this->state['num_ack_pending'] ?? 0);
+        return MixedTypes::int($this->state['num_ack_pending'] ?? 0);
     }
 
     public function getNumWaiting(): int
     {
-        return (int) ($this->state['num_waiting'] ?? 0);
+        return MixedTypes::int($this->state['num_waiting'] ?? 0);
     }
 
     /**
