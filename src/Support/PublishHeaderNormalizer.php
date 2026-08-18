@@ -27,7 +27,7 @@ final class PublishHeaderNormalizer
                     if ($item === null) {
                         continue;
                     }
-                    $list[] = is_string($item) ? $item : (string) $item;
+                    $list[] = MixedTypes::string($item);
                 }
                 if ($list !== []) {
                     $out[$key] = $list;
@@ -40,7 +40,7 @@ final class PublishHeaderNormalizer
 
                 continue;
             }
-            $out[$key] = [is_string($value) ? $value : (string) $value];
+            $out[$key] = [MixedTypes::string($value)];
         }
 
         return $out;

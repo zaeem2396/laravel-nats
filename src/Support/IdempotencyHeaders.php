@@ -26,7 +26,7 @@ final class IdempotencyHeaders
             return $headers;
         }
 
-        $name = (string) $config->get('nats_basis.idempotency.header_name', self::DEFAULT_HEADER);
+        $name = MixedTypes::string($config->get('nats_basis.idempotency.header_name', self::DEFAULT_HEADER), self::DEFAULT_HEADER);
         if ($name === '') {
             $name = self::DEFAULT_HEADER;
         }

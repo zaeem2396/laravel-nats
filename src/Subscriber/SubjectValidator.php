@@ -6,6 +6,7 @@ namespace LaravelNats\Subscriber;
 
 use Illuminate\Contracts\Config\Repository;
 use LaravelNats\Subscriber\Exceptions\InvalidSubjectException;
+use LaravelNats\Support\MixedTypes;
 
 /**
  * Validates NATS subject strings for subscriptions (length, non-empty).
@@ -26,7 +27,7 @@ final class SubjectValidator
             throw InvalidSubjectException::empty();
         }
 
-        $max = (int) $this->config->get('nats_basis.subscriber.subject_max_length', 512);
+        $max = MixedTypes::int($this->config->get('nats_basis.subscriber.subject_max_length', 512), 512);
         if ($max > 0 && strlen($subject) > $max) {
             throw InvalidSubjectException::tooLong($max);
         }
