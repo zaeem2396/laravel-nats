@@ -11,6 +11,7 @@ use LaravelNats\Core\Protocol\ServerInfo;
 use LaravelNats\Exceptions\ConnectionException;
 use LaravelNats\Exceptions\NatsException;
 use LaravelNats\Exceptions\TimeoutException;
+use LaravelNats\Support\MixedTypes;
 
 /**
  * JetStreamClient provides access to NATS JetStream functionality.
@@ -179,13 +180,14 @@ final class JetStreamClient
 
             // Check for error in response
             if (isset($decoded['error'])) {
-                $errorCode = $decoded['error']['code'] ?? 0;
-                $errorMessage = $decoded['error']['description'] ?? 'Unknown JetStream error';
+                $error = MixedTypes::assoc($decoded['error']);
+                $errorCode = MixedTypes::int($error['code'] ?? 0);
+                $errorMessage = MixedTypes::string($error['description'] ?? 'Unknown JetStream error', 'Unknown JetStream error');
 
                 throw new NatsException("JetStream API error [{$errorCode}]: {$errorMessage}");
             }
 
-            return $decoded;
+            return MixedTypes::assoc($decoded);
         } catch (TimeoutException $e) {
             throw new TimeoutException("JetStream API request to '{$subject}' timed out after {$timeout} seconds", 0, $e);
         }
@@ -301,14 +303,16 @@ final class JetStreamClient
 
         $response = $this->apiRequest($subject, $payload, $timeout);
 
-        $total = (int) ($response['total'] ?? 0);
-        $off = (int) ($response['offset'] ?? 0);
-        $limit = (int) ($response['limit'] ?? 0);
-        $items = $response['streams'] ?? [];
+        $total = MixedTypes::int($response['total'] ?? 0);
+        $off = MixedTypes::int($response['offset'] ?? 0);
+        $limit = MixedTypes::int($response['limit'] ?? 0);
+        $items = MixedTypes::list($response['streams'] ?? []);
 
         $streams = [];
         foreach ($items as $item) {
-            $name = is_array($item) ? ($item['name'] ?? '') : (string) $item;
+            $name = is_array($item)
+                ? MixedTypes::string(MixedTypes::assoc($item)['name'] ?? '')
+                : MixedTypes::string($item);
             if ($name !== '') {
                 $streams[] = $name;
             }
@@ -623,22 +627,23 @@ final class JetStreamClient
 
         $response = $this->apiRequest($subject, $payload, $timeout);
 
-        $total = (int) ($response['total'] ?? 0);
-        $off = (int) ($response['offset'] ?? 0);
-        $limit = (int) ($response['limit'] ?? 0);
-        $items = $response['consumers'] ?? [];
+        $total = MixedTypes::int($response['total'] ?? 0);
+        $off = MixedTypes::int($response['offset'] ?? 0);
+        $limit = MixedTypes::int($response['limit'] ?? 0);
+        $items = MixedTypes::list($response['consumers'] ?? []);
 
         $consumers = [];
         foreach ($items as $item) {
+            $row = MixedTypes::assoc($item);
             $state = [
-                'num_pending' => $item['num_pending'] ?? 0,
-                'num_ack_pending' => $item['num_ack_pending'] ?? 0,
-                'num_waiting' => $item['num_waiting'] ?? 0,
+                'num_pending' => $row['num_pending'] ?? 0,
+                'num_ack_pending' => $row['num_ack_pending'] ?? 0,
+                'num_waiting' => $row['num_waiting'] ?? 0,
             ];
             $consumers[] = ConsumerInfo::fromArray([
-                'stream_name' => $item['stream_name'] ?? $streamName,
-                'name' => $item['name'] ?? '',
-                'config' => $item['config'] ?? [],
+                'stream_name' => $row['stream_name'] ?? $streamName,
+                'name' => $row['name'] ?? '',
+                'config' => MixedTypes::assoc($row['config'] ?? []),
                 'state' => $state,
             ]);
         }
