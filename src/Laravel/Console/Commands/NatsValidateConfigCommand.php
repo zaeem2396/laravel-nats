@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace LaravelNats\Laravel\Console\Commands;
 
 use Illuminate\Console\Command;
+use Illuminate\Contracts\Config\Repository;
 use LaravelNats\Security\NatsBasisConfigurationValidator;
 
 /**
@@ -19,7 +20,14 @@ final class NatsValidateConfigCommand extends Command
     public function handle(NatsBasisConfigurationValidator $validator): int
     {
         try {
-            $validator->validate($this->laravel->make('config'), $this->laravel, true);
+            $config = $this->laravel->make('config');
+            if (! $config instanceof Repository) {
+                $this->error('Laravel config repository is not available.');
+
+                return self::FAILURE;
+            }
+
+            $validator->validate($config, $this->laravel, true);
 
             $this->info('nats_basis configuration is valid.');
 

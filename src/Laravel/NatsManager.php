@@ -15,6 +15,7 @@ use LaravelNats\Core\JetStream\JetStreamClient;
 use LaravelNats\Core\JetStream\JetStreamConfig;
 use LaravelNats\Core\Serialization\JsonSerializer;
 use LaravelNats\Core\Serialization\PhpSerializer;
+use LaravelNats\Support\MixedTypes;
 
 /**
  * NatsManager handles multiple NATS connections for Laravel.
@@ -99,7 +100,7 @@ class NatsManager
      */
     public function getDefaultConnection(): string
     {
-        return $this->config->get('nats.default', 'default');
+        return MixedTypes::string($this->config->get('nats.default', 'default'), 'default');
     }
 
     /**
@@ -177,7 +178,7 @@ class NatsManager
 
         if ($config === null) {
             $jsConfig = $this->config->get('nats.jetstream', []);
-            $config = JetStreamConfig::fromArray($jsConfig);
+            $config = JetStreamConfig::fromArray(MixedTypes::assoc($jsConfig));
         }
 
         return $client->getJetStream($config);

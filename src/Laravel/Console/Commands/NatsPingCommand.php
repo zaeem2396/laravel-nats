@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace LaravelNats\Laravel\Console\Commands;
 
 use Illuminate\Console\Command;
+use Illuminate\Contracts\Config\Repository;
 use LaravelNats\Laravel\Facades\NatsV2;
+use LaravelNats\Support\MixedTypes;
 
 /**
  * TCP-level NATS PING/PONG against the basis client (readiness / liveness helper).
@@ -23,9 +25,11 @@ final class NatsPingCommand extends Command
         $connection = $this->option('connection');
         $conn = is_string($connection) && $connection !== '' ? $connection : null;
         $asJson = (bool) $this->option('json');
-        /** @var \Illuminate\Contracts\Config\Repository $cfg */
         $cfg = $this->laravel->make('config');
-        $defaultConn = (string) $cfg->get('nats_basis.default', 'default');
+        $defaultConn = 'default';
+        if ($cfg instanceof Repository) {
+            $defaultConn = MixedTypes::string($cfg->get('nats_basis.default', 'default'), 'default');
+        }
 
         try {
             $ok = NatsV2::ping($conn);

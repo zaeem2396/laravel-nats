@@ -25,6 +25,7 @@ use LaravelNats\Outbox\NatsOutboxDispatchResult;
 use LaravelNats\Publisher\Contracts\NatsPublisherContract;
 use LaravelNats\Subscriber\Contracts\NatsSubscriberContract;
 use LaravelNats\Subscriber\InboundMessage;
+use LaravelNats\Support\MixedTypes;
 
 /**
  * Facade root for the v2 NATS stack (basis-company/nats envelope publisher + subscriber).
@@ -76,7 +77,7 @@ final class NatsV2Gateway
 
                 continue;
             }
-            $normalized[$key] = is_string($value) ? $value : (string) $value;
+            $normalized[$key] = MixedTypes::string($value);
         }
 
         $this->publisher->publish($subject, $payload, $normalized, $this->selectConnection($subject, $connection));
@@ -183,7 +184,7 @@ final class NatsV2Gateway
         ?int $limit = null,
         ?bool $stopOnFailure = null,
     ): NatsOutboxDispatchResult {
-        $limit ??= (int) $this->config->get('nats_basis.outbox.batch_size', 100);
+        $limit ??= MixedTypes::int($this->config->get('nats_basis.outbox.batch_size', 100), 100);
         $stopOnFailure ??= filter_var($this->config->get('nats_basis.outbox.stop_on_failure', true), FILTER_VALIDATE_BOOL);
 
         return $this->outboxDispatcher->dispatch($store, $limit, $stopOnFailure);
@@ -251,8 +252,8 @@ final class NatsV2Gateway
         ?float $expiresSeconds = null,
         ?string $connection = null,
     ): array {
-        $batch ??= (int) $this->config->get('nats_basis.jetstream.pull.default_batch', 10);
-        $expiresSeconds ??= (float) $this->config->get('nats_basis.jetstream.pull.default_expires', 0.5);
+        $batch ??= MixedTypes::int($this->config->get('nats_basis.jetstream.pull.default_batch', 10), 10);
+        $expiresSeconds ??= MixedTypes::float($this->config->get('nats_basis.jetstream.pull.default_expires', 0.5), 0.5);
 
         return $this->pullConsumerBatch->fetch(
             $stream,

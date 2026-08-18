@@ -6,6 +6,7 @@ namespace LaravelNats\Laravel\Console\Commands;
 
 use Illuminate\Console\Command;
 use LaravelNats\Laravel\NatsManager;
+use LaravelNats\Support\MixedTypes;
 
 /**
  * Show JetStream account status and usage.
@@ -85,7 +86,7 @@ class NatsJetStreamStatusCommand extends Command
                 $encoded = json_encode($value);
                 $rows[] = [$key, $encoded !== false ? $encoded : '[]'];
             } else {
-                $rows[] = [$key, (string) $value];
+                $rows[] = [MixedTypes::string($key), MixedTypes::string($value)];
             }
         }
 
