@@ -9,12 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- **`LaravelNats\Support\MixedTypes`:** helpers to narrow mixed config and JSON values (string, int, float, bool, assoc arrays, lists).
+- (none)
 
 ### Changed
 
-- **PHPStan:** analysis level raised from 8 to **9** (maximum for PHPStan 1.x); `composer analyse` uses a 512M memory limit; unmatched ignore patterns are reported.
-- **Static analysis:** mixed casts and offset access on config/JSON arrays replaced with `MixedTypes` across connection config, JetStream DTOs, queue drivers, publisher, subscriber, and Artisan commands. No public API changes.
+- (none)
 
 ### Removed
 
@@ -22,7 +21,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Documentation
 
-- Roadmap and quality docs note PHPStan level 9 for the **1.6.4** patch track.
+- (none)
+
+## [1.6.4] - 2026-08-19
+
+### Added
+
+- **`LaravelNats\Support\MixedTypes`:** helpers to narrow mixed config and JSON values (string, int, float, bool, assoc arrays, lists). Integer keys are dropped from `assoc()` so the result is a true `array<string, mixed>`.
+
+### Changed
+
+- **PHPStan:** analysis level raised from 8 to **9** (maximum for PHPStan 1.x); `composer analyse` uses a 512M memory limit; unmatched ignore patterns are reported.
+- **Static analysis:** mixed casts and offset access on config/JSON arrays replaced with `MixedTypes` across connection config, JetStream DTOs, queue drivers, publisher, subscriber, and Artisan commands. No public API changes.
+- **CI:** Tests workflow runs on push only for `main` / `develop` (PRs still get the full matrix); wait for NATS with bash `/dev/tcp` instead of installing netcat via apt.
+
+### Fixed
+
+- **Security:** malformed `nats_basis` connection ports are rejected instead of silently becoming `4222`; boot fails if the Laravel config binding is not a repository.
+- **CI:** GitHub Actions jobs no longer hang on `apt-get update` when waiting for NATS.
+
+### Documentation
+
+- Roadmap, README, and quality docs record PHPStan level 9 for **1.6.4**.
 
 ## [1.6.3] - 2026-08-01
 
@@ -385,6 +405,22 @@ Run `composer update zaeem2396/laravel-nats` to upgrade.
 
 Run `composer update zaeem2396/laravel-nats` to upgrade.
 
+### From 1.6.3 to 1.6.4
+
+- **No public API changes.** Patch release focused on PHPStan level 9 and mixed-type narrowing.
+- **Contributors:** `composer analyse` now runs PHPStan **level 9**. Use `MixedTypes` for mixed config/JSON values instead of casts.
+- **CI:** GitHub Actions Tests no longer install netcat; wait-for-NATS uses bash `/dev/tcp`.
+
+```json
+{
+    "require": {
+        "zaeem2396/laravel-nats": "^1.6.4"
+    }
+}
+```
+
+Run `composer update zaeem2396/laravel-nats` to upgrade.
+
 ### From 1.6.2 to 1.6.3
 
 - **No public API changes.** Patch release focused on documentation and examples.
@@ -479,7 +515,8 @@ Run `composer update zaeem2396/laravel-nats` to upgrade.
 
 ---
 
-[Unreleased]: https://github.com/zaeem2396/laravel-nats/compare/v1.6.3...HEAD
+[Unreleased]: https://github.com/zaeem2396/laravel-nats/compare/v1.6.4...HEAD
+[1.6.4]: https://github.com/zaeem2396/laravel-nats/compare/v1.6.3...v1.6.4
 [1.6.3]: https://github.com/zaeem2396/laravel-nats/compare/v1.6.2...v1.6.3
 [1.6.2]: https://github.com/zaeem2396/laravel-nats/compare/v1.6.1...v1.6.2
 [1.6.1]: https://github.com/zaeem2396/laravel-nats/compare/v1.6.0...v1.6.1
