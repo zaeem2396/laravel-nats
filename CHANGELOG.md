@@ -9,11 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- (none)
+- **`LaravelNats\Support\MixedTypes`:** helpers to narrow mixed config and JSON values (string, int, float, bool, assoc arrays, lists).
 
 ### Changed
 
-- (none)
+- **PHPStan:** analysis level raised from 8 to **9** (maximum for PHPStan 1.x); `composer analyse` uses a 512M memory limit; unmatched ignore patterns are reported.
+- **Static analysis:** mixed casts and offset access on config/JSON arrays replaced with `MixedTypes` across connection config, JetStream DTOs, queue drivers, publisher, subscriber, and Artisan commands. No public API changes.
 
 ### Removed
 
@@ -21,7 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Documentation
 
-- (none)
+- Roadmap and quality docs note PHPStan level 9 for the **1.6.4** patch track.
 
 ## [1.6.3] - 2026-08-01
 

@@ -7,6 +7,7 @@ namespace LaravelNats\Security;
 use Illuminate\Contracts\Config\Repository;
 use Illuminate\Contracts\Foundation\Application;
 use LaravelNats\Security\Exceptions\NatsConfigurationException;
+use LaravelNats\Support\MixedTypes;
 
 /**
  * Optional strict checks for `nats_basis` before connections are used (see `nats_basis.security.validate_on_boot`).
@@ -63,8 +64,7 @@ final class NatsBasisConfigurationValidator
             throw NatsConfigurationException::forConnection($name, 'host must be a non-empty string.');
         }
 
-        $port = $entry['port'] ?? 4222;
-        $port = is_int($port) ? $port : (int) $port;
+        $port = MixedTypes::int($entry['port'] ?? 4222, 0);
         if ($port < 1 || $port > 65535) {
             throw NatsConfigurationException::forConnection($name, sprintf('port must be between 1 and 65535, got %d.', $port));
         }
@@ -108,8 +108,6 @@ final class NatsBasisConfigurationValidator
             return null;
         }
 
-        $s = is_string($value) ? trim($value) : trim((string) $value);
-
-        return $s !== '' ? $s : null;
+        return MixedTypes::nullableString(is_string($value) ? trim($value) : $value);
     }
 }

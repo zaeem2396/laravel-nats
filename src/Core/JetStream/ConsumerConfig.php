@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace LaravelNats\Core\JetStream;
 
+use LaravelNats\Support\MixedTypes;
+
 /**
  * ConsumerConfig holds configuration for a JetStream consumer.
  *
@@ -136,35 +138,35 @@ final class ConsumerConfig
      */
     public static function fromArray(array $data): self
     {
-        $durable = isset($data['durable_name']) ? (string) $data['durable_name'] : null;
-        $config = new self($durable === '' ? null : $durable);
+        $durable = MixedTypes::nullableString($data['durable_name'] ?? null);
+        $config = new self($durable);
 
         if (isset($data['filter_subject'])) {
-            $config->filterSubject = (string) $data['filter_subject'];
+            $config->filterSubject = MixedTypes::string($data['filter_subject']);
         }
         if (isset($data['deliver_policy'])) {
-            $config->deliverPolicy = (string) $data['deliver_policy'];
+            $config->deliverPolicy = MixedTypes::string($data['deliver_policy']);
         }
         if (isset($data['ack_policy'])) {
-            $config->ackPolicy = (string) $data['ack_policy'];
+            $config->ackPolicy = MixedTypes::string($data['ack_policy']);
         }
         if (isset($data['ack_wait'])) {
-            $config->ackWait = (float) $data['ack_wait'];
+            $config->ackWait = MixedTypes::float($data['ack_wait']);
         }
         if (isset($data['max_deliver'])) {
-            $config->maxDeliver = (int) $data['max_deliver'];
+            $config->maxDeliver = MixedTypes::int($data['max_deliver']);
         }
         if (isset($data['replay_policy'])) {
-            $config->replayPolicy = (string) $data['replay_policy'];
+            $config->replayPolicy = MixedTypes::string($data['replay_policy']);
         }
         if (isset($data['deliver_subject'])) {
-            $config->deliverSubject = (string) $data['deliver_subject'];
+            $config->deliverSubject = MixedTypes::string($data['deliver_subject']);
         }
         if (isset($data['opt_start_seq'])) {
-            $config->optStartSeq = (int) $data['opt_start_seq'];
+            $config->optStartSeq = MixedTypes::int($data['opt_start_seq']);
         }
         if (isset($data['opt_start_time'])) {
-            $config->optStartTime = (string) $data['opt_start_time'];
+            $config->optStartTime = MixedTypes::string($data['opt_start_time']);
         }
 
         return $config;

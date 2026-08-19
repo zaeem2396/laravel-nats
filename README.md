@@ -65,6 +65,7 @@ Version map:
 - **1.6.1**: expanded Pest coverage, Pint CI workflow, `composer ci` script; no public API changes
 - **1.6.2**: connection reconnect helpers and transport cleanup for legacy and basis clients
 - **1.6.3**: documentation improvements and expanded [`docs/v2/examples`](docs/v2/examples/README.md)
+- **1.6.4** *(upcoming)*: PHPStan level 9 (max) and mixed-type static analysis fixes
 
 Roadmap: [`docs/ROADMAP.md`](docs/ROADMAP.md) · Changelog: [`CHANGELOG.md`](CHANGELOG.md)
 
@@ -220,7 +221,7 @@ Full details: [`docs/v2/SECURITY.md`](docs/v2/SECURITY.md)
 # Optional local NATS (integration tests)
 docker compose up -d
 
-# Full local CI gate (Pest + PHPStan + Pint + PHP-CS-Fixer)
+# Full local CI gate (Pest + PHPStan level 9 + Pint + PHP-CS-Fixer)
 composer ci
 
 # Individual checks

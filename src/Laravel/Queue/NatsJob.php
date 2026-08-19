@@ -10,6 +10,7 @@ use Illuminate\Queue\Jobs\Job;
 use Illuminate\Support\Arr;
 use LaravelNats\Laravel\Queue\Contracts\NatsJobQueueBridge;
 use LaravelNats\Laravel\Queue\Failed\NatsFailedJobProvider;
+use LaravelNats\Support\MixedTypes;
 use Throwable;
 
 /**
@@ -202,7 +203,7 @@ class NatsJob extends Job implements JobContract
      */
     public function attempts(): int
     {
-        return Arr::get($this->payload(), 'attempts', 1);
+        return MixedTypes::int(Arr::get($this->payload(), 'attempts', 1), 1);
     }
 
     /**
@@ -212,7 +213,7 @@ class NatsJob extends Job implements JobContract
      */
     public function maxTries(): ?int
     {
-        return Arr::get($this->payload(), 'maxTries');
+        return MixedTypes::nullableInt(Arr::get($this->payload(), 'maxTries'));
     }
 
     /**
@@ -222,7 +223,7 @@ class NatsJob extends Job implements JobContract
      */
     public function maxExceptions(): ?int
     {
-        return Arr::get($this->payload(), 'maxExceptions');
+        return MixedTypes::nullableInt(Arr::get($this->payload(), 'maxExceptions'));
     }
 
     /**
@@ -232,7 +233,7 @@ class NatsJob extends Job implements JobContract
      */
     public function timeout(): ?int
     {
-        return Arr::get($this->payload(), 'timeout');
+        return MixedTypes::nullableInt(Arr::get($this->payload(), 'timeout'));
     }
 
     /**
@@ -242,7 +243,7 @@ class NatsJob extends Job implements JobContract
      */
     public function retryUntil(): ?int
     {
-        return Arr::get($this->payload(), 'retryUntil');
+        return MixedTypes::nullableInt(Arr::get($this->payload(), 'retryUntil'));
     }
 
     /**
@@ -262,7 +263,18 @@ class NatsJob extends Job implements JobContract
      */
     public function backoff(): array|int|null
     {
-        return Arr::get($this->payload(), 'backoff');
+        $value = Arr::get($this->payload(), 'backoff');
+        if ($value === null) {
+            return null;
+        }
+        if (is_int($value)) {
+            return $value;
+        }
+        if (is_array($value)) {
+            return MixedTypes::intList($value);
+        }
+
+        return MixedTypes::nullableInt($value);
     }
 
     /**
@@ -300,7 +312,7 @@ class NatsJob extends Job implements JobContract
      */
     public function getJobId(): string
     {
-        return Arr::get($this->payload(), 'uuid', Arr::get($this->payload(), 'id', ''));
+        return MixedTypes::string(Arr::get($this->payload(), 'uuid', Arr::get($this->payload(), 'id', '')));
     }
 
     /**
@@ -321,7 +333,7 @@ class NatsJob extends Job implements JobContract
     public function payload(): array
     {
         if ($this->decoded === null) {
-            $this->decoded = json_decode($this->job, true) ?? [];
+            $this->decoded = MixedTypes::assoc(json_decode($this->job, true));
         }
 
         return $this->decoded;
@@ -354,7 +366,7 @@ class NatsJob extends Job implements JobContract
      */
     public function getName(): string
     {
-        return Arr::get($this->payload(), 'displayName', '');
+        return MixedTypes::string(Arr::get($this->payload(), 'displayName', ''));
     }
 
     /**
@@ -364,7 +376,7 @@ class NatsJob extends Job implements JobContract
      */
     public function resolveName(): string
     {
-        return Arr::get($this->payload(), 'displayName', $this->getName());
+        return MixedTypes::string(Arr::get($this->payload(), 'displayName', $this->getName()), $this->getName());
     }
 
     /**
@@ -565,11 +577,13 @@ class NatsJob extends Job implements JobContract
         try {
             $payload = $this->payload();
 
-            if (! isset($payload['data']['commandName']) || ! isset($payload['data']['command'])) {
+            $data = MixedTypes::assoc($payload['data'] ?? null);
+
+            if (! isset($data['commandName'], $data['command'])) {
                 return null;
             }
 
-            $commandData = $payload['data']['command'];
+            $commandData = $data['command'];
 
             // Skip if command is not a string (shouldn't happen, but be safe)
             if (! is_string($commandData)) {
@@ -677,14 +691,17 @@ class NatsJob extends Job implements JobContract
             }
 
             $config = $this->container->make('config');
-            if (! $config) {
+            if (! $config instanceof \Illuminate\Contracts\Config\Repository) {
                 return null;
             }
 
             $connection = $config->get('queue.failed.connection', config('database.default'));
             $table = $config->get('queue.failed.table', 'failed_jobs');
 
-            return new NatsFailedJobProvider($connection, $table);
+            return new NatsFailedJobProvider(
+                MixedTypes::string($connection, 'default'),
+                MixedTypes::string($table, 'failed_jobs'),
+            );
         } catch (Throwable $e) {
             return null;
         }

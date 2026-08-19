@@ -8,6 +8,7 @@ use Basis\Nats\Client;
 use Basis\Nats\Configuration as BasisConfiguration;
 use Illuminate\Contracts\Config\Repository;
 use InvalidArgumentException;
+use LaravelNats\Support\MixedTypes;
 use Psr\Log\LoggerInterface;
 use Throwable;
 
@@ -222,8 +223,8 @@ final class ConnectionManager
         };
 
         $primary = new NatsServerEndpoint(
-            (string) ($c['host'] ?? '127.0.0.1'),
-            (int) ($c['port'] ?? 4222),
+            MixedTypes::string($c['host'] ?? '127.0.0.1', '127.0.0.1'),
+            MixedTypes::int($c['port'] ?? 4222, 4222),
         );
         $add($primary);
 
@@ -319,10 +320,10 @@ final class ConnectionManager
             pedantic: (bool) ($c['pedantic'] ?? false),
             reconnect: (bool) ($c['reconnect'] ?? true),
             verbose: (bool) ($c['verbose'] ?? false),
-            timeout: (float) ($c['timeout'] ?? 1.0),
-            pingInterval: (int) ($c['pingInterval'] ?? 2),
-            lang: (string) ($c['lang'] ?? 'php'),
-            version: (string) ($c['version'] ?? 'laravel-nats'),
+            timeout: MixedTypes::float($c['timeout'] ?? 1.0, 1.0),
+            pingInterval: MixedTypes::int($c['pingInterval'] ?? 2, 2),
+            lang: MixedTypes::string($c['lang'] ?? 'php', 'php'),
+            version: MixedTypes::string($c['version'] ?? 'laravel-nats', 'laravel-nats'),
         );
     }
 
@@ -332,6 +333,6 @@ final class ConnectionManager
             return null;
         }
 
-        return is_string($value) ? $value : (string) $value;
+        return MixedTypes::nullableString($value);
     }
 }

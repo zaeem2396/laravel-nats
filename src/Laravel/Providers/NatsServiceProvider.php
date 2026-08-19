@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace LaravelNats\Laravel\Providers;
 
 use Illuminate\Contracts\Cache\Factory as CacheFactory;
+use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Log\LogManager;
 use Illuminate\Queue\Worker;
@@ -47,6 +48,7 @@ use LaravelNats\Observability\NullNatsMetrics;
 use LaravelNats\Outbox\NatsOutboxDispatcher;
 use LaravelNats\Publisher\Contracts\NatsPublisherContract;
 use LaravelNats\Publisher\NatsPublisher;
+use LaravelNats\Security\Exceptions\NatsConfigurationException;
 use LaravelNats\Security\NatsBasisConfigurationValidator;
 use LaravelNats\Security\SubjectAclChecker;
 use LaravelNats\Subscriber\Contracts\NatsSubscriberContract;
@@ -337,8 +339,13 @@ class NatsServiceProvider extends ServiceProvider implements DeferrableProvider
      */
     protected function bootNatsBasisSecurity(): void
     {
+        $config = $this->app->make('config');
+        if (! $config instanceof ConfigRepository) {
+            throw NatsConfigurationException::global('Laravel config repository is not bound.');
+        }
+
         $this->app->make(NatsBasisConfigurationValidator::class)->validate(
-            $this->app->make('config'),
+            $config,
             $this->app,
         );
     }

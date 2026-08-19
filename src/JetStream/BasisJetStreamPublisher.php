@@ -11,6 +11,7 @@ use LaravelNats\Exceptions\PublishException;
 use LaravelNats\Security\Exceptions\SubjectNotAllowedException;
 use LaravelNats\Security\SubjectAclChecker;
 use LaravelNats\Support\MessageEnvelope;
+use LaravelNats\Support\MixedTypes;
 
 /**
  * Publishes to subjects captured by a JetStream stream using basis {@see \Basis\Nats\Stream\Stream}.
@@ -47,7 +48,7 @@ final class BasisJetStreamPublisher
             $manager = new BasisJetStreamManager($this->connections, $connection);
             $stream = $manager->stream($streamName, $connection);
             if ($useEnvelope) {
-                $version = (string) $this->config->get('nats_basis.envelope_version', 'v1');
+                $version = MixedTypes::string($this->config->get('nats_basis.envelope_version', 'v1'), 'v1');
                 $data = $payload;
                 $idempotencyKey = null;
                 if (array_key_exists('idempotency_key', $data)) {

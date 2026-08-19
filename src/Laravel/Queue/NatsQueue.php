@@ -12,6 +12,7 @@ use Illuminate\Support\Str;
 use LaravelNats\Core\Client;
 use LaravelNats\Core\JetStream\JetStreamClient;
 use LaravelNats\Laravel\Queue\Contracts\NatsJobQueueBridge;
+use LaravelNats\Support\MixedTypes;
 
 /**
  * NatsQueue implements Laravel's Queue contract using NATS as the backend.
@@ -153,7 +154,7 @@ class NatsQueue extends Queue implements QueueContract, NatsJobQueueBridge
      */
     public function push($job, $data = '', $queue = null): ?string
     {
-        return $this->enqueueUsing(
+        return MixedTypes::nullableString($this->enqueueUsing(
             $job,
             $this->createPayload($job, $this->getQueue($queue), $data),
             $this->getQueue($queue),
@@ -161,7 +162,7 @@ class NatsQueue extends Queue implements QueueContract, NatsJobQueueBridge
             function ($payload, $queue) {
                 return $this->pushRaw($payload, $queue);
             },
-        );
+        ));
     }
 
     /**
@@ -178,8 +179,9 @@ class NatsQueue extends Queue implements QueueContract, NatsJobQueueBridge
         $subject = $this->getSubject($queue);
 
         // Decode to extract job ID
-        $decoded = json_decode($payload, true);
-        $jobId = $decoded['uuid'] ?? $decoded['id'] ?? Str::uuid()->toString();
+        $decoded = MixedTypes::assoc(json_decode($payload, true));
+        $jobId = MixedTypes::nullableString($decoded['uuid'] ?? $decoded['id'] ?? null)
+            ?? Str::uuid()->toString();
 
         $this->client->publishRaw($subject, $payload);
 

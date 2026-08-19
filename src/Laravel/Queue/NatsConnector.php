@@ -9,6 +9,7 @@ use Illuminate\Queue\Connectors\ConnectorInterface;
 use LaravelNats\Core\Client;
 use LaravelNats\Core\Connection\ConnectionConfig;
 use LaravelNats\Core\JetStream\JetStreamConfig;
+use LaravelNats\Support\MixedTypes;
 
 /**
  * NatsConnector creates NatsQueue instances from configuration.
@@ -54,27 +55,27 @@ class NatsConnector implements ConnectorInterface
         $delayedEnabled = is_array($delayed) && ($delayed['enabled'] ?? false);
 
         if ($delayedEnabled) {
-            $jsConfig = JetStreamConfig::fromArray($this->readConfig('nats.jetstream', []));
+            $jsConfig = JetStreamConfig::fromArray(MixedTypes::assoc($this->readConfig('nats.jetstream', [])));
             $jetStream = $client->getJetStream($jsConfig);
             DelayStreamBootstrap::ensureStreamAndConsumer(
                 $jetStream,
-                $delayed['stream'] ?? 'laravel_delayed',
-                $delayed['subject_prefix'] ?? 'laravel.delayed.',
-                $delayed['consumer'] ?? 'laravel_delayed_worker',
+                MixedTypes::string($delayed['stream'] ?? 'laravel_delayed', 'laravel_delayed'),
+                MixedTypes::string($delayed['subject_prefix'] ?? 'laravel.delayed.', 'laravel.delayed.'),
+                MixedTypes::string($delayed['consumer'] ?? 'laravel_delayed_worker', 'laravel_delayed_worker'),
             );
             $delayedConfig = [
-                'stream' => $delayed['stream'] ?? 'laravel_delayed',
-                'subject_prefix' => $delayed['subject_prefix'] ?? 'laravel.delayed.',
-                'consumer' => $delayed['consumer'] ?? 'laravel_delayed_worker',
+                'stream' => MixedTypes::string($delayed['stream'] ?? 'laravel_delayed', 'laravel_delayed'),
+                'subject_prefix' => MixedTypes::string($delayed['subject_prefix'] ?? 'laravel.delayed.', 'laravel.delayed.'),
+                'consumer' => MixedTypes::string($delayed['consumer'] ?? 'laravel_delayed_worker', 'laravel_delayed_worker'),
             ];
         }
 
         return new NatsQueue(
             client: $client,
-            defaultQueue: $config['queue'] ?? 'default',
-            retryAfter: $config['retry_after'] ?? 60,
-            maxTries: $config['tries'] ?? 3,
-            deadLetterQueue: $dlqSubject,
+            defaultQueue: MixedTypes::string($config['queue'] ?? 'default', 'default'),
+            retryAfter: MixedTypes::int($config['retry_after'] ?? 60, 60),
+            maxTries: MixedTypes::int($config['tries'] ?? 3, 3),
+            deadLetterQueue: MixedTypes::nullableString($dlqSubject),
             jetStream: $jetStream,
             delayedConfig: $delayedConfig,
         );
@@ -113,17 +114,17 @@ class NatsConnector implements ConnectorInterface
     protected function createConnectionConfig(array $config): ConnectionConfig
     {
         return new ConnectionConfig(
-            host: $config['host'] ?? 'localhost',
-            port: (int) ($config['port'] ?? 4222),
-            user: $config['user'] ?? null,
-            password: $config['password'] ?? null,
-            token: $config['token'] ?? null,
-            timeout: (float) ($config['timeout'] ?? 5.0),
-            pingInterval: (float) ($config['ping_interval'] ?? 120.0),
-            maxPingsOut: (int) ($config['max_pings_out'] ?? 2),
-            verbose: (bool) ($config['verbose'] ?? false),
-            pedantic: (bool) ($config['pedantic'] ?? false),
-            clientName: $config['client_name'] ?? 'laravel-queue',
+            host: MixedTypes::string($config['host'] ?? 'localhost', 'localhost'),
+            port: MixedTypes::int($config['port'] ?? 4222, 4222),
+            user: MixedTypes::nullableString($config['user'] ?? null),
+            password: MixedTypes::nullableString($config['password'] ?? null),
+            token: MixedTypes::nullableString($config['token'] ?? null),
+            timeout: MixedTypes::float($config['timeout'] ?? 5.0, 5.0),
+            pingInterval: MixedTypes::float($config['ping_interval'] ?? 120.0, 120.0),
+            maxPingsOut: MixedTypes::int($config['max_pings_out'] ?? 2, 2),
+            verbose: MixedTypes::bool($config['verbose'] ?? false),
+            pedantic: MixedTypes::bool($config['pedantic'] ?? false),
+            clientName: MixedTypes::string($config['client_name'] ?? 'laravel-queue', 'laravel-queue'),
         );
     }
 }

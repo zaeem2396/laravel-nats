@@ -29,7 +29,8 @@ Use this page as the quick-access map for package docs.
 
 ## Quality And CI
 
-- local checks: run `composer ci` (Pest, PHPStan, Pint, PHP-CS-Fixer)
+- local checks: run `composer ci` (Pest, PHPStan **level 9**, Pint, PHP-CS-Fixer)
+- static analysis: `composer analyse` (`phpstan.neon`, PHPStan 1.x maximum level)
 - workflows: Tests, Static Analysis, Code Style, Pint (see repository `.github/workflows/`)
 
 ## Help And Examples

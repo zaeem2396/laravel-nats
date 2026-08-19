@@ -18,6 +18,7 @@ use LaravelNats\Security\SubjectAclChecker;
 use LaravelNats\Support\CorrelationHeaders;
 use LaravelNats\Support\IdempotencyHeaders;
 use LaravelNats\Support\MessageEnvelope;
+use LaravelNats\Support\MixedTypes;
 use LaravelNats\Support\PublishHeaderNormalizer;
 use LaravelNats\Support\TraceContextHeaders;
 use LogicException;
@@ -49,7 +50,7 @@ final class NatsPublisher implements NatsPublisherContract
         try {
             $this->subjectAcl->assertPublishAllowed($subject);
 
-            $version = (string) $this->config->get('nats_basis.envelope_version', 'v1');
+            $version = MixedTypes::string($this->config->get('nats_basis.envelope_version', 'v1'), 'v1');
             $data = $payload;
             $idempotencyKey = null;
             if (array_key_exists('idempotency_key', $data)) {

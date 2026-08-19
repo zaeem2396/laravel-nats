@@ -6,6 +6,7 @@ namespace LaravelNats\Laravel\Queue\Failed;
 
 use Illuminate\Queue\Failed\FailedJobProviderInterface;
 use Illuminate\Support\Facades\DB;
+use LaravelNats\Support\MixedTypes;
 use Throwable;
 
 /**
@@ -88,6 +89,10 @@ class NatsFailedJobProvider implements FailedJobProviderInterface
      */
     public function find($id)
     {
+        if (! is_int($id) && ! is_string($id)) {
+            return null;
+        }
+
         $job = DB::connection($this->connection)
             ->table($this->table)
             ->find($id);
@@ -127,7 +132,7 @@ class NatsFailedJobProvider implements FailedJobProviderInterface
             $query->where('queue', $queue);
         }
 
-        return $query->pluck('id')->all();
+        return MixedTypes::intList($query->pluck('id')->all());
     }
 
     /**

@@ -14,7 +14,7 @@ name: Tests
 
 on:
   push:
-    branches: ['**']
+    branches: [main, develop]
   pull_request:
     branches: [main, develop]
   workflow_dispatch:
@@ -145,9 +145,6 @@ jobs:
         run: |
           composer require "laravel/framework:${{ matrix.laravel }}" "orchestra/testbench:${{ matrix.testbench }}" --dev --no-interaction --no-update
           composer update --${{ matrix.stability }} --prefer-dist --no-interaction --no-progress
-
-      - name: Install netcat
-        run: sudo apt-get update && sudo apt-get install -y netcat-openbsd
 
       - name: Wait for NATS servers
         run: bash .github/scripts/wait-for-nats-ci.sh

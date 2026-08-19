@@ -8,6 +8,7 @@ use Closure;
 use Illuminate\Contracts\Config\Repository;
 use LaravelNats\Idempotency\Contracts\IdempotencyStoreContract;
 use LaravelNats\Subscriber\InboundMessage;
+use LaravelNats\Support\MixedTypes;
 
 /**
  * Skips the subscriber handler when an idempotency key was already processed within TTL (cache ADD).
@@ -33,7 +34,7 @@ final class IdempotencyInboundMiddleware implements InboundMiddleware
             return;
         }
 
-        $headerName = (string) $this->config->get('nats_basis.idempotency.header_name', '');
+        $headerName = MixedTypes::string($this->config->get('nats_basis.idempotency.header_name', ''));
         $key = $message->idempotencyKey($headerName !== '' ? $headerName : null);
         if ($key === null || $key === '') {
             $next();
@@ -41,8 +42,7 @@ final class IdempotencyInboundMiddleware implements InboundMiddleware
             return;
         }
 
-        $ttl = (int) $this->config->get('nats_basis.idempotency.ttl_seconds', 86400);
-        $ttl = max(1, $ttl);
+        $ttl = max(1, MixedTypes::int($this->config->get('nats_basis.idempotency.ttl_seconds', 86400), 86400));
 
         if (! $this->store->reserve($key, $ttl)) {
             return;

@@ -10,6 +10,7 @@ use Illuminate\Queue\Queue;
 use Illuminate\Support\Str;
 use LaravelNats\Connection\ConnectionManager;
 use LaravelNats\Laravel\Queue\Contracts\NatsJobQueueBridge;
+use LaravelNats\Support\MixedTypes;
 
 /**
  * Laravel queue driver on {@see Client} (basis-company/nats) via {@see ConnectionManager}.
@@ -105,7 +106,7 @@ class BasisNatsQueue extends Queue implements QueueContract, NatsJobQueueBridge
 
     public function push($job, $data = '', $queue = null): ?string
     {
-        return $this->enqueueUsing(
+        return MixedTypes::nullableString($this->enqueueUsing(
             $job,
             $this->createPayload($job, $this->getQueue($queue), $data),
             $this->getQueue($queue),
@@ -113,7 +114,7 @@ class BasisNatsQueue extends Queue implements QueueContract, NatsJobQueueBridge
             function ($payload, $queue) {
                 return $this->pushRaw($payload, $queue);
             },
-        );
+        ));
     }
 
     /**
@@ -122,8 +123,9 @@ class BasisNatsQueue extends Queue implements QueueContract, NatsJobQueueBridge
     public function pushRaw($payload, $queue = null, array $options = []): ?string
     {
         $subject = $this->getSubject($queue);
-        $decoded = json_decode($payload, true);
-        $jobId = is_array($decoded) ? ($decoded['uuid'] ?? $decoded['id'] ?? Str::uuid()->toString()) : Str::uuid()->toString();
+        $decoded = MixedTypes::assoc(json_decode($payload, true));
+        $jobId = MixedTypes::nullableString($decoded['uuid'] ?? $decoded['id'] ?? null)
+            ?? Str::uuid()->toString();
 
         $this->client()->publish($subject, $payload);
 

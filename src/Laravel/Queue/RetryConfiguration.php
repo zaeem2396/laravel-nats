@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace LaravelNats\Laravel\Queue;
 
+use LaravelNats\Support\MixedTypes;
+
 /**
  * RetryConfiguration handles the configuration and calculation of job retry behavior.
  *
@@ -80,10 +82,10 @@ class RetryConfiguration
         int $defaultRetryDelay = self::DEFAULT_RETRY_DELAY,
     ): self {
         return new self(
-            maxTries: (int) ($payload['maxTries'] ?? $defaultMaxTries),
-            retryDelay: (int) ($payload['retryAfter'] ?? $payload['backoff'] ?? $defaultRetryDelay),
-            retryUntil: isset($payload['retryUntil']) ? (int) $payload['retryUntil'] : null,
-            maxExceptions: isset($payload['maxExceptions']) ? (int) $payload['maxExceptions'] : null,
+            maxTries: MixedTypes::int($payload['maxTries'] ?? $defaultMaxTries, $defaultMaxTries),
+            retryDelay: MixedTypes::int($payload['retryAfter'] ?? $payload['backoff'] ?? $defaultRetryDelay, $defaultRetryDelay),
+            retryUntil: MixedTypes::nullableInt($payload['retryUntil'] ?? null),
+            maxExceptions: MixedTypes::nullableInt($payload['maxExceptions'] ?? null),
         );
     }
 

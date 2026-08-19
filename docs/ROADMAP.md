@@ -13,10 +13,11 @@ Package releases follow [Semantic Versioning](https://semver.org/). See [CHANGEL
 | 1.6.1 | — | Test coverage, CI (Pest, PHPStan, Pint), no public API changes (shipped) |
 | 1.6.2 | — | Connection reconnect helpers and transport edge-case fixes (shipped) |
 | 1.6.3 | — | Documentation improvements and expanded examples (shipped) |
+| 1.6.4 | — | PHPStan level 9 (max) and mixed-type static analysis fixes (in progress) |
 
 ## Current stable
 
-**v1.6.3** — documentation improvements and expanded v2 examples.
+**v1.6.3** — documentation improvements and expanded v2 examples. Next: **v1.6.4** PHPStan max.
 
 ## Upgrade path
 

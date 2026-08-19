@@ -44,8 +44,8 @@ final class CorrelationHeaders
             return $headers;
         }
 
-        $requestIdHeader = (string) $config->get('nats_basis.correlation.request_id_header', self::DEFAULT_REQUEST_ID);
-        $correlationHeader = (string) $config->get('nats_basis.correlation.correlation_id_header', self::DEFAULT_CORRELATION_ID);
+        $requestIdHeader = MixedTypes::string($config->get('nats_basis.correlation.request_id_header', self::DEFAULT_REQUEST_ID), self::DEFAULT_REQUEST_ID);
+        $correlationHeader = MixedTypes::string($config->get('nats_basis.correlation.correlation_id_header', self::DEFAULT_CORRELATION_ID), self::DEFAULT_CORRELATION_ID);
         $generate = filter_var($config->get('nats_basis.correlation.generate_when_missing', true), FILTER_VALIDATE_BOOL);
 
         $out = $headers;

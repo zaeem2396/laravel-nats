@@ -7,6 +7,7 @@ namespace LaravelNats\Laravel\Queue;
 use Illuminate\Contracts\Queue\Queue;
 use Illuminate\Queue\Connectors\ConnectorInterface;
 use LaravelNats\Connection\ConnectionManager;
+use LaravelNats\Support\MixedTypes;
 use RuntimeException;
 
 /**
@@ -43,9 +44,9 @@ class BasisNatsConnector implements ConnectorInterface
         return new BasisNatsQueue(
             connections: $manager,
             basisConnectionName: is_string($basisConnection) ? $basisConnection : null,
-            defaultQueue: $config['queue'] ?? 'default',
-            retryAfter: (int) ($config['retry_after'] ?? $this->readConfig('nats_basis.queue.retry_after', 60)),
-            maxTries: (int) ($config['tries'] ?? $this->readConfig('nats_basis.queue.tries', 3)),
+            defaultQueue: MixedTypes::string($config['queue'] ?? 'default', 'default'),
+            retryAfter: MixedTypes::int($config['retry_after'] ?? $this->readConfig('nats_basis.queue.retry_after', 60), 60),
+            maxTries: MixedTypes::int($config['tries'] ?? $this->readConfig('nats_basis.queue.tries', 3), 3),
             deadLetterQueue: is_string($dlqSubject) ? $dlqSubject : null,
             subjectPrefix: is_string($prefix) ? $prefix : 'laravel.queue.',
             popBlockSeconds: $blockFor,

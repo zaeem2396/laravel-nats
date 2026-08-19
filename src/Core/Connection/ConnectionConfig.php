@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace LaravelNats\Core\Connection;
 
 use LaravelNats\Contracts\Connection\ConnectionConfigInterface;
+use LaravelNats\Support\MixedTypes;
 
 /**
  * ConnectionConfig holds all configuration for a NATS connection.
@@ -87,33 +88,43 @@ final class ConnectionConfig implements ConnectionConfigInterface
      */
     public static function fromArray(array $config): self
     {
-        // Parse host and port from URL if provided
-        $host = $config['host'] ?? 'localhost';
-        $port = $config['port'] ?? self::DEFAULT_PORT;
+        $host = MixedTypes::string($config['host'] ?? 'localhost', 'localhost');
+        $port = MixedTypes::int($config['port'] ?? self::DEFAULT_PORT, self::DEFAULT_PORT);
 
-        // Support URL format: nats://host:port
-        if (isset($config['url'])) {
-            $parsed = parse_url($config['url']);
-            if ($parsed !== false) {
-                $host = $parsed['host'] ?? $host;
-                $port = $parsed['port'] ?? $port;
+        $url = MixedTypes::nullableString($config['url'] ?? null);
+        if ($url !== null) {
+            $parsed = parse_url($url);
+            if (is_array($parsed)) {
+                $host = MixedTypes::string($parsed['host'] ?? $host, $host);
+                $port = MixedTypes::int($parsed['port'] ?? $port, $port);
             }
+        }
+
+        $auth = MixedTypes::assoc($config['auth'] ?? []);
+        $tls = $config['tls'] ?? false;
+        $tlsEnabled = false;
+        $tlsOptions = [];
+        if (is_array($tls)) {
+            $tlsEnabled = MixedTypes::bool($tls['enabled'] ?? false);
+            $tlsOptions = MixedTypes::assoc($tls['options'] ?? []);
+        } else {
+            $tlsEnabled = MixedTypes::bool($tls);
         }
 
         return new self(
             host: $host,
-            port: (int) $port,
-            user: $config['user'] ?? $config['auth']['user'] ?? null,
-            password: $config['password'] ?? $config['auth']['password'] ?? null,
-            token: $config['token'] ?? $config['auth']['token'] ?? null,
-            timeout: (float) ($config['timeout'] ?? self::DEFAULT_TIMEOUT),
-            tlsEnabled: (bool) ($config['tls']['enabled'] ?? $config['tls'] ?? false),
-            tlsOptions: $config['tls']['options'] ?? [],
-            clientName: $config['client_name'] ?? $config['name'] ?? 'laravel-nats',
-            verbose: (bool) ($config['verbose'] ?? false),
-            pedantic: (bool) ($config['pedantic'] ?? false),
-            pingInterval: (float) ($config['ping_interval'] ?? self::DEFAULT_PING_INTERVAL),
-            maxPingsOut: (int) ($config['max_pings_out'] ?? self::DEFAULT_MAX_PINGS_OUT),
+            port: $port,
+            user: MixedTypes::nullableString($config['user'] ?? $auth['user'] ?? null),
+            password: MixedTypes::nullableString($config['password'] ?? $auth['password'] ?? null),
+            token: MixedTypes::nullableString($config['token'] ?? $auth['token'] ?? null),
+            timeout: MixedTypes::float($config['timeout'] ?? self::DEFAULT_TIMEOUT, self::DEFAULT_TIMEOUT),
+            tlsEnabled: $tlsEnabled,
+            tlsOptions: $tlsOptions,
+            clientName: MixedTypes::string($config['client_name'] ?? $config['name'] ?? 'laravel-nats', 'laravel-nats'),
+            verbose: MixedTypes::bool($config['verbose'] ?? false),
+            pedantic: MixedTypes::bool($config['pedantic'] ?? false),
+            pingInterval: MixedTypes::float($config['ping_interval'] ?? self::DEFAULT_PING_INTERVAL, self::DEFAULT_PING_INTERVAL),
+            maxPingsOut: MixedTypes::int($config['max_pings_out'] ?? self::DEFAULT_MAX_PINGS_OUT, self::DEFAULT_MAX_PINGS_OUT),
             echo: filter_var($config['echo'] ?? true, FILTER_VALIDATE_BOOL),
         );
     }

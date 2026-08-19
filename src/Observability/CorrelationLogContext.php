@@ -7,6 +7,7 @@ namespace LaravelNats\Observability;
 use Illuminate\Contracts\Config\Repository;
 use Illuminate\Http\Request;
 use LaravelNats\Support\CorrelationHeaders;
+use LaravelNats\Support\MixedTypes;
 
 /**
  * Builds structured log context (`nats_request_id`, `nats_correlation_id`) from an HTTP request using `nats_basis.correlation` header names.
@@ -20,8 +21,8 @@ final class CorrelationLogContext
      */
     public static function fromRequest(Request $request, Repository $config): array
     {
-        $requestIdHeader = (string) $config->get('nats_basis.correlation.request_id_header', CorrelationHeaders::DEFAULT_REQUEST_ID);
-        $correlationHeader = (string) $config->get('nats_basis.correlation.correlation_id_header', CorrelationHeaders::DEFAULT_CORRELATION_ID);
+        $requestIdHeader = MixedTypes::string($config->get('nats_basis.correlation.request_id_header', CorrelationHeaders::DEFAULT_REQUEST_ID), CorrelationHeaders::DEFAULT_REQUEST_ID);
+        $correlationHeader = MixedTypes::string($config->get('nats_basis.correlation.correlation_id_header', CorrelationHeaders::DEFAULT_CORRELATION_ID), CorrelationHeaders::DEFAULT_CORRELATION_ID);
 
         return array_filter([
             'nats_request_id' => self::firstHeader($request, [
