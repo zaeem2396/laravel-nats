@@ -34,6 +34,7 @@ jobs:
       - name: Install dependencies
         env:
           COMPOSER_NO_SECURITY_BLOCKING: 1
+          COMPOSER_AUTH: '{"github-oauth": {"github.com": "${{ secrets.GITHUB_TOKEN }}"}}'
         run: |
           composer require "laravel/framework:12.*" "orchestra/testbench:10.*" --dev --no-interaction --no-update
           composer update --prefer-stable --prefer-dist --no-interaction --no-progress
