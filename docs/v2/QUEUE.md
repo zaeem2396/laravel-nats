@@ -38,7 +38,7 @@ Add (or switch) a connection:
 
 Set **`QUEUE_CONNECTION=nats_basis`** (or dispatch to this connection explicitly).
 
-You can set **`max_in_flight`** on the connection (or rely on **`nats_basis.queue.max_in_flight`**). When set to a positive integer, **`pop()`** returns **`null`** while the internal counter is at or above that limit. The counter increments when a message is delivered to a **`NatsJob`** and decrements when the job is **deleted**, **released**, or **failed** (via **`NatsJobQueueBridge::notifyJobHandled()`**).
+You can set **`max_in_flight`** on the connection (or rely on **`nats_basis.queue.max_in_flight`**). When set to a positive integer, **`pop()`** returns **`null`** while the internal counter is at or above that limit. The counter increments when a message is delivered to a **`NatsJob`** and decrements when the job is **deleted**, **released**, or **failed** (via **`NatsJobQueueBridge::notifyJobHandled()`**). **`reservedSize()`** reports the same counter. (Before **1.6.5** the counter was never incremented, so **`max_in_flight`** had no effect.)
 
 This is **per PHP worker process**, not cluster-wide. Standard **`queue:work`** runs one job at a time, so a limit greater than **1** only matters if you run custom code that holds multiple jobs without completing them, or future async worker modes. Omit **`max_in_flight`** (or use **0**) for unlimited behaviour.
 
@@ -101,6 +101,7 @@ stopwaitsecs=3600
 ## Limitations (current release)
 
 - **`later()` / delayed dispatch** are not backed by JetStream on **`nats_basis`**; the driver **pushes immediately** (same pattern as NATS Core on the legacy driver without delayed JetStream).
+- **Release delays / `backoff`**: **`$job->release($delay)`** and **`releaseWithBackoff()`** republish the original payload (with **`attempts + 1`**) **immediately**; the delay is not enforced by NATS Core. Since **1.6.5** the payload stays intact (earlier versions wrapped it and the redelivered job could not be resolved).
 - **Queue depth** (`size()`) always returns **0** (NATS Core does not expose a durable depth).
 - **Cross-process backpressure** (global cap across all workers) is not built in; use **`max_in_flight`** only for per-process limits or external coordination (e.g. Redis) if you need cluster-wide throttling.
 
