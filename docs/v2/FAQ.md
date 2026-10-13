@@ -26,6 +26,8 @@
 
 **How do I reconnect after a dropped session?** From **1.6.2+**, call `NatsV2::reconnect()` (or `Nats::reconnect()` on the legacy stack) to drop the cached client and open a fresh one. This is separate from basis-company/nats automatic reconnect. See [examples/11-reconnect.md](examples/11-reconnect.md) and [GUIDE.md](GUIDE.md).
 
+**Why does `dispatch()` to `nats_basis` fail with `No connector for [nats_basis]` in a web request?** Before **1.6.5**, the service provider was deferred, so outside Artisan the queue connectors were only registered after a NATS service had been resolved. Upgrade to **1.6.5+**, and run `php artisan optimize:clear` if your deploy skips Composer scripts. See [QUEUE.md](QUEUE.md).
+
 **Where are copy-paste examples?** [examples/README.md](examples/README.md) — subscribe, queue, ACL, reconnect, outbox, trace, request/reply, and idempotency.
 
 **Overhead?** One JSON encode and UUID per publish; negligible vs network.

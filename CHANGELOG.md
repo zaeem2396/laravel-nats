@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- (none)
+
+### Changed
+
+- (none)
+
+### Removed
+
+- (none)
+
+### Documentation
+
+- (none)
+
+## [1.6.5] - 2026-10-13
+
 Laravel 12 compatibility verification. Verified on a fresh `laravel/laravel` 12.x app: HTTP dispatch to `nats_basis` and `queue:work nats_basis` worked, and the full suite (including integration tests against NATS) passed on Laravel 12.70 and at the lowest supported Laravel 12.0.x dependency set.
 
 ### Fixed
@@ -419,6 +437,24 @@ Run `composer update zaeem2396/laravel-nats` to upgrade.
 
 Run `composer update zaeem2396/laravel-nats` to upgrade.
 
+### From 1.6.4 to 1.6.5
+
+- **No public API changes.** Patch release: Laravel 12 compatibility verification plus service provider and queue fixes.
+- **Queue from HTTP requests:** `NatsServiceProvider` is no longer deferred, so `nats` / `nats_basis` queue connections work during web requests. Composer's `post-autoload-dump` clears the provider manifest automatically. If your deploy skips Composer scripts, run `php artisan optimize:clear` once. Remove any workaround that resolved `NatsV2` / `nats` early or registered the connectors manually.
+- **`max_in_flight`:** now enforced on `nats_basis`. If you set it, check that the value matches the concurrency you actually want per worker process.
+- **Release / backoff:** delayed `release()` and `backoff` now redeliver the original job immediately (NATS Core has no broker-side delay). Before this release, those redeliveries could not be resolved by the worker.
+- **Dependencies:** requires `basis-company/nats` **^1.0.3** and declares `illuminate/*` **^10–^13**. Laravel 10–13 apps need no changes.
+
+```json
+{
+    "require": {
+        "zaeem2396/laravel-nats": "^1.6.5"
+    }
+}
+```
+
+Run `composer update zaeem2396/laravel-nats` to upgrade.
+
 ### From 1.6.3 to 1.6.4
 
 - **No public API changes.** Patch release focused on PHPStan level 9 and mixed-type narrowing.
@@ -529,7 +565,8 @@ Run `composer update zaeem2396/laravel-nats` to upgrade.
 
 ---
 
-[Unreleased]: https://github.com/zaeem2396/laravel-nats/compare/v1.6.4...HEAD
+[Unreleased]: https://github.com/zaeem2396/laravel-nats/compare/v1.6.5...HEAD
+[1.6.5]: https://github.com/zaeem2396/laravel-nats/compare/v1.6.4...v1.6.5
 [1.6.4]: https://github.com/zaeem2396/laravel-nats/compare/v1.6.3...v1.6.4
 [1.6.3]: https://github.com/zaeem2396/laravel-nats/compare/v1.6.2...v1.6.3
 [1.6.2]: https://github.com/zaeem2396/laravel-nats/compare/v1.6.1...v1.6.2
