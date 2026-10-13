@@ -93,6 +93,8 @@ class NatsJob extends Job implements JobContract
     /**
      * Release the job back into the queue.
      *
+     * The delay is not honoured by NATS Core; the job is republished immediately with attempts + 1.
+     *
      * @param int $delay
      *
      * @return void
@@ -112,12 +114,9 @@ class NatsJob extends Job implements JobContract
         }
 
         try {
-            // Re-publish the job to the queue
-            if ($delay > 0) {
-                $this->nats->later($delay, $newPayload, '', $this->queue);
-            } else {
-                $this->nats->pushRaw($newPayload, $this->queue);
-            }
+            // Must stay pushRaw: later()/push() would wrap the already-encoded payload as a new string job.
+            // NATS Core has no broker-side delay, so the job is redelivered immediately.
+            $this->nats->pushRaw($newPayload, $this->queue, ['delay' => $delay]);
         } finally {
             $this->finalizeNatsQueueJobLifecycle();
         }

@@ -363,10 +363,10 @@ describe('NatsJob', function (): void {
             $payload = json_encode(['uuid' => 'test', 'backoff' => 30, 'attempts' => 1]);
             $queue = createMockQueue();
             $queue->shouldReceive('getRetryAfter')->andReturn(60);
-            $queue->shouldReceive('later')
+            $queue->shouldReceive('pushRaw')
                 ->once()
-                ->withArgs(function ($delay, $payload, $data, $queueName) {
-                    return $delay === 30;
+                ->withArgs(function ($payload, $queueName, $options) {
+                    return $options === ['delay' => 30];
                 })
                 ->andReturn('job-id');
             $job = createTestJob($payload, $queue);
@@ -383,10 +383,10 @@ describe('NatsJob', function (): void {
             $queue->shouldReceive('getDeadLetterQueueSubject')->andReturn(null);
             $queue->shouldReceive('getRetryAfter')->andReturn(45);
             $queue->shouldReceive('notifyJobHandled')->once()->andReturnNull();
-            $queue->shouldReceive('later')
+            $queue->shouldReceive('pushRaw')
                 ->once()
-                ->withArgs(function ($delay, $payload, $data, $queueName) {
-                    return $delay === 45;
+                ->withArgs(function ($payload, $queueName, $options) {
+                    return $options === ['delay' => 45];
                 })
                 ->andReturn('job-id');
             $job = createTestJob($payload, $queue);
@@ -531,12 +531,12 @@ describe('NatsJob', function (): void {
         it('releases the job with delay', function (): void {
             $queue = createMockQueue();
             // The release method now increments attempts from 2 to 3
-            $queue->shouldReceive('later')
+            $queue->shouldReceive('pushRaw')
                 ->once()
-                ->withArgs(function ($delay, $payload, $data, $queueName) {
+                ->withArgs(function ($payload, $queueName, $options) {
                     $decoded = json_decode($payload, true);
 
-                    return $delay === 30 && $decoded['attempts'] === 3 && $queueName === 'test-queue';
+                    return $options === ['delay' => 30] && $decoded['attempts'] === 3 && $queueName === 'test-queue';
                 })
                 ->andReturn('job-uuid-123');
 

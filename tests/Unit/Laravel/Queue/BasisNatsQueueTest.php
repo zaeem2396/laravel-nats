@@ -114,6 +114,24 @@ describe('BasisNatsQueue', function (): void {
         $client->shouldHaveReceived('subscribe')->once();
     });
 
+    it('republishes the original payload when a job is released with a delay', function (): void {
+        $queue = makeBasisQueue();
+        $queue->setContainer(new Container);
+        $queue->setConnectionName('nats_basis');
+        $client = fakeBasisClientDelivering($queue, '{"uuid":"job-1","job":"App\\\\Jobs\\\\Ping","data":[],"attempts":1}');
+
+        $queue->pop()->release(30);
+
+        $client->shouldHaveReceived('publish')->once()->with('laravel.queue.jobs', Mockery::on(
+            fn (string $raw): bool => json_decode($raw, true) === [
+                'uuid' => 'job-1',
+                'job' => 'App\\Jobs\\Ping',
+                'data' => [],
+                'attempts' => 2,
+            ],
+        ));
+    });
+
     it('manages dead letter queue subject', function (): void {
         $queue = makeBasisQueue(['dead_letter_queue' => 'failed']);
 
