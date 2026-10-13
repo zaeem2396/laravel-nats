@@ -169,6 +169,8 @@ class BasisNatsQueue extends Queue implements QueueContract, NatsJobQueueBridge
             return null;
         }
 
+        $this->inFlight++;
+
         return new NatsJob(
             container: $this->container,
             nats: $this,
