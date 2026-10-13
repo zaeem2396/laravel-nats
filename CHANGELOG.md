@@ -18,8 +18,9 @@ Laravel 12 compatibility verification. Verified on a fresh `laravel/laravel` 12.
 
 ### Changed
 
+- **`basis-company/nats` minimum raised to `^1.0.3`.** `ConnectionManager` passes `tlsHandshakeFirst` to `Basis\Nats\Configuration`, which only exists from 1.0.3. With 1.0.0–1.0.2, every `nats_basis` connection failed with `Unknown named parameter $tlsHandshakeFirst`. The new `--prefer-lowest` CI job caught this.
 - **`composer.json`:** `require` now declares `illuminate/console`, `illuminate/contracts`, `illuminate/queue`, and `illuminate/support` (`^10.0|^11.0|^12.0|^13.0`). Composer now refuses to install the package alongside unsupported Laravel versions. `laravel/framework` replaces these packages, so applications need nothing extra.
-- **CI:** added a PHP 8.2 / Laravel 12 `--prefer-lowest` job (Laravel 12.0.x, Testbench 10.0, `basis-company/nats` 1.0). The Composer cache key now includes the stability mode.
+- **CI:** added a PHP 8.2 / Laravel 12 `--prefer-lowest` job (Laravel 12.0.x, Testbench 10.0, `basis-company/nats` 1.0.3). The Composer cache key now includes the stability mode, and every workflow now authenticates Composer's GitHub downloads (`COMPOSER_AUTH`) to avoid HTTP 429 rate limits on cold caches.
 
 ### Added
 

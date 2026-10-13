@@ -22,7 +22,7 @@
     "require": {
         "php": "^8.2",
         "ext-json": "*",
-        "basis-company/nats": "^1.0",
+        "basis-company/nats": "^1.0.3",
         "illuminate/console": "^10.0|^11.0|^12.0|^13.0",
         "illuminate/contracts": "^10.0|^11.0|^12.0|^13.0",
         "illuminate/queue": "^10.0|^11.0|^12.0|^13.0",
