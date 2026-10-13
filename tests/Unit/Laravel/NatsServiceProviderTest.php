@@ -37,7 +37,29 @@ it('registers Client binding', function (): void {
     expect($this->app->bound(Client::class))->toBeTrue();
 });
 
-it('provides deferred services', function (): void {
+it('is an eager provider so queue connectors exist outside the console', function (): void {
+    expect((new NatsServiceProvider($this->app))->isDeferred())->toBeFalse();
+});
+
+it('boots through the provider repository like package discovery does', function (): void {
+    $manifest = sys_get_temp_dir().'/laravel-nats-providers-'.uniqid().'.php';
+    $app = new Illuminate\Foundation\Application(sys_get_temp_dir());
+    $app->instance('config', new Illuminate\Config\Repository([
+        'queue' => ['default' => 'sync', 'connections' => []],
+    ]));
+
+    try {
+        (new Illuminate\Foundation\ProviderRepository($app, new Illuminate\Filesystem\Filesystem, $manifest))
+            ->load([NatsServiceProvider::class]);
+
+        expect($app->providerIsLoaded(NatsServiceProvider::class))->toBeTrue()
+            ->and($app->getDeferredServices())->not->toHaveKey('nats.v2');
+    } finally {
+        @unlink($manifest);
+    }
+});
+
+it('lists provided services', function (): void {
     $provider = new NatsServiceProvider($this->app);
 
     $provides = $provider->provides();

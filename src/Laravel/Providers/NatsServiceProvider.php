@@ -6,7 +6,6 @@ namespace LaravelNats\Laravel\Providers;
 
 use Illuminate\Contracts\Cache\Factory as CacheFactory;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
-use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Log\LogManager;
 use Illuminate\Queue\Worker;
 use Illuminate\Support\ServiceProvider;
@@ -57,8 +56,12 @@ use LaravelNats\Subscriber\SubjectValidator;
 
 /**
  * NatsServiceProvider registers NATS services with the Laravel container.
+ *
+ * Must stay eager (not a DeferrableProvider): boot() registers the `nats` / `nats_basis` queue
+ * connectors and optional config validation, which have to exist before any service in
+ * provides() is resolved (e.g. Queue::connection('nats_basis') during an HTTP request).
  */
-class NatsServiceProvider extends ServiceProvider implements DeferrableProvider
+class NatsServiceProvider extends ServiceProvider
 {
     /**
      * Register any application services.
@@ -92,7 +95,7 @@ class NatsServiceProvider extends ServiceProvider implements DeferrableProvider
     }
 
     /**
-     * Get the services provided by the provider.
+     * Get the services registered by the provider (informational; the provider is not deferred).
      *
      * @return array<string>
      */
