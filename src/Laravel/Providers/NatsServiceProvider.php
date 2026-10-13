@@ -7,6 +7,7 @@ namespace LaravelNats\Laravel\Providers;
 use Illuminate\Contracts\Cache\Factory as CacheFactory;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Log\LogManager;
+use Illuminate\Queue\QueueManager;
 use Illuminate\Queue\Worker;
 use Illuminate\Support\ServiceProvider;
 use LaravelNats\Connection\ConnectionManager;
@@ -327,14 +328,19 @@ class NatsServiceProvider extends ServiceProvider
      */
     protected function registerQueueDriver(): void
     {
-        $this->app->afterResolving('queue', function (\Illuminate\Queue\QueueManager $manager): void {
-            $manager->addConnector('nats', function () {
-                return new NatsConnector();
-            });
-            $manager->addConnector('nats_basis', function () {
-                return new BasisNatsConnector();
-            });
-        });
+        $register = static function (QueueManager $manager): void {
+            $manager->addConnector('nats', static fn () => new NatsConnector());
+            $manager->addConnector('nats_basis', static fn () => new BasisNatsConnector());
+        };
+
+        if ($this->app->resolved('queue')) {
+            $manager = $this->app->make('queue');
+            if ($manager instanceof QueueManager) {
+                $register($manager);
+            }
+        }
+
+        $this->app->afterResolving('queue', $register);
     }
 
     /**

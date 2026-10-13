@@ -59,6 +59,25 @@ it('boots through the provider repository like package discovery does', function
     }
 });
 
+it('registers nats and nats_basis queue connectors', function (): void {
+    $connectors = (new ReflectionProperty(Illuminate\Queue\QueueManager::class, 'connectors'))
+        ->getValue($this->app->make('queue'));
+
+    expect($connectors)->toHaveKeys(['nats', 'nats_basis']);
+});
+
+it('registers queue connectors when the queue manager was resolved before boot', function (): void {
+    $manager = new Illuminate\Queue\QueueManager($this->app);
+    $this->app->instance('queue', $manager);
+
+    $provider = new NatsServiceProvider($this->app);
+    (new ReflectionMethod($provider, 'registerQueueDriver'))->invoke($provider);
+
+    $connectors = (new ReflectionProperty(Illuminate\Queue\QueueManager::class, 'connectors'))->getValue($manager);
+
+    expect($connectors)->toHaveKeys(['nats', 'nats_basis']);
+});
+
 it('lists provided services', function (): void {
     $provider = new NatsServiceProvider($this->app);
 
