@@ -54,6 +54,19 @@ composer require zaeem2396/laravel-nats
 php artisan vendor:publish --tag=nats-config
 ```
 
+The service provider and the `Nats` / `NatsV2` facades are auto-discovered; no manual registration is needed (including the Laravel 11+ `bootstrap/providers.php` skeleton).
+
+### Compatibility
+
+| Laravel | PHP | Testbench (dev) | CI coverage |
+|---------|-----|-----------------|-------------|
+| 10.x | 8.2 – 8.4 | 8.x | PHP 8.2, 8.4 |
+| 11.x | 8.2 – 8.5 | 9.x | PHP 8.2, 8.3, 8.4, 8.5 |
+| 12.x | 8.2 – 8.5 | 10.x | PHP 8.2, 8.3, 8.4, 8.5, plus a `--prefer-lowest` run (12.0.x) |
+| 13.x | 8.3 – 8.5 | 11.x | PHP 8.3, 8.4, 8.5 |
+
+Every CI job runs the unit, feature, and integration suites against real NATS servers. `tests/Feature/LaravelFrameworkCompatibilityTest.php` covers framework-facing behaviour: bus dispatch onto `nats_basis`, job payload shape, `NatsJob` firing, Artisan command registration, the publish tag, and facades.
+
 Version map:
 
 - **1.3.0+**: `NatsV2` publish/subscribe foundation
@@ -66,6 +79,7 @@ Version map:
 - **1.6.2**: connection reconnect helpers and transport cleanup for legacy and basis clients
 - **1.6.3**: documentation improvements and expanded [`docs/v2/examples`](docs/v2/examples/README.md)
 - **1.6.4**: PHPStan level 9 (max) and mixed-type static analysis fixes
+- **1.6.5**: Laravel 12 compatibility verification; service provider no longer deferred (fixes `nats_basis` dispatch from HTTP requests); `max_in_flight` and delayed `release()` fixes
 
 Roadmap: [`docs/ROADMAP.md`](docs/ROADMAP.md) · Changelog: [`CHANGELOG.md`](CHANGELOG.md)
 

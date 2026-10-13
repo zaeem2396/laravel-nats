@@ -47,6 +47,8 @@ jobs:
           restore-keys: ${{ runner.os }}-composer-
 
       - name: Install dependencies
+        env:
+          COMPOSER_AUTH: '{"github-oauth": {"github.com": "${{ secrets.GITHUB_TOKEN }}"}}'
         run: composer install --prefer-dist --no-progress
 
       - name: Check code style

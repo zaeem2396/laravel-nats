@@ -2,10 +2,13 @@
 
 declare(strict_types=1);
 
+use Basis\Nats\Client;
+use Basis\Nats\Message\Payload;
 use Illuminate\Config\Repository;
 use Illuminate\Container\Container;
 use LaravelNats\Connection\ConnectionManager;
 use LaravelNats\Laravel\Queue\BasisNatsQueue;
+use Mockery\MockInterface;
 
 function makeBasisQueue(array $overrides = []): BasisNatsQueue
 {
@@ -29,6 +32,33 @@ function makeBasisQueue(array $overrides = []): BasisNatsQueue
         $overrides['block_for'] ?? 0.1,
         $overrides['max_in_flight'] ?? null,
     );
+}
+
+/**
+ * Swap the queue's basis client for a mock whose process() delivers $body once to the active subscription.
+ */
+function fakeBasisClientDelivering(BasisNatsQueue $queue, string $body): MockInterface
+{
+    $handler = null;
+    $client = Mockery::spy(Client::class);
+    $client->shouldReceive('subscribe')->andReturnUsing(function (string $subject, callable $cb) use (&$handler, $client) {
+        $handler = $cb;
+
+        return $client;
+    });
+    $client->shouldReceive('process')->andReturnUsing(function () use (&$handler, &$body) {
+        if ($handler !== null && $body !== null) {
+            $handler(new Payload($body), null);
+            $body = null;
+        }
+
+        return null;
+    });
+
+    $connections = (new ReflectionProperty(BasisNatsQueue::class, 'connections'))->getValue($queue);
+    (new ReflectionProperty(ConnectionManager::class, 'clients'))->setValue($connections, ['default' => $client]);
+
+    return $client;
 }
 
 describe('BasisNatsQueue', function (): void {
@@ -66,6 +96,43 @@ describe('BasisNatsQueue', function (): void {
         $ref->setValue($queue, 1);
 
         expect($queue->pop())->toBeNull();
+    });
+
+    it('counts popped jobs as in flight until they are handled', function (): void {
+        $queue = makeBasisQueue(['max_in_flight' => 1]);
+        $queue->setContainer(new Container);
+        $queue->setConnectionName('nats_basis');
+        $client = fakeBasisClientDelivering($queue, '{"uuid":"job-1","job":"X","data":[]}');
+
+        $job = $queue->pop();
+
+        expect($job)->not->toBeNull()
+            ->and($queue->getInFlightCount())->toBe(1)
+            ->and($queue->reservedSize())->toBe(1)
+            ->and($queue->pop())->toBeNull();
+
+        $job->delete();
+
+        expect($queue->getInFlightCount())->toBe(0);
+        $client->shouldHaveReceived('subscribe')->once();
+    });
+
+    it('republishes the original payload when a job is released with a delay', function (): void {
+        $queue = makeBasisQueue();
+        $queue->setContainer(new Container);
+        $queue->setConnectionName('nats_basis');
+        $client = fakeBasisClientDelivering($queue, '{"uuid":"job-1","job":"App\\\\Jobs\\\\Ping","data":[],"attempts":1}');
+
+        $queue->pop()->release(30);
+
+        $client->shouldHaveReceived('publish')->once()->with('laravel.queue.jobs', Mockery::on(
+            fn (string $raw): bool => json_decode($raw, true) === [
+                'uuid' => 'job-1',
+                'job' => 'App\\Jobs\\Ping',
+                'data' => [],
+                'attempts' => 2,
+            ],
+        ));
     });
 
     it('manages dead letter queue subject', function (): void {

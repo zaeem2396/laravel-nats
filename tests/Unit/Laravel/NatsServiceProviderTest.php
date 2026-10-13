@@ -2,6 +2,11 @@
 
 declare(strict_types=1);
 
+use Illuminate\Config\Repository;
+use Illuminate\Filesystem\Filesystem;
+use Illuminate\Foundation\Application;
+use Illuminate\Foundation\ProviderRepository;
+use Illuminate\Queue\QueueManager;
 use LaravelNats\Connection\ConnectionManager;
 use LaravelNats\Connection\ConnectionSelector;
 use LaravelNats\Core\Client;
@@ -37,7 +42,48 @@ it('registers Client binding', function (): void {
     expect($this->app->bound(Client::class))->toBeTrue();
 });
 
-it('provides deferred services', function (): void {
+it('is an eager provider so queue connectors exist outside the console', function (): void {
+    expect((new NatsServiceProvider($this->app))->isDeferred())->toBeFalse();
+});
+
+it('boots through the provider repository like package discovery does', function (): void {
+    $manifest = sys_get_temp_dir().'/laravel-nats-providers-'.uniqid().'.php';
+    $app = new Application(sys_get_temp_dir());
+    $app->instance('config', new Repository([
+        'queue' => ['default' => 'sync', 'connections' => []],
+    ]));
+
+    try {
+        (new ProviderRepository($app, new Filesystem, $manifest))
+            ->load([NatsServiceProvider::class]);
+
+        expect($app->providerIsLoaded(NatsServiceProvider::class))->toBeTrue()
+            ->and($app->getDeferredServices())->not->toHaveKey('nats.v2');
+    } finally {
+        @unlink($manifest);
+    }
+});
+
+it('registers nats and nats_basis queue connectors', function (): void {
+    $connectors = (new ReflectionProperty(QueueManager::class, 'connectors'))
+        ->getValue($this->app->make('queue'));
+
+    expect($connectors)->toHaveKeys(['nats', 'nats_basis']);
+});
+
+it('registers queue connectors when the queue manager was resolved before boot', function (): void {
+    $manager = new QueueManager($this->app);
+    $this->app->instance('queue', $manager);
+
+    $provider = new NatsServiceProvider($this->app);
+    (new ReflectionMethod($provider, 'registerQueueDriver'))->invoke($provider);
+
+    $connectors = (new ReflectionProperty(QueueManager::class, 'connectors'))->getValue($manager);
+
+    expect($connectors)->toHaveKeys(['nats', 'nats_basis']);
+});
+
+it('lists provided services', function (): void {
     $provider = new NatsServiceProvider($this->app);
 
     $provides = $provider->provides();
