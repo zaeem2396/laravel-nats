@@ -2,10 +2,13 @@
 
 declare(strict_types=1);
 
+use Basis\Nats\Client;
+use Basis\Nats\Message\Payload;
 use Illuminate\Config\Repository;
 use Illuminate\Container\Container;
 use LaravelNats\Connection\ConnectionManager;
 use LaravelNats\Laravel\Queue\BasisNatsQueue;
+use Mockery\MockInterface;
 
 function makeBasisQueue(array $overrides = []): BasisNatsQueue
 {
@@ -34,10 +37,10 @@ function makeBasisQueue(array $overrides = []): BasisNatsQueue
 /**
  * Swap the queue's basis client for a mock whose process() delivers $body once to the active subscription.
  */
-function fakeBasisClientDelivering(BasisNatsQueue $queue, string $body): Mockery\MockInterface
+function fakeBasisClientDelivering(BasisNatsQueue $queue, string $body): MockInterface
 {
     $handler = null;
-    $client = Mockery::spy(Basis\Nats\Client::class);
+    $client = Mockery::spy(Client::class);
     $client->shouldReceive('subscribe')->andReturnUsing(function (string $subject, callable $cb) use (&$handler, $client) {
         $handler = $cb;
 
@@ -45,7 +48,7 @@ function fakeBasisClientDelivering(BasisNatsQueue $queue, string $body): Mockery
     });
     $client->shouldReceive('process')->andReturnUsing(function () use (&$handler, &$body) {
         if ($handler !== null && $body !== null) {
-            $handler(new Basis\Nats\Message\Payload($body), null);
+            $handler(new Payload($body), null);
             $body = null;
         }
 
