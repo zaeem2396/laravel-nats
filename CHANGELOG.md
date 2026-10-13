@@ -7,21 +7,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Added
+Laravel 12 compatibility verification. Verified on a fresh `laravel/laravel` 12.x app: HTTP dispatch to `nats_basis` and `queue:work nats_basis` worked, and the full suite (including integration tests against NATS) passed on Laravel 12.70 and at the lowest supported Laravel 12.0.x dependency set.
 
-- (none)
+### Fixed
+
+- **Service provider is no longer deferred.** `NatsServiceProvider` implemented `DeferrableProvider`, so with package discovery its `boot()` only ran once a NATS service was resolved. During HTTP requests, `Queue::connection('nats_basis')` / `dispatch()->onConnection('nats_basis')` failed with `No connector for [nats_basis]` (and likewise `nats`), and `nats_basis.security.validate_on_boot` never ran. Console was unaffected because the console kernel loads every deferred provider.
+- **Queue connectors registered when `queue` is already resolved.** If another provider resolved the queue manager before `NatsServiceProvider` booted, `afterResolving('queue')` never fired and the `nats` / `nats_basis` connectors were missing.
+- **`nats_basis` `max_in_flight` now applies.** `BasisNatsQueue::pop()` never incremented the in-flight counter, so the cap was never reached and `reservedSize()` always returned `0`.
+- **Delayed `release()` no longer corrupts the job.** `NatsJob::release($delay > 0)` (including `releaseWithBackoff()` and job `backoff`) passed the encoded payload to `later()`, which wrapped it as a new string job. The redelivered message could not be resolved by the worker. Release now republishes the original payload with `attempts + 1` via `pushRaw()` on both drivers. The delay is still not enforced by NATS Core.
 
 ### Changed
 
-- (none)
+- **`composer.json`:** `require` now declares `illuminate/console`, `illuminate/contracts`, `illuminate/queue`, and `illuminate/support` (`^10.0|^11.0|^12.0|^13.0`). Composer now refuses to install the package alongside unsupported Laravel versions. `laravel/framework` replaces these packages, so applications need nothing extra.
+- **CI:** added a PHP 8.2 / Laravel 12 `--prefer-lowest` job (Laravel 12.0.x, Testbench 10.0, `basis-company/nats` 1.0). The Composer cache key now includes the stability mode.
 
-### Removed
+### Added
 
-- (none)
+- **`tests/Feature/LaravelFrameworkCompatibilityTest.php`:** framework compatibility checks run on every Laravel version in the matrix. They cover bus dispatch onto `nats_basis`, payload shape, `NatsJob::fire()` through `CallQueuedHandler`, `pop()` round-trip, Artisan command registration, the `nats-config` publish tag, and facades.
+- Regression tests for the eager provider (loaded through `ProviderRepository` like package discovery), connector registration after early `queue` resolution, in-flight counting, and delayed release payloads.
 
 ### Documentation
 
-- (none)
+- **README:** Laravel / PHP / Testbench compatibility matrix, auto-discovery note, and 1.6.5 version map entry.
+- **`docs/v2/QUEUE.md`:** in-flight counting and `reservedSize()`, plus release delay / backoff behaviour on NATS Core.
+
+### Upgrade notes
+
+- No API changes. If your app caches the provider manifest outside Composer (for example a deploy that skips `composer install` scripts), run `php artisan optimize:clear` once so `bootstrap/cache/services.php` no longer lists the provider as deferred.
+- If you worked around the HTTP dispatch issue by resolving `NatsV2` / `nats` early (or by registering the connectors yourself), you can remove that workaround.
 
 ## [1.6.4] - 2026-08-19
 

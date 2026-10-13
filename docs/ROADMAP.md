@@ -14,6 +14,7 @@ Package releases follow [Semantic Versioning](https://semver.org/). See [CHANGEL
 | 1.6.2 | — | Connection reconnect helpers and transport edge-case fixes (shipped) |
 | 1.6.3 | — | Documentation improvements and expanded examples (shipped) |
 | 1.6.4 | — | PHPStan level 9 (max) and mixed-type static analysis fixes (shipped) |
+| 1.6.5 | — | Laravel 12 compatibility verification; eager service provider and queue fixes (in progress) |
 
 ## Current stable
 
